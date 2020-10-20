@@ -1,0 +1,13 @@
+:root {
+  --anim-short: 100ms;
+  --anim-medium: 300ms;
+  --anim-long: 500ms;
+  --color-background-0: rgba(228,228,231,1);
+  --color-background-1: rgba(242,242,243,1);
+  --color-background-2: rgba(250,250,250,1);
+  --color-primary-0: rgba(47,128,237,1);
+  --color-primary-foreground: rgba(250,250,250,1);
+  --color-foreground-0: rgba(70,70,83,1);
+  --color-foreground-1: rgba(94,94,110,1);
+  --color-foreground-2: rgba(117,117,138,1);
+}
