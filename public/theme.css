@@ -1,13 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+
 :root {
   --anim-short: 100ms;
   --anim-medium: 300ms;
   --anim-long: 500ms;
-  --color-background-0: rgba(228,228,231,1);
-  --color-background-1: rgba(242,242,243,1);
-  --color-background-2: rgba(250,250,250,1);
-  --color-primary-0: rgba(47,128,237,1);
-  --color-primary-foreground: rgba(250,250,250,1);
-  --color-foreground-0: rgba(70,70,83,1);
-  --color-foreground-1: rgba(94,94,110,1);
-  --color-foreground-2: rgba(117,117,138,1);
+}
+
+body {
+  font-family: 'Fira Sans', sans-serif;
+}
+
+/* Colors */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-background-0: #e4e4e7;
+    --color-background-1: #f2f2f3;
+    --color-background-2: #fafafa;
+    --color-foreground-0: #464653;
+    --color-foreground-1: #5e5e6e;
+    --color-foreground-2: #75758a;
+    --color-color-blue: #2f80ed;
+    --color-color-red: #eb5757;
+    --color-color-purple: #9b51e0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-0: #191e2a;
+    --color-background-1: #1f2430;
+    --color-background-2: #232834;
+    --color-foreground-0: #cbccc6;
+    --color-foreground-1: #707a8c;
+    --color-foreground-2: #5c6773;
+    --color-color-blue: #2f80ed;
+    --color-color-red: #eb5757;
+    --color-color-purple: #9b51e0;
+  }
 }

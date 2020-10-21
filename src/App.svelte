@@ -1,12 +1,8 @@
 <script lang="ts">
   import Pane from './components/Pane.svelte';
   import SplitPane from './components/SplitPane.svelte';
-  import Toolbar from './components/Toolbar.svelte';
+  import Toolbar from './app/Toolbar.svelte';
 </script>
-
-<svelte:head>
-  <title>Nema Audio</title>
-</svelte:head>
 
 <main>
   <Toolbar />
@@ -34,6 +30,7 @@ main {
   height: 100vh;
 
   background: var(--color-background-0);
+  color: var(--color-foreground-0);
 
   justify-content: stretch;
 

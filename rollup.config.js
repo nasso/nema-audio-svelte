@@ -37,6 +37,16 @@ export default {
     name: 'app',
     file: 'public/build/bundle.js'
   },
+  onwarn(warning) {
+      // Skip certain warnings
+
+      switch(warning.code) {
+        case 'THIS_IS_UNDEFINED':
+          return;
+        default:
+          console.warn(warning.message);
+      }
+  },
   plugins: [
     svelte({
       // enable run-time checks when not in production
@@ -48,7 +58,6 @@ export default {
       },
       preprocess: sveltePreprocess({
         sourceMap: !production,
-        postcss: true,
       }),
     }),
 
@@ -59,12 +68,12 @@ export default {
     // https://github.com/rollup/plugins/tree/master/packages/commonjs
     resolve({
       browser: true,
-      dedupe: ['svelte']
+      dedupe: ['svelte'],
     }),
     commonjs(),
     typescript({
       sourceMap: !production,
-      inlineSources: !production
+      inlineSources: !production,
     }),
 
     // In dev mode, call `npm run start` once
