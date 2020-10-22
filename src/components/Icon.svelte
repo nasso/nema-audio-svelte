@@ -3,7 +3,7 @@
   const parser = new DOMParser();
 
   async function fetchPath(name: string): Promise<string> {
-    const response = await fetch(`/icons/${name}.svg`);
+    const response = await fetch(`icons/${name}.svg`);
     const svgSource = await response.text();
 
     const svg = parser.parseFromString(svgSource, "image/svg+xml");
