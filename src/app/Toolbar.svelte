@@ -1,13 +1,15 @@
 <script lang="ts">
   import ToolbarButton from './ToolbarButton.svelte';
+  import TempoInput from '../components/TempoInput.svelte';
+
+  let bpm = 128;
 </script>
 
 <nav>
   <div class="group left">
     <div class="subgroup">
       <ToolbarButton icon="basic/stopwatch" />
-      <ToolbarButton icon="basic/stopwatch" />
-      <ToolbarButton icon="basic/stopwatch" />
+      <TempoInput bind:value={bpm} />
     </div>
 
     <div class="subgroup">
