@@ -48,6 +48,9 @@
     "array-bracket-newline": [
       "error",
       "consistent"
+    ],
+    "prefer-template": [
+      "error"
     ]
   }
 }

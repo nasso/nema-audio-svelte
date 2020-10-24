@@ -1,3 +1,7 @@
+<script lang="ts">
+  export let pressed: undefined | string | boolean = undefined;
+</script>
+
 <style lang="scss">
   @use '../scss/normalize';
 
@@ -24,6 +28,6 @@
   }
 </style>
 
-<button on:click>
+<button on:click aria-pressed={pressed && `${pressed}`}>
   <slot />
 </button>

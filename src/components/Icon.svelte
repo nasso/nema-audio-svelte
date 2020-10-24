@@ -29,6 +29,12 @@
   $: path = getIconPath(name);
 </script>
 
+<style lang="scss">
+  path {
+    transition: fill var(--anim-short);
+  }
+</style>
+
 <svg
   width={size}
   height={size}

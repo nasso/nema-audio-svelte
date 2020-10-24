@@ -2,6 +2,7 @@
   import ToolbarButton from "./ToolbarButton.svelte";
   import PlayButton from "./PlayButton.svelte";
   import TempoInput from "../components/TempoInput.svelte";
+  import ToolbarToggle from "./ToolbarToggle.svelte";
 
   let bpm = 128;
 </script>
@@ -52,8 +53,8 @@
 
   <div class="group center">
     <div class="subgroup">
-      <ToolbarButton icon="media/skip_previous" />
-      <ToolbarButton icon="media/repeat" />
+      <ToolbarToggle icon="media/skip_previous" selected />
+      <ToolbarToggle icon="media/repeat" selected />
     </div>
 
     <div class="subgroup">
