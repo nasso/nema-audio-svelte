@@ -1,7 +1,8 @@
 <script lang="ts">
   import Pane from "./components/Pane.svelte";
   import SplitPane from "./components/SplitPane.svelte";
-  import Toolbar from "./app/Toolbar.svelte";
+  import Toolbar from "./components/Toolbar.svelte";
+  import uiState from "./stores/ui";
 </script>
 
 <style lang="scss">
@@ -31,10 +32,14 @@
 
 <main>
   <Toolbar />
-  <SplitPane reverse>
-    <SplitPane split_pos={200} direction="row">
+  <SplitPane bind:split_pos={$uiState.bottomPaneHeight} reverse>
+    <SplitPane bind:split_pos={$uiState.sidePaneWidth} direction="row">
       <Pane />
-      <div />
+      {#if $uiState.currentView === 'playlist'}
+        <div>this is the playlist</div>
+      {:else if $uiState.currentView === 'audio_graph'}
+        <div>this is the audio graph</div>
+      {/if}
     </SplitPane>
     <Pane />
   </SplitPane>

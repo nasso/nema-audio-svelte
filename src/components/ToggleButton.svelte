@@ -13,5 +13,5 @@
 </script>
 
 <Button on:click={handleClick} pressed={selected ? 'true' : 'false'}>
-  <Icon size={16} name={icon} color={iconColor} />
+  <Icon name={icon} color={iconColor} />
 </Button>

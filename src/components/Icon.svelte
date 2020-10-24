@@ -24,7 +24,7 @@
 <script lang="ts">
   export let name: string;
   export let color = "currentColor";
-  export let size = 24;
+  export let size = "1em";
 
   $: path = getIconPath(name);
 </script>

@@ -1,8 +1,11 @@
 <script lang="ts">
+  import Icon from "../components/Icon.svelte";
   import Button from "../components/Button.svelte";
+  import TabbedControl from "../components/TabbedControl.svelte";
   import TempoInput from "../components/TempoInput.svelte";
   import ToggleButton from "../components/ToggleButton.svelte";
-  import PlayButton from "./PlayButton.svelte";
+  import PlayButton from "../components/PlayButton.svelte";
+  import uiState from "../stores/ui";
 
   let bpm = 128;
 </script>
@@ -46,12 +49,16 @@
 <nav>
   <div class="group left">
     <div class="subgroup">
-      <Button icon="basic/stopwatch" />
+      <Button>
+        <Icon name="basic/stopwatch" />
+      </Button>
       <TempoInput bind:value={bpm} />
     </div>
 
     <div class="subgroup">
-      <Button icon="misc/dot_05_xl" />
+      <Button>
+        <Icon name="misc/dot_05_xl" />
+      </Button>
     </div>
   </div>
 
@@ -62,20 +69,27 @@
     </div>
 
     <div class="subgroup">
-      <Button icon="media/fast_rewind" />
+      <Button>
+        <Icon name="media/fast_rewind" />
+      </Button>
       <PlayButton />
-      <Button icon="media/fast_forward" />
+      <Button>
+        <Icon name="media/fast_forward" />
+      </Button>
     </div>
 
     <div class="subgroup">
-      <Button icon="edit/list_ul" />
-      <Button icon="basic/path" />
+      <TabbedControl
+        bind:selected={$uiState.currentView}
+        tabs={[{ icon: 'edit/list_ul', name: 'playlist' }, { icon: 'basic/path', name: 'audio_graph' }]} />
     </div>
   </div>
 
   <div class="group right">
     <div class="subgroup">
-      <Button icon="basic/share" />
+      <Button>
+        <Icon name="basic/share" />
+      </Button>
     </div>
   </div>
 </nav>

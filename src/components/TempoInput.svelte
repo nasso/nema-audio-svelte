@@ -125,5 +125,5 @@
     on:blur={handleBlur}
     on:dblclick={handleDblClick}
     on:keydown={handleKeyDown} />
-  <Icon size={16} name="arrow/unfold_more" />
+  <Icon name="arrow/unfold_more" />
 </div>

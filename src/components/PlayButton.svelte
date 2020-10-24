@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Button from "../components/Button.svelte";
+  import Button from "./Button.svelte";
+  import Icon from "./Icon.svelte";
 
   export let playing: boolean = false;
 
@@ -10,4 +11,6 @@
   }
 </script>
 
-<Button {icon} on:click={handleClick} />
+<Button on:click={handleClick}>
+  <Icon name={icon} />
+</Button>
