@@ -23,8 +23,11 @@
 
 <script lang="ts">
   export let name: string;
+  export let preload: string[] = [];
   export let color = "currentColor";
   export let size = "1em";
+
+  preload.forEach(getIconPath);
 
   $: path = getIconPath(name);
 </script>

@@ -12,5 +12,7 @@
 </script>
 
 <Button on:click={handleClick}>
-  <Icon name={icon} />
+  <Icon
+    name={icon}
+    preload={['media/pause_circle_filled', 'media/play_arrow']} />
 </Button>
