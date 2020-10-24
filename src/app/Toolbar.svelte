@@ -1,9 +1,42 @@
 <script lang="ts">
-  import ToolbarButton from './ToolbarButton.svelte';
-  import TempoInput from '../components/TempoInput.svelte';
+  import ToolbarButton from "./ToolbarButton.svelte";
+  import PlayButton from "./PlayButton.svelte";
+  import TempoInput from "../components/TempoInput.svelte";
 
   let bpm = 128;
 </script>
+
+<style lang="scss">
+  nav {
+    flex-grow: 0;
+    height: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;
+    grid-template-areas: "left center right";
+
+    @each $side in (left, right, center) {
+      .#{$side} {
+        grid-area: $side;
+        justify-self: $side;
+      }
+    }
+
+    .group,
+    .subgroup {
+      display: inline-flex;
+      flex-direction: row;
+    }
+
+    .group {
+      gap: 32px;
+    }
+
+    .subgroup {
+      gap: 4px;
+    }
+  }
+</style>
 
 <nav>
   <div class="group left">
@@ -25,7 +58,7 @@
 
     <div class="subgroup">
       <ToolbarButton icon="media/fast_rewind" />
-      <ToolbarButton icon="media/play_arrow" />
+      <PlayButton />
       <ToolbarButton icon="media/fast_forward" />
     </div>
 
@@ -41,34 +74,3 @@
     </div>
   </div>
 </nav>
-
-<style lang="scss">
-  nav {
-    flex-grow: 0;
-    height: 28px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 1fr;
-    grid-template-areas: "left center right";
-
-    @each $side in (left, right, center) {
-      .#{$side} {
-        grid-area: $side;
-        justify-self: $side;
-      }
-    }
-
-    .group, .subgroup {
-      display: inline-flex;
-      flex-direction: row;
-    }
-
-    .group {
-      gap: 32px;
-    }
-
-    .subgroup {
-      gap: 4px;
-    }
-  }
-</style>

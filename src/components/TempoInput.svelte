@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-  import Icon from './Icon.svelte';
+  import { tick } from "svelte";
+  import Icon from "./Icon.svelte";
 
   export let value: number;
   export let min: number = 0.01;
@@ -13,7 +13,7 @@
   $: value = Math.min(max, Math.max(min, value));
 
   function handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       this.blur();
     }
   }
@@ -27,7 +27,7 @@
   }
 
   async function handleBlur() {
-    if (['number', 'string'].includes(typeof fieldValue)) {
+    if (["number", "string"].includes(typeof fieldValue)) {
       const num = Number(fieldValue);
 
       // only update the value if it's valid
@@ -80,24 +80,6 @@
   }
 </script>
 
-<div
-  class="tempo-root"
-  on:wheel={handleWheel}
-  on:pointerdown={handlePointerDown}
->
-  <input
-    {min}
-    {max}
-    type="number"
-    bind:value={fieldValue}
-    {readonly}
-    on:blur={handleBlur}
-    on:dblclick={handleDblClick}
-    on:keydown={handleKeyDown}
-  >
-  <Icon size={16} name="arrow/unfold_more" />
-</div>
-
 <style lang="scss">
   @use '../scss/normalize';
 
@@ -129,3 +111,19 @@
     }
   }
 </style>
+
+<div
+  class="tempo-root"
+  on:wheel={handleWheel}
+  on:pointerdown={handlePointerDown}>
+  <input
+    {min}
+    {max}
+    type="number"
+    bind:value={fieldValue}
+    {readonly}
+    on:blur={handleBlur}
+    on:dblclick={handleDblClick}
+    on:keydown={handleKeyDown} />
+  <Icon size={16} name="arrow/unfold_more" />
+</div>

@@ -1,5 +1,3 @@
-<div></div>
-
 <style lang="scss">
   div {
     flex-grow: 1;
@@ -9,3 +7,5 @@
     border-radius: 8px;
   }
 </style>
+
+<div />

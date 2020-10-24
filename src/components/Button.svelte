@@ -1,7 +1,3 @@
-<button>
-  <slot />
-</button>
-
 <style lang="scss">
   @use '../scss/normalize';
 
@@ -17,7 +13,8 @@
 
     transition: background-color var(--anim-short);
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background-color: var(--color-background-2);
     }
 
@@ -26,3 +23,7 @@
     }
   }
 </style>
+
+<button on:click>
+  <slot />
+</button>

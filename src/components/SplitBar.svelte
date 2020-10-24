@@ -1,6 +1,6 @@
 <script>
   export let split_pos;
-  export let direction = 'column';
+  export let direction = "column";
   export let reverse = false;
 
   let mouse_is_down = false;
@@ -20,16 +20,15 @@
   }
 
   function handleMouseMove(e) {
-    if (!mouse_is_down)
-      return;
+    if (!mouse_is_down) return;
 
     e.preventDefault();
 
     const factor = reverse ? -1 : 1;
 
-    if (direction === 'column') {
+    if (direction === "column") {
       split_pos += e.movementY * factor;
-    } else if (direction === 'row') {
+    } else if (direction === "row") {
       split_pos += e.movementX * factor;
     }
   }
@@ -43,7 +42,7 @@
     bottom: 0px;
     left: 0px;
 
-    opacity: 0.0;
+    opacity: 0;
 
     border-radius: 4px;
 
@@ -52,7 +51,7 @@
   }
 
   div:hover {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   div.horizontal {
@@ -68,13 +67,9 @@
   }
 </style>
 
-<svelte:window
-  on:mouseup={handleMouseUp}
-  on:mousemove={handleMouseMove}
-/>
+<svelte:window on:mouseup={handleMouseUp} on:mousemove={handleMouseMove} />
 
 <div
   class:horizontal={direction === 'row'}
   class:vertical={direction === 'column'}
-  on:mousedown={handleMouseDown}
-></div>
+  on:mousedown={handleMouseDown} />

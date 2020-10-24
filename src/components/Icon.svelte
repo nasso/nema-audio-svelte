@@ -22,8 +22,6 @@
 </script>
 
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-
   export let name: string;
   export let color = "currentColor";
   export let size = 24;
@@ -31,8 +29,12 @@
   $: path = getIconPath(name);
 </script>
 
-<svg width="{size}" height="{size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  xmlns="http://www.w3.org/2000/svg">
   {#await path then path}
-    <path in:fade d={path} fill={color} />
+    <path d={path} fill={color} />
   {/await}
 </svg>
