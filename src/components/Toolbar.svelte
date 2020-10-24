@@ -55,41 +55,28 @@
       <TempoInput bind:value={bpm} />
     </div>
 
-    <div class="subgroup">
-      <Button>
-        <Icon name="misc/dot_05_xl" />
-      </Button>
-    </div>
+    <Button>
+      <Icon name="misc/dot_05_xl" />
+    </Button>
   </div>
 
   <div class="group center">
     <div class="subgroup">
-      <ToggleButton icon="media/skip_previous" selected />
+      <Button>
+        <Icon name="media/skip_previous" />
+      </Button>
+      <PlayButton />
       <ToggleButton icon="media/repeat" selected />
     </div>
 
-    <div class="subgroup">
-      <Button>
-        <Icon name="media/fast_rewind" />
-      </Button>
-      <PlayButton />
-      <Button>
-        <Icon name="media/fast_forward" />
-      </Button>
-    </div>
-
-    <div class="subgroup">
-      <TabbedControl
-        bind:selected={$uiState.currentView}
-        tabs={[{ icon: 'edit/list_ul', name: 'playlist' }, { icon: 'basic/path', name: 'audio_graph' }]} />
-    </div>
+    <TabbedControl
+      bind:selected={$uiState.currentView}
+      tabs={[{ icon: 'edit/list_ul', name: 'playlist' }, { icon: 'basic/path', name: 'audio_graph' }]} />
   </div>
 
   <div class="group right">
-    <div class="subgroup">
-      <Button>
-        <Icon name="basic/share" />
-      </Button>
-    </div>
+    <Button>
+      <Icon name="basic/share" />
+    </Button>
   </div>
 </nav>
