@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ToolbarButton from "./ToolbarButton.svelte";
-  import PlayButton from "./PlayButton.svelte";
+  import Button from "../components/Button.svelte";
   import TempoInput from "../components/TempoInput.svelte";
-  import ToolbarToggle from "./ToolbarToggle.svelte";
+  import ToggleButton from "../components/ToggleButton.svelte";
+  import PlayButton from "./PlayButton.svelte";
 
   let bpm = 128;
 </script>
@@ -11,16 +11,20 @@
   nav {
     flex-grow: 0;
     height: 28px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 1fr;
-    grid-template-areas: "left center right";
+    display: flex;
+    justify-content: space-between;
 
-    @each $side in (left, right, center) {
-      .#{$side} {
-        grid-area: $side;
-        justify-self: $side;
-      }
+    .left,
+    .right {
+      flex: 2;
+    }
+
+    .left {
+      justify-content: flex-start;
+    }
+
+    .right {
+      justify-content: flex-end;
     }
 
     .group,
@@ -42,36 +46,36 @@
 <nav>
   <div class="group left">
     <div class="subgroup">
-      <ToolbarButton icon="basic/stopwatch" />
+      <Button icon="basic/stopwatch" />
       <TempoInput bind:value={bpm} />
     </div>
 
     <div class="subgroup">
-      <ToolbarButton icon="misc/dot_05_xl" />
+      <Button icon="misc/dot_05_xl" />
     </div>
   </div>
 
   <div class="group center">
     <div class="subgroup">
-      <ToolbarToggle icon="media/skip_previous" selected />
-      <ToolbarToggle icon="media/repeat" selected />
+      <ToggleButton icon="media/skip_previous" selected />
+      <ToggleButton icon="media/repeat" selected />
     </div>
 
     <div class="subgroup">
-      <ToolbarButton icon="media/fast_rewind" />
+      <Button icon="media/fast_rewind" />
       <PlayButton />
-      <ToolbarButton icon="media/fast_forward" />
+      <Button icon="media/fast_forward" />
     </div>
 
     <div class="subgroup">
-      <ToolbarButton icon="edit/list_ul" />
-      <ToolbarButton icon="basic/path" />
+      <Button icon="edit/list_ul" />
+      <Button icon="basic/path" />
     </div>
   </div>
 
   <div class="group right">
     <div class="subgroup">
-      <ToolbarButton icon="basic/share" />
+      <Button icon="basic/share" />
     </div>
   </div>
 </nav>

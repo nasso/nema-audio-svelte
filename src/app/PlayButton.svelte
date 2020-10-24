@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ToolbarButton from "./ToolbarButton.svelte";
+  import Button from "../components/Button.svelte";
 
   export let playing: boolean = false;
 
@@ -10,4 +10,4 @@
   }
 </script>
 
-<ToolbarButton {icon} on:click={handleClick} />
+<Button {icon} on:click={handleClick} />

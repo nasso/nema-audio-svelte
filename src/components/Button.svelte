@@ -1,5 +1,8 @@
 <script lang="ts">
+  import Icon from "./Icon.svelte";
+
   export let pressed: undefined | string | boolean = undefined;
+  export let icon: undefined | string = null;
 </script>
 
 <style lang="scss">
@@ -29,5 +32,8 @@
 </style>
 
 <button on:click aria-pressed={pressed && `${pressed}`}>
+  {#if icon}
+    <Icon size={16} name={icon} />
+  {/if}
   <slot />
 </button>
