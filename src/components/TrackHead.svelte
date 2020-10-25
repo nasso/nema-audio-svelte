@@ -1,13 +1,24 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+
   import type { Track } from "../stores/project";
   import { PluginTrack } from "../stores/project";
   import Checkbox from "./Checkbox.svelte";
-  import FlexSpace from "./FlexSpace.svelte";
   import HStack from "./HStack.svelte";
   import Knob from "./Knob.svelte";
   import VStack from "./VStack.svelte";
 
   export let track: Track;
+
+  const dispatch = createEventDispatcher();
+
+  function handleMuteContextMenu(this: HTMLElement, e: MouseEvent) {
+    // no we're not contextmenu-ing
+    e.preventDefault();
+
+    // this is just the best way to handle right clicks on the web. boo!!
+    dispatch("solo", track);
+  }
 </script>
 
 <style lang="scss">
@@ -61,7 +72,10 @@
   style={`--track-height: ${track.height}px`}>
   <HStack align="center">
     <HStack hpad={16} vpad={8} spacing={8} align="center">
-      <Checkbox size={8} bind:checked={track.enabled} />
+      <Checkbox
+        size={10}
+        bind:checked={track.enabled}
+        on:contextmenu={handleMuteContextMenu} />
       <VStack>
         <h1>{track.name}</h1>
         {#if track instanceof PluginTrack}

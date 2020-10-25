@@ -2,6 +2,7 @@
   import { writable } from "svelte/store";
 
   import drag from "../utils/drag";
+  import type { Track } from "../stores/project";
   import project from "../stores/project";
   import uiState from "../stores/ui";
   import FlexSpace from "./FlexSpace.svelte";
@@ -24,6 +25,17 @@
   }
 
   $: $scroll.x = Math.max(0, $scroll.x);
+
+  function handleSolo(e: CustomEvent<Track>) {
+    const track = e.detail;
+
+    const isSolo = $project.tracks.every((t) => t.enabled === (t === track));
+
+    // enable all the tracks if this track was the only one enabled
+    for (let i = 0; i < $project.tracks.length; i++) {
+      $project.tracks[i].enabled = isSolo || $project.tracks[i] === track;
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -50,7 +62,7 @@
     <VStack spacing={1}>
       <VStack spacing={2}>
         {#each $project.tracks as track}
-          <TrackHead bind:track />
+          <TrackHead bind:track on:solo={handleSolo} />
           <SplitBar
             bind:position={track.height}
             snaps={[1, 2, 3, 4].map((x) => 64 * x)}
