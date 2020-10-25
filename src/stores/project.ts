@@ -24,21 +24,6 @@ export class Project {
       new PluginTrack(),
       new PluginTrack(),
       new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
-      new PluginTrack(),
     ];
   }
 }
