@@ -1,5 +1,6 @@
 <script lang="ts">
   import Pane from "./components/Pane.svelte";
+  import Playlist from "./components/Playlist.svelte";
   import SplitPane from "./components/SplitPane.svelte";
   import Toolbar from "./components/Toolbar.svelte";
   import Tracklist from "./components/Tracklist.svelte";
@@ -40,16 +41,7 @@
       <Pane />
       <Tracklist>
         {#if $uiState.currentView === 'playlist'}
-          <VStack spacing={4}>
-            {#each $project.tracks as track}
-              <div style="height: var(--track-height)">
-                {track.enabled ? 'enabled' : 'disabled'}
-                {#if track instanceof PluginTrack}
-                  volume({Math.round(track.volume * 100)}%) pan({Math.round(track.pan * 100)}%)
-                {/if}
-              </div>
-            {/each}
-          </VStack>
+          <Playlist />
         {:else if $uiState.currentView === 'audio_graph'}
           <div>this is the audio graph</div>
         {/if}
