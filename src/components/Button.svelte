@@ -1,6 +1,4 @@
 <script lang="ts">
-  import Icon from "./Icon.svelte";
-
   export let pressed: undefined | string | boolean = undefined;
 </script>
 

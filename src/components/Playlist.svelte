@@ -1,5 +1,5 @@
 <script lang="ts">
-  import project, { PluginTrack } from "../stores/project";
+  import project from "../stores/project";
   import PlaylistTrack from "./PlaylistTrack.svelte";
   import VStack from "./VStack.svelte";
 </script>

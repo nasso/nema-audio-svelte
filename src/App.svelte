@@ -1,11 +1,10 @@
 <script lang="ts">
+  import AudioGraph from "./components/AudioGraph.svelte";
   import Pane from "./components/Pane.svelte";
   import Playlist from "./components/Playlist.svelte";
   import SplitPane from "./components/SplitPane.svelte";
   import Toolbar from "./components/Toolbar.svelte";
   import Tracklist from "./components/Tracklist.svelte";
-  import VStack from "./components/VStack.svelte";
-  import project, { PluginTrack } from "./stores/project";
   import uiState from "./stores/ui";
 </script>
 
@@ -43,7 +42,7 @@
         {#if $uiState.currentView === 'playlist'}
           <Playlist />
         {:else if $uiState.currentView === 'audio_graph'}
-          <div>this is the audio graph</div>
+          <AudioGraph />
         {/if}
       </Tracklist>
     </SplitPane>
