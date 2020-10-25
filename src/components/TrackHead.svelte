@@ -2,6 +2,7 @@
   import type { Track } from "../stores/project";
   import { PluginTrack } from "../stores/project";
   import Checkbox from "./Checkbox.svelte";
+  import FlexSpace from "./FlexSpace.svelte";
   import HStack from "./HStack.svelte";
   import Knob from "./Knob.svelte";
   import VStack from "./VStack.svelte";
@@ -11,7 +12,7 @@
 
 <style lang="scss">
   .track-head {
-    display: flex;
+    display: grid;
     background: var(--color-background-1);
     height: var(--track-height);
     border-radius: 8px;
@@ -45,6 +46,7 @@
         {/if}
       </VStack>
     </HStack>
+    <FlexSpace />
     <VStack spacing={8} hpad={8}>
       {#if track instanceof PluginTrack}
         <Knob type="absolute" bind:value={track.volume} />

@@ -1,9 +1,13 @@
-<script>
+<script lang="ts">
   import SplitBar from "./SplitBar.svelte";
 
-  export let direction = "column";
-  export let splitpos = 200;
-  export let reverse = false;
+  export let direction: "column" | "row" = "column";
+  export let splitpos: number;
+  export let reverse: boolean = false;
+  export let min: undefined | number = undefined;
+  export let max: undefined | number = undefined;
+  export let snaps: undefined | number[] = undefined;
+  export let snapdist: undefined | number = undefined;
 </script>
 
 <style lang="scss">
@@ -65,6 +69,13 @@
   style={`--split-pos: ${splitpos}px`}>
   <slot />
   <div class="splitter">
-    <SplitBar bind:position={splitpos} {direction} {reverse} />
+    <SplitBar
+      bind:position={splitpos}
+      {direction}
+      {reverse}
+      {min}
+      {max}
+      {snaps}
+      {snapdist} />
   </div>
 </div>

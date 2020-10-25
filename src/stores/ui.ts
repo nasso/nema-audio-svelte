@@ -9,14 +9,16 @@ interface UiState {
   readonly version: string;
   sidePaneWidth: number;
   bottomPaneHeight: number;
+  trackHeadsWidth: number,
   currentView: string;
   usePointerLock: boolean;
 }
 
 const uiState: Writable<UiState> = writable({
-  version: "0.1.1",
+  version: "0.1.2",
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
+  trackHeadsWidth: 150,
   currentView: "playlist",
   usePointerLock: false,
 });
