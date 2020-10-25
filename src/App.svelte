@@ -6,6 +6,8 @@
   import Toolbar from "./components/Toolbar.svelte";
   import Tracklist from "./components/Tracklist.svelte";
   import uiState from "./stores/ui";
+
+  let xscroll: number;
 </script>
 
 <style lang="scss">
@@ -38,11 +40,11 @@
   <SplitPane bind:splitpos={$uiState.bottomPaneHeight} reverse>
     <SplitPane bind:splitpos={$uiState.sidePaneWidth} direction="row">
       <Pane />
-      <Tracklist>
+      <Tracklist let:xscroll>
         {#if $uiState.currentView === 'playlist'}
-          <Playlist />
+          <Playlist {xscroll} />
         {:else if $uiState.currentView === 'audio_graph'}
-          <AudioGraph />
+          <AudioGraph {xscroll} />
         {/if}
       </Tracklist>
     </SplitPane>

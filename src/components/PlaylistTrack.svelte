@@ -2,16 +2,19 @@
   import type { Track } from "../stores/project";
 
   export let track: Track;
+  export let xscroll: number;
 </script>
 
 <style lang="scss">
   .track {
+    --background-xshift: calc(-1px - var(--xscroll));
+
     height: var(--track-height);
 
     border-radius: 8px;
 
     background-size: 80px 1px, 640px 1px;
-    background-position: -1px 0px, 0px 0px;
+    background-position: var(--background-xshift) 0px;
     background-image: linear-gradient(
         to right,
         var(--color-background-0) 1px,
@@ -39,7 +42,7 @@
       bottom: 0;
 
       background-size: 20px 1px;
-      background-position: -1px 0px;
+      background-position: var(--background-xshift) 0px;
       background-image: linear-gradient(
         to right,
         var(--color-background-0) 1px,
@@ -58,4 +61,7 @@
 <div
   class="track"
   class:disabled={!track.enabled}
-  style={`--track-height: ${track.height}px`} />
+  style={`
+    --track-height: ${track.height}px;
+    --xscroll: ${xscroll}px;
+  `} />

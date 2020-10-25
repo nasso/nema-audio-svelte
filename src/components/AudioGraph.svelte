@@ -1,3 +1,7 @@
+<script lang="ts">
+  export let xscroll: number;
+</script>
+
 <style lang="scss">
   .audio-graph {
     display: flex;
