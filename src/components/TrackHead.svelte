@@ -32,6 +32,26 @@
       font-size: 10px;
       color: var(--color-foreground-2);
     }
+
+    .knobs {
+      margin-left: auto;
+    }
+
+    h1,
+    h2,
+    .knobs {
+      transition: opacity var(--anim-short);
+    }
+
+    &.disabled {
+      --color-accent: var(--color-foreground-1);
+
+      h1,
+      h2,
+      .knobs {
+        opacity: 0.5;
+      }
+    }
   }
 </style>
 
@@ -49,12 +69,13 @@
         {/if}
       </VStack>
     </HStack>
-    <FlexSpace />
-    <VStack spacing={8} hpad={8}>
-      {#if track instanceof PluginTrack}
-        <Knob type="absolute" bind:value={track.volume} />
-        <Knob type="relative" bind:value={track.pan} />
-      {/if}
-    </VStack>
+    <div class="knobs">
+      <VStack spacing={8} hpad={8}>
+        {#if track instanceof PluginTrack}
+          <Knob type="absolute" bind:value={track.volume} />
+          <Knob type="relative" bind:value={track.pan} />
+        {/if}
+      </VStack>
+    </div>
   </HStack>
 </article>

@@ -10,31 +10,38 @@
 </script>
 
 <style lang="scss">
-  .content {
-    flex-grow: 1;
+  .tracklist {
     display: grid;
+    overflow: hidden;
+
+    .content {
+      flex-grow: 1;
+      display: grid;
+    }
   }
 </style>
 
-<SplitPane
-  direction="row"
-  min={150}
-  snaps={[150, 200]}
-  bind:splitpos={$uiState.trackHeadsWidth}>
-  <VStack spacing={1}>
-    <VStack spacing={2}>
-      {#each $project.tracks as track}
-        <TrackHead bind:track />
-        <SplitBar
-          bind:position={track.height}
-          snaps={[1, 2, 3, 4].map((x) => 64 * x)}
-          min={64} />
-      {/each}
+<div class="tracklist">
+  <SplitPane
+    direction="row"
+    min={150}
+    snaps={[150, 200, 250]}
+    bind:splitpos={$uiState.trackHeadsWidth}>
+    <VStack spacing={1}>
+      <VStack spacing={2}>
+        {#each $project.tracks as track}
+          <TrackHead bind:track />
+          <SplitBar
+            bind:position={track.height}
+            snaps={[1, 2, 3, 4].map((x) => 64 * x)}
+            min={64} />
+        {/each}
+      </VStack>
+      <FlexSpace />
+      <NewTrackHead />
     </VStack>
-    <FlexSpace />
-    <NewTrackHead />
-  </VStack>
-  <div class="content">
-    <slot />
-  </div>
-</SplitPane>
+    <div class="content">
+      <slot />
+    </div>
+  </SplitPane>
+</div>
