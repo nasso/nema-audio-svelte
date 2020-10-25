@@ -1,11 +1,11 @@
 <script lang="ts">
   import { tick } from "svelte";
+  import uiState from "../stores/ui";
   import Icon from "./Icon.svelte";
 
   export let value: number;
   export let min: number = 0.01;
   export let max: number = 999.99;
-  export let usePointerLock: boolean = false;
 
   let readonly = true;
 
@@ -51,7 +51,7 @@
   }
 
   function handlePointerDown(e: PointerEvent) {
-    const usedPointerLock = usePointerLock;
+    const usedPointerLock = $uiState.usePointerLock;
     const startValue = value;
     let deltaY = 0;
 

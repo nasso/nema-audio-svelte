@@ -10,13 +10,15 @@ interface UiState {
   sidePaneWidth: number;
   bottomPaneHeight: number;
   currentView: string;
+  usePointerLock: boolean;
 }
 
 const uiState: Writable<UiState> = writable({
-  version: "0.1.0",
+  version: "0.1.1",
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
   currentView: "playlist",
+  usePointerLock: false,
 });
 
 function patch(state: UiState, newValues: Record<string, unknown>) {
