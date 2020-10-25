@@ -35,7 +35,10 @@
   }
 </style>
 
-<article class="track-head" style={`--track-height: ${track.height}px`}>
+<article
+  class="track-head"
+  class:disabled={!track.enabled}
+  style={`--track-height: ${track.height}px`}>
   <HStack align="center">
     <HStack hpad={16} vpad={8} spacing={8} align="center">
       <Checkbox size={8} bind:checked={track.enabled} />

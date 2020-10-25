@@ -36,13 +36,15 @@
   function handlePointerDown(e: PointerEvent) {
     const factor = reverse ? -1 : 1;
     const startPos = position;
-    let delta = 0;
+    const pointerStart = { x: e.clientX, y: e.clientY };
 
     this.onpointermove = (e: PointerEvent) => {
+      let delta: number;
+
       if (direction === "column") {
-        delta += e.movementY * factor;
+        delta = (e.clientY - pointerStart.y) * factor;
       } else if (direction === "row") {
-        delta += e.movementX * factor;
+        delta = (e.clientX - pointerStart.x) * factor;
       }
 
       position = startPos + delta;
