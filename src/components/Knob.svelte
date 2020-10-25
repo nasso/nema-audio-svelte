@@ -14,6 +14,7 @@
   $: valueArcStart = (type === "absolute" ? 90 : 225) * (Math.PI / 180);
   $: valueArcEnd = (90 + normalized * 270) * (Math.PI / 180);
   $: valueArcLarge = valueArcEnd - valueArcStart > Math.PI;
+  $: valueArcSide = valueArcEnd > valueArcStart;
   $: neutral = value === 0;
 
   $: if (clamp) {
@@ -49,10 +50,6 @@
 <style lang="scss">
   .knob {
     line-height: 0;
-
-    svg {
-      overflow: visible;
-    }
   }
 </style>
 
@@ -99,7 +96,8 @@
         d={`
           M ${Math.cos(valueArcStart) * (1 - size / 2)}
             ${Math.sin(valueArcStart) * (1 - size / 2)}
-          A ${size / 2 - 1} ${size / 2 - 1} 0 ${valueArcLarge ? 1 : 0} 1
+          A ${size / 2 - 1} ${size / 2 - 1} 0
+            ${valueArcLarge ? 1 : 0} ${valueArcSide ? 1 : 0}
             ${Math.cos(valueArcEnd) * (1 - size / 2)}
             ${Math.sin(valueArcEnd) * (1 - size / 2)}
         `} />
