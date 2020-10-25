@@ -8,6 +8,8 @@
   import uiState from "./stores/ui";
 
   let xscroll: number;
+
+  const paneSnaps = [200];
 </script>
 
 <style lang="scss">
@@ -37,8 +39,14 @@
 
 <main>
   <Toolbar />
-  <SplitPane bind:splitpos={$uiState.bottomPaneHeight} reverse>
-    <SplitPane bind:splitpos={$uiState.sidePaneWidth} direction="row">
+  <SplitPane
+    bind:splitpos={$uiState.bottomPaneHeight}
+    reverse
+    snaps={paneSnaps}>
+    <SplitPane
+      bind:splitpos={$uiState.sidePaneWidth}
+      direction="row"
+      snaps={paneSnaps}>
       <Pane />
       <Tracklist let:xscroll>
         {#if $uiState.currentView === 'playlist'}
