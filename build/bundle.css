@@ -1,4 +1,5 @@
 main.svelte-2bg3vx{position:relative;margin:0;padding:4px;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;width:100vw;height:100vh;background:var(--color-background-0);color:var(--color-foreground-0);justify-content:stretch}main.svelte-2bg3vx>*{flex-grow:1}
+.audio-graph.svelte-h2tt8a{display:flex;align-items:center;justify-content:center}
 button.svelte-1q710ay{background:none;color:inherit;border:none;padding:0;font:inherit;cursor:pointer;outline:inherit;box-shadow:none;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background-color:var(--color-background-1);padding:0px 8px;transition:background-color var(--anim-short)}button.svelte-1q710ay:hover,button.svelte-1q710ay:focus{background-color:var(--color-background-2)}button.svelte-1q710ay:active{background-color:var(--color-background-1)}
 .checkbox.svelte-1s86c47.svelte-1s86c47{line-height:0}.checkbox.svelte-1s86c47 svg.svelte-1s86c47{overflow:visible}
 path.svelte-hig2lj{transition:fill var(--anim-short)}
