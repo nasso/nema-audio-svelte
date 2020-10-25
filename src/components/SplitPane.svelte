@@ -2,7 +2,7 @@
   import SplitBar from "./SplitBar.svelte";
 
   export let direction = "column";
-  export let split_pos = 200;
+  export let splitpos = 200;
   export let reverse = false;
 </script>
 
@@ -10,24 +10,27 @@
   .split-pane {
     display: inline-grid;
     gap: 2px;
+    min-height: 0;
+    min-width: 0;
 
-    $pane-width: calc(var(--split-pos, 50%) - 4px / 2);
+    $pane-size: calc(var(--split-pos, 50%) - 2px);
+    $alt-pane-size: calc(100% - var(--split-pos, 50%) - 2px);
 
     &.horizontal {
-      grid-template-columns: $pane-width 0px auto;
+      grid-template-columns: $pane-size 0px $alt-pane-size;
 
       &.reverse {
-        grid-template-columns: auto 0px $pane-width;
+        grid-template-columns: $alt-pane-size 0px $pane-size;
       }
 
       grid-template-areas: "first splitter second";
     }
 
     &.vertical {
-      grid-template-rows: $pane-width 0px auto;
+      grid-template-rows: $pane-size 0px $alt-pane-size;
 
       &.reverse {
-        grid-template-rows: auto 0px $pane-width;
+        grid-template-rows: $alt-pane-size 0px $pane-size;
       }
 
       grid-template-areas:
@@ -38,7 +41,8 @@
 
     .splitter {
       grid-area: splitter;
-      position: relative;
+
+      display: grid;
     }
 
     & > :global(*) {
@@ -58,9 +62,9 @@
   class:horizontal={direction === 'row'}
   class:reverse
   class="split-pane"
-  style={`--split-pos: ${split_pos}px`}>
+  style={`--split-pos: ${splitpos}px`}>
   <slot />
   <div class="splitter">
-    <SplitBar bind:split_pos {direction} {reverse} />
+    <SplitBar bind:position={splitpos} {direction} {reverse} />
   </div>
 </div>

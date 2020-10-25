@@ -12,6 +12,7 @@
 
 <style lang="scss">
   nav {
+    flex-shrink: 0;
     flex-grow: 0;
     height: 28px;
     display: flex;

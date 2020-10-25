@@ -35,8 +35,8 @@
 
 <main>
   <Toolbar />
-  <SplitPane bind:split_pos={$uiState.bottomPaneHeight} reverse>
-    <SplitPane bind:split_pos={$uiState.sidePaneWidth} direction="row">
+  <SplitPane bind:splitpos={$uiState.bottomPaneHeight} reverse>
+    <SplitPane bind:splitpos={$uiState.sidePaneWidth} direction="row">
       <Pane />
       <Tracklist>
         {#if $uiState.currentView === 'playlist'}

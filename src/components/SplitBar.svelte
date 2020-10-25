@@ -1,75 +1,129 @@
-<script>
-  export let split_pos;
-  export let direction = "column";
-  export let reverse = false;
+<script lang="ts">
+  export let position: number;
+  export let direction: "column" | "row" = "column";
+  export let reverse: boolean = false;
+  export let snaps: undefined | number[] = undefined;
+  export let snapdist: number = 10;
+  export let min: undefined | number = undefined;
+  export let max: undefined | number = undefined;
 
-  let mouse_is_down = false;
+  $: if (min) {
+    position = Math.max(min, position);
+  }
 
-  function handleMouseDown(e) {
-    if (!mouse_is_down && e.button === 0) {
-      e.preventDefault();
-      mouse_is_down = true;
+  $: if (max) {
+    position = Math.min(max, position);
+  }
+
+  $: if (snaps) {
+    const candidates = snaps.filter(
+      (snap) => Math.abs(position - snap) < snapdist
+    );
+
+    if (candidates.length) {
+      const closest = candidates.reduce((closestYet, snap) => {
+        if (Math.abs(snap - position) < Math.abs(closestYet - position)) {
+          return snap;
+        }
+
+        return closestYet;
+      });
+
+      position = closest;
     }
   }
 
-  function handleMouseUp(e) {
-    if (mouse_is_down && e.button === 0) {
-      e.preventDefault();
-      mouse_is_down = false;
-    }
-  }
-
-  function handleMouseMove(e) {
-    if (!mouse_is_down) return;
-
-    e.preventDefault();
-
+  function handlePointerDown(e: PointerEvent) {
     const factor = reverse ? -1 : 1;
+    const startPos = position;
+    let delta = 0;
 
-    if (direction === "column") {
-      split_pos += e.movementY * factor;
-    } else if (direction === "row") {
-      split_pos += e.movementX * factor;
-    }
+    this.onpointermove = (e: PointerEvent) => {
+      if (direction === "column") {
+        delta += e.movementY * factor;
+      } else if (direction === "row") {
+        delta += e.movementX * factor;
+      }
+
+      position = startPos + delta;
+    };
+
+    this.onpointerup = (e: PointerEvent) => {
+      this.onpointermove = null;
+      this.onpointerup = null;
+      this.releasePointerCapture(e.pointerId);
+    };
+
+    this.setPointerCapture(e.pointerId);
   }
 </script>
 
-<style>
-  div {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
+<style lang="scss">
+  .split-bar {
+    display: inline-block;
+    position: relative;
 
-    opacity: 0;
+    --hotspot-size: 8px;
 
-    border-radius: 4px;
+    .hotspot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
 
-    background: var(--color-background-2);
-    transition: opacity var(--anim-short);
-  }
+      &::before {
+        content: "";
 
-  div:hover {
-    opacity: 1;
-  }
+        --distance-to-edge: 8px;
+        --line-width: 2px;
 
-  div.horizontal {
-    cursor: ew-resize;
-    width: 8px;
-    transform: translateX(-50%);
-  }
+        position: absolute;
+        opacity: 0;
 
-  div.vertical {
-    cursor: ns-resize;
-    height: 8px;
-    transform: translateY(-50%);
+        border-radius: calc(var(--line-width) / 2);
+
+        transition: opacity var(--anim-short);
+        background: var(--color-foreground-2);
+      }
+
+      &:hover::before {
+        opacity: 0.5;
+      }
+
+      &.horizontal {
+        cursor: ew-resize;
+        width: var(--hotspot-size);
+        transform: translateX(-50%);
+
+        &::before {
+          left: calc(50% - var(--line-width) / 2);
+          width: var(--line-width);
+          top: var(--distance-to-edge);
+          bottom: var(--distance-to-edge);
+        }
+      }
+
+      &.vertical {
+        cursor: ns-resize;
+        height: var(--hotspot-size);
+        transform: translateY(-50%);
+
+        &::before {
+          top: calc(50% - var(--line-width) / 2);
+          height: var(--line-width);
+          left: var(--distance-to-edge);
+          right: var(--distance-to-edge);
+        }
+      }
+    }
   }
 </style>
 
-<svelte:window on:mouseup={handleMouseUp} on:mousemove={handleMouseMove} />
-
-<div
-  class:horizontal={direction === 'row'}
-  class:vertical={direction === 'column'}
-  on:mousedown={handleMouseDown} />
+<div class="split-bar">
+  <div
+    class="hotspot"
+    class:horizontal={direction === 'row'}
+    class:vertical={direction === 'column'}
+    on:pointerdown={handlePointerDown} />
+</div>

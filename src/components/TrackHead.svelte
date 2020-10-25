@@ -16,6 +16,8 @@
     height: var(--track-height);
     border-radius: 8px;
 
+    flex-shrink: 0;
+
     h1,
     h2 {
       margin: 0;
@@ -32,7 +34,7 @@
   }
 </style>
 
-<article class="track-head">
+<article class="track-head" style={`--track-height: ${track.height}px`}>
   <HStack align="center">
     <HStack hpad={16} vpad={8} spacing={8} align="center">
       <Checkbox size={8} bind:checked={track.enabled} />

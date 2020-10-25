@@ -55,4 +55,7 @@
   }
 </style>
 
-<div class="track" class:disabled={!track.enabled} />
+<div
+  class="track"
+  class:disabled={!track.enabled}
+  style={`--track-height: ${track.height}px`} />
