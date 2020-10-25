@@ -1,5 +1,6 @@
 <script lang="ts">
   import project from "../stores/project";
+  import NewTrackHead from "./NewTrackHead.svelte";
   import SplitBar from "./SplitBar.svelte";
   import TrackHead from "./TrackHead.svelte";
   import VStack from "./VStack.svelte";
@@ -27,6 +28,7 @@
         snaps={[1, 2, 3, 4].map((x) => 64 * x)}
         min={64} />
     {/each}
+    <NewTrackHead />
   </VStack>
   <div class="content">
     <slot />
