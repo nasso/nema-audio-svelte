@@ -9,10 +9,10 @@
     "public/*"
   ],
   "compilerOptions": {
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
       "@app/*": [
-        "*"
+        "./src/*"
       ]
     }
   }
