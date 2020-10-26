@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from "./Button.svelte";
-  import Icon from "./Icon.svelte";
+  import Button from "@app/components/control/Button.svelte";
+  import Icon from "@app/components/Icon.svelte";
 
   export let icon: string;
   export let selected: boolean = false;

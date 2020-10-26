@@ -1,16 +1,16 @@
 <script lang="ts">
   import { writable } from "svelte/store";
 
-  import drag from "../utils/drag";
-  import type { Track } from "../stores/project";
-  import project from "../stores/project";
-  import uiState from "../stores/ui";
-  import FlexSpace from "./FlexSpace.svelte";
+  import drag from "@app/utils/drag";
+  import type { Track } from "@app/stores/project";
+  import project from "@app/stores/project";
+  import uiState from "@app/stores/ui";
+  import FlexSpace from "@app/components/layout/FlexSpace.svelte";
+  import SplitBar from "@app/components/layout/SplitBar.svelte";
+  import SplitPane from "@app/components/layout/SplitPane.svelte";
+  import VStack from "@app/components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
-  import SplitBar from "./SplitBar.svelte";
-  import SplitPane from "./SplitPane.svelte";
   import TrackHead from "./TrackHead.svelte";
-  import VStack from "./VStack.svelte";
 
   let tracklist: HTMLElement;
   let scroll = writable({

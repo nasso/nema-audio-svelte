@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Track } from "../stores/project";
+  import type { Track } from "../../../stores/project";
 
   export let track: Track;
   export let xscroll: number;

@@ -1,7 +1,9 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import path from "path";
 import svelte from "rollup-plugin-svelte";
+import alias from "@rollup/plugin-alias";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import livereload from "rollup-plugin-livereload";
@@ -10,6 +12,9 @@ import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
 
 const production = !process.env.ROLLUP_WATCH;
+
+const projectDir = path.resolve(__dirname);
+const srcDir = path.resolve(projectDir, "src");
 
 function serve() {
   let server;
@@ -61,7 +66,28 @@ export default {
       },
       preprocess: sveltePreprocess({
         sourceMap: !production,
+        scss: {
+          importer(url) {
+            return {
+              file: url.replace("@app", srcDir),
+            };
+          },
+        },
       }),
+    }),
+
+    typescript({
+      sourceMap: !production,
+      inlineSources: !production,
+    }),
+
+    alias({
+      entries: [
+        {
+          find: "@app",
+          replacement: srcDir,
+        },
+      ],
     }),
 
     // If you have external dependencies installed from
@@ -74,10 +100,6 @@ export default {
       dedupe: ["svelte"],
     }),
     commonjs(),
-    typescript({
-      sourceMap: !production,
-      inlineSources: !production,
-    }),
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated

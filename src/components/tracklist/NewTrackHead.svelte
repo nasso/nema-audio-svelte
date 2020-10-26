@@ -1,6 +1,6 @@
 <script>
-  import project, { PluginTrack } from "../stores/project";
-  import Icon from "./Icon.svelte";
+  import project, { PluginTrack } from "@app/stores/project";
+  import Icon from "@app/components/Icon.svelte";
 
   function handleClick() {
     $project.tracks = [...$project.tracks, new PluginTrack()];
@@ -8,7 +8,7 @@
 </script>
 
 <style lang="scss">
-  @use '../scss/normalize';
+  @use '@app/scss/normalize';
 
   .new-track-head {
     @include normalize.button;

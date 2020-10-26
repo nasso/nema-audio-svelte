@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Icon from "../components/Icon.svelte";
-  import Button from "../components/Button.svelte";
-  import TabbedControl from "../components/TabbedControl.svelte";
-  import TempoInput from "../components/TempoInput.svelte";
-  import ToggleButton from "../components/ToggleButton.svelte";
-  import PlayButton from "../components/PlayButton.svelte";
-  import uiState from "../stores/ui";
+  import uiState from "@app/stores/ui";
+  import Icon from "@app/components/Icon.svelte";
+  import Button from "@app/components/control/Button.svelte";
+  import TabbedControl from "@app/components/control/TabbedControl.svelte";
+  import ToggleButton from "@app/components/control/ToggleButton.svelte";
+  import TempoInput from "./TempoInput.svelte";
+  import PlayButton from "./PlayButton.svelte";
 
   let bpm = 128;
 </script>

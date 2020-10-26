@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
-  import uiState from "../stores/ui";
-  import Icon from "./Icon.svelte";
+  import uiState from "@app/stores/ui";
+  import Icon from "@app/components/Icon.svelte";
 
   export let value: number;
   export let min: number = 0.01;
@@ -81,7 +81,7 @@
 </script>
 
 <style lang="scss">
-  @use '../scss/normalize';
+  @use '@app/scss/normalize';
 
   .tempo-root {
     display: inline-flex;

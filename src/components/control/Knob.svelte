@@ -1,5 +1,5 @@
 <script lang="ts">
-  import uiState from "../stores/ui";
+  import uiState from "@app/stores/ui";
 
   export let color: string = "var(--color-accent)";
   export let size: number = 20;

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  import type { Track } from "../stores/project";
-  import { PluginTrack } from "../stores/project";
-  import Checkbox from "./Checkbox.svelte";
-  import HStack from "./HStack.svelte";
-  import Knob from "./Knob.svelte";
-  import VStack from "./VStack.svelte";
+  import type { Track } from "@app/stores/project";
+  import { PluginTrack } from "@app/stores/project";
+  import HStack from "@app/components/layout/HStack.svelte";
+  import VStack from "@app/components/layout/VStack.svelte";
+  import Checkbox from "@app/components/control/Checkbox.svelte";
+  import Knob from "@app/components/control/Knob.svelte";
 
   export let track: Track;
 

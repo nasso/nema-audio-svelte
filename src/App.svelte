@@ -1,11 +1,11 @@
 <script lang="ts">
-  import AudioGraph from "./components/AudioGraph.svelte";
-  import Pane from "./components/Pane.svelte";
-  import Playlist from "./components/Playlist.svelte";
-  import SplitPane from "./components/SplitPane.svelte";
-  import Toolbar from "./components/Toolbar.svelte";
-  import Tracklist from "./components/Tracklist.svelte";
-  import uiState from "./stores/ui";
+  import uiState from "@app/stores/ui";
+  import AudioGraph from "@app/components/tracklist/pipeline/Pipeline.svelte";
+  import Pane from "@app/components/Pane.svelte";
+  import Playlist from "@app/components/tracklist/playlist/Playlist.svelte";
+  import SplitPane from "@app/components/layout/SplitPane.svelte";
+  import Toolbar from "@app/components/toolbar/Toolbar.svelte";
+  import Tracklist from "@app/components/tracklist/Tracklist.svelte";
 
   let xscroll: number;
 
