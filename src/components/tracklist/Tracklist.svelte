@@ -1,6 +1,7 @@
 <script lang="ts">
   import { writable } from "svelte/store";
 
+  import drag from "@app/utils/drag";
   import type { Track } from "@app/stores/project";
   import project from "@app/stores/project";
   import uiState from "@app/stores/ui";
