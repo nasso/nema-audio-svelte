@@ -3,10 +3,10 @@
 
   import type { Track } from "@app/stores/project";
   import { PluginTrack } from "@app/stores/project";
-  import HStack from "@app/components/layout/HStack.svelte";
-  import VStack from "@app/components/layout/VStack.svelte";
-  import Checkbox from "@app/components/control/Checkbox.svelte";
-  import Knob from "@app/components/control/Knob.svelte";
+  import HStack from "@components/layout/HStack.svelte";
+  import VStack from "@components/layout/VStack.svelte";
+  import Checkbox from "@components/control/Checkbox.svelte";
+  import Knob from "@components/control/Knob.svelte";
 
   export let track: Track;
 

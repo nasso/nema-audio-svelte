@@ -1,6 +1,6 @@
 <script>
   import project, { PluginTrack } from "@app/stores/project";
-  import Icon from "@app/components/Icon.svelte";
+  import Icon from "@components/Icon.svelte";
 
   function handleClick() {
     $project.tracks = [...$project.tracks, new PluginTrack()];

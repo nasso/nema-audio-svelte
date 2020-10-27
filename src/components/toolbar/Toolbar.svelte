@@ -1,9 +1,9 @@
 <script lang="ts">
   import uiState from "@app/stores/ui";
-  import Icon from "@app/components/Icon.svelte";
-  import Button from "@app/components/control/Button.svelte";
-  import TabbedControl from "@app/components/control/TabbedControl.svelte";
-  import ToggleButton from "@app/components/control/ToggleButton.svelte";
+  import Icon from "@components/Icon.svelte";
+  import Button from "@components/control/Button.svelte";
+  import TabbedControl from "@components/control/TabbedControl.svelte";
+  import ToggleButton from "@components/control/ToggleButton.svelte";
   import TempoInput from "./TempoInput.svelte";
   import PlayButton from "./PlayButton.svelte";
 

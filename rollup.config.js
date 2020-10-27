@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
@@ -47,7 +48,6 @@ export default {
   },
   onwarn(warning) {
     // Skip certain warnings
-
     switch(warning.code) {
     case "THIS_IS_UNDEFINED":
       return;
@@ -83,6 +83,10 @@ export default {
 
     alias({
       entries: [
+        {
+          find: "@components",
+          replacement: path.resolve(srcDir, "components"),
+        },
         {
           find: "@app",
           replacement: srcDir,

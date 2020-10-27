@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Tab from "@app/components/layout/Tab.svelte";
+  import Tab from "@components/layout/Tab.svelte";
 
   interface TabDescriptor {
     icon: string;

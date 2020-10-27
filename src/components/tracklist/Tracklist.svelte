@@ -1,14 +1,13 @@
 <script lang="ts">
   import { writable } from "svelte/store";
 
-  import drag from "@app/src/utils/drag";
   import type { Track } from "@app/stores/project";
   import project from "@app/stores/project";
   import uiState from "@app/stores/ui";
-  import FlexSpace from "@app/components/layout/FlexSpace.svelte";
-  import SplitBar from "@app/components/layout/SplitBar.svelte";
-  import SplitPane from "@app/components/layout/SplitPane.svelte";
-  import VStack from "@app/components/layout/VStack.svelte";
+  import FlexSpace from "@components/layout/FlexSpace.svelte";
+  import SplitBar from "@components/layout/SplitBar.svelte";
+  import SplitPane from "@components/layout/SplitPane.svelte";
+  import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import project from "@app/stores/project";
-  import VStack from "@app/components/layout/VStack.svelte";
+  import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./PlaylistTrack.svelte";
 
   export let xscroll: number;

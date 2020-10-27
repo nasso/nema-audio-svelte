@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "@app/components/Icon.svelte";
+  import Icon from "@components/Icon.svelte";
 
   export let icon: string;
   export let selected: boolean = false;

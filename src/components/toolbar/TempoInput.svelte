@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import uiState from "@app/stores/ui";
-  import Icon from "@app/components/Icon.svelte";
+  import Icon from "@components/Icon.svelte";
 
   export let value: number;
   export let min: number = 0.01;

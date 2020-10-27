@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Button from "@app/components/control/Button.svelte";
-  import Icon from "@app/components/Icon.svelte";
+  import Button from "@components/control/Button.svelte";
+  import Icon from "@components/Icon.svelte";
 
   export let playing: boolean = false;
 
