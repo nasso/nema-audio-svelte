@@ -8,6 +8,7 @@
   import FlexSpace from "@components/layout/FlexSpace.svelte";
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
+  import Port from "./Port.svelte";
 
   export let node: AudioGraphNode;
 
@@ -48,6 +49,22 @@
       transition: opacity var(--anim-short);
     }
 
+    .inputs,
+    .outputs {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      height: 100%;
+    }
+
+    .inputs {
+      right: 100%;
+    }
+
+    .outputs {
+      left: 100%;
+    }
+
     .parameters {
       display: grid;
       justify-items: center;
@@ -74,6 +91,22 @@
   style={`
     transform: translate(${node.x || 0}px, ${node.y || 0}px);
   `}>
+  <div class="inputs">
+    <VStack spacing={8}>
+      {#each { length: node.mod.inputs } as _, i}
+        <Port />
+      {/each}
+    </VStack>
+  </div>
+
+  <div class="outputs">
+    <VStack spacing={8}>
+      {#each { length: node.mod.outputs } as _, i}
+        <Port />
+      {/each}
+    </VStack>
+  </div>
+
   <VStack>
     <header use:drag={{ button: 0, offset }}>
       <HStack hpad={4} vpad={2} spacing={8} align="center">
