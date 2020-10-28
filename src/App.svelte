@@ -1,7 +1,7 @@
 <script lang="ts">
   import uiState from "@app/stores/ui";
   import Pane from "@components/Pane.svelte";
-  import AudioGraph from "@components/tracklist/pipeline/Viewport.svelte";
+  import AudioGraph from "@components/tracklist/audiograph/Viewport.svelte";
   import Playlist from "@components/tracklist/playlist/Playlist.svelte";
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";

@@ -84,6 +84,10 @@ export default {
     alias({
       entries: [
         {
+          find: "@api",
+          replacement: path.resolve(srcDir, "api"),
+        },
+        {
           find: "@components",
           replacement: path.resolve(srcDir, "components"),
         },

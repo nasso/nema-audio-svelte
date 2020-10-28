@@ -3,9 +3,11 @@
 
   export let id: undefined | string = undefined;
   export let color: string = "var(--color-accent)";
+  export let disabledColor: string = "var(--color-foreground-1)";
   export let size: number = 20;
   export let type: "absolute" | "relative" = "absolute";
   export let value: number = 0;
+  export let disabled: boolean = false;
   export let min: number = { absolute: 0, relative: -1 }[type];
   export let max: number = { absolute: 1, relative: 1 }[type];
   export let step: undefined | number = undefined;
@@ -54,21 +56,30 @@
   }
 </style>
 
-<label class="knob">
+<label
+  class="knob"
+  style={`
+    color: ${disabled ? disabledColor : color};
+  `}>
   <input
-    {id}
     type="number"
-    min={clamp && min}
-    max={clamp && max}
-    {step}
+    hidden
     bind:value
-    hidden />
+    {id}
+    {step}
+    {disabled}
+    min={clamp && min}
+    max={clamp && max} />
   <svg width={size} height={size} on:pointerdown={handlePointerDown}>
     <!-- Background -->
-    <circle opacity="0.1" cx="50%" cy="50%" r={size / 2} fill={color} />
+    <circle opacity="0.1" cx="50%" cy="50%" r={size / 2} fill="currentColor" />
 
     <!-- Stroked stuff -->
-    <g stroke={color} stroke-width="2" stroke-linecap="round" fill="none">
+    <g
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      fill="none">
       <!-- Little line that shows the value -->
       <g
         transform={`translate(${size / 2} ${size / 2}) rotate(${normalized * 270 - 135})`}>

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  import type { Track } from "@app/stores/project";
-  import { PluginTrack } from "@app/stores/project";
+  import type { Track } from "@api/project";
+  import { PluginTrack } from "@api/project";
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
   import Checkbox from "@components/control/Checkbox.svelte";
@@ -86,8 +86,14 @@
     <div class="knobs">
       <VStack spacing={8} hpad={8}>
         {#if track instanceof PluginTrack}
-          <Knob type="absolute" bind:value={track.volume} />
-          <Knob type="relative" bind:value={track.pan} />
+          <Knob
+            type="absolute"
+            disabled={!track.enabled}
+            bind:value={track.volume} />
+          <Knob
+            type="relative"
+            disabled={!track.enabled}
+            bind:value={track.pan} />
         {/if}
       </VStack>
     </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Track } from "@app/stores/project";
+  import type { Track } from "@api/project";
   import project from "@app/stores/project";
-  import Module from "./Module.svelte";
+  import Node from "./Node.svelte";
   import Port from "./Port.svelte";
 
   export let xscroll: number;
@@ -42,8 +42,8 @@
         x={8}
         y={index * 4 + accumulatedHeight[index] - track.height / 2} />
     {/each}
-    {#each $project.pipeline.modules as mod}
-      <Module {mod} />
+    {#each $project.graph.nodes as node}
+      <Node {node} />
     {/each}
   </div>
 </div>

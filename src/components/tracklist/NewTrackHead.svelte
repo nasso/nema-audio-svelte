@@ -1,5 +1,6 @@
 <script>
-  import project, { PluginTrack } from "@app/stores/project";
+  import { PluginTrack } from "@api/project";
+  import project from "@app/stores/project";
   import Icon from "@components/Icon.svelte";
   import { createEventDispatcher } from "svelte";
 

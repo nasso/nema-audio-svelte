@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { PipelineModule } from "@app/stores/project";
+  import type { AudioGraphNode } from "@api/graph";
+  import type { DragOffset } from "@app/utils/drag";
   import drag from "@app/utils/drag";
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
@@ -7,9 +8,8 @@
   import FlexSpace from "@components/layout/FlexSpace.svelte";
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
-  import Port from "./Port.svelte";
 
-  export let mod: PipelineModule;
+  export let node: AudioGraphNode;
 
   let subs = [];
 
@@ -17,10 +17,10 @@
     subs.forEach((run) => run({ x, y }));
   }
 
-  $: notifySubs({ x: mod.x, y: mod.y });
+  $: notifySubs({ x: node.x, y: node.y });
 
   const offset = {
-    subscribe(run) {
+    subscribe(run: (val: DragOffset) => void) {
       subs = [...subs, run];
 
       return () => {
@@ -29,8 +29,8 @@
     },
 
     set({ x, y }) {
-      mod.x = x;
-      mod.y = y;
+      node.x = x;
+      node.y = y;
     },
   };
 </script>
@@ -40,23 +40,29 @@
     display: grid;
     position: absolute;
     height: 64px;
-    background: var(--color-background-2);
+    background: var(--color-background-1);
     border-radius: 8px;
 
     h2 {
       font-size: 12px;
+      transition: opacity var(--anim-short);
     }
 
     .parameters {
-      flex-grow: 1;
-
       display: grid;
+      justify-items: center;
 
       .parameter {
         label {
           font-size: 10px;
-          color: var(--color-foreground-2);
+          color: var(--color-foreground-1);
         }
+      }
+    }
+
+    &.disabled {
+      h2 {
+        opacity: 0.5;
       }
     }
   }
@@ -64,30 +70,31 @@
 
 <section
   class="module"
+  class:disabled={!node.enabled}
   style={`
-    transform: translate(${mod.x || 0}px, ${mod.y || 0}px);
+    transform: translate(${node.x || 0}px, ${node.y || 0}px);
   `}>
   <VStack>
     <header use:drag={{ button: 0, offset }}>
       <HStack hpad={4} vpad={2} spacing={8} align="center">
         <HStack hpad={4} vpad={2} spacing={8} align="center">
-          <Checkbox bind:checked={mod.enabled} size={8} />
-          <h2>{mod.title}</h2>
+          <Checkbox bind:checked={node.enabled} size={8} />
+          <h2>{node.mod.name}</h2>
         </HStack>
         <FlexSpace />
         <Icon name="arrow/chevron_down" color="var(--color-foreground-2)" />
       </HStack>
     </header>
     <div class="parameters">
-      <HStack hpad={8} spacing={8} align="end">
-        {#each mod.parameters as param}
+      <HStack hpad={8} spacing={16} align="end">
+        {#each node.mod.parameters as param}
           <div class="parameter">
-            <VStack align="center">
-              <VStack align="center" spacing={2} vpad={4}>
-                <Knob id={`${mod.id}-${param}`} />
-                <label for={`${mod.id}-${param}`}>{param}</label>
-              </VStack>
-              <!-- <Port /> -->
+            <VStack align="center" spacing={2} vpad={4}>
+              <Knob
+                id={`${node.id}-${param.name}`}
+                bind:value={param.value}
+                disabled={!node.enabled} />
+              <label for={`${node.id}-${param.name}`}>{param.name}</label>
             </VStack>
           </div>
         {/each}
