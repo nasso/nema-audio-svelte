@@ -1,6 +1,9 @@
 <script lang="ts">
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
+  export let absolute: boolean = false;
+  export let x: number = 0;
+  export let y: number = 0;
 
   let wired: boolean = false;
 </script>
@@ -28,11 +31,24 @@
         stroke-width: 100%;
       }
     }
+
+    &.absolute {
+      position: absolute;
+
+      transform: translate(-50%, -50%) translate(var(--x), var(--y));
+    }
   }
 </style>
 
-<div class="graph-port">
-  <svg width={size} height={size} class:wired>
+<div
+  class="graph-port"
+  class:wired
+  class:absolute
+  style={`
+    --x: ${x}px;
+    --y: ${y}px;
+  `}>
+  <svg width={size} height={size}>
     <clipPath id="clip">
       <circle cx="0%" cy="0%" r="50%" />
     </clipPath>
