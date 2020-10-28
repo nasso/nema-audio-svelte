@@ -1,9 +1,15 @@
 <script>
   import project, { PluginTrack } from "@app/stores/project";
   import Icon from "@components/Icon.svelte";
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
 
   function handleClick() {
-    $project.tracks = [...$project.tracks, new PluginTrack()];
+    const track = new PluginTrack();
+
+    $project.tracks = [...$project.tracks, track];
+    dispatch("newtrack", track);
   }
 </script>
 

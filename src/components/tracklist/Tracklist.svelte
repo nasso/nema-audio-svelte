@@ -11,6 +11,7 @@
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
+  import { loop_guard, tick } from "svelte/internal";
 
   let tracklist: HTMLElement;
   let scroll = writable({
@@ -21,6 +22,7 @@
   $: if (tracklist) {
     tracklist.scrollTop = $scroll.y;
     // the user-agent clamps scrollTop for us... tysm user-agent :)
+    // we'll kindly steal your value :)
     $scroll.y = tracklist.scrollTop;
   }
 
@@ -36,12 +38,25 @@
       $project.tracks[i].enabled = isSolo || $project.tracks[i] === track;
     }
   }
+
+  function handleScroll(this: HTMLElement) {
+    // $scroll.x = this.scrollLeft;
+    // SIKE! don't touch horizontal scrolling, we take care of it without the ua
+
+    $scroll.y = this.scrollTop;
+  }
+
+  async function handleNewTrack() {
+    await tick();
+    $scroll.y = tracklist.scrollHeight - tracklist.clientHeight;
+  }
 </script>
 
 <style lang="scss">
   .tracklist {
     display: grid;
     overflow: hidden;
+    overflow-y: scroll;
 
     .content {
       flex-grow: 1;
@@ -53,7 +68,8 @@
 <div
   bind:this={tracklist}
   class="tracklist"
-  use:drag={{ button: 1, offset: scroll }}>
+  use:drag={{ button: 1, offset: scroll, invert: true }}
+  on:scroll={handleScroll}>
   <SplitPane
     direction="row"
     min={150}
@@ -70,7 +86,7 @@
         {/each}
       </VStack>
       <FlexSpace />
-      <NewTrackHead />
+      <NewTrackHead on:newtrack={handleNewTrack} />
     </VStack>
     <div class="content">
       <slot xscroll={$scroll.x} />

@@ -30,16 +30,16 @@
 
     flex-shrink: 0;
 
-    h1,
-    h2 {
+    h2,
+    h3 {
       margin: 0;
     }
 
-    h1 {
+    h2 {
       font-size: 12px;
     }
 
-    h2 {
+    h3 {
       font-size: 10px;
       color: var(--color-foreground-2);
     }
@@ -48,8 +48,8 @@
       margin-left: auto;
     }
 
-    h1,
     h2,
+    h3,
     .knobs {
       transition: opacity var(--anim-short);
     }
@@ -57,8 +57,8 @@
     &.disabled {
       --color-accent: var(--color-foreground-1);
 
-      h1,
       h2,
+      h3,
       .knobs {
         opacity: 0.5;
       }
@@ -77,9 +77,9 @@
         bind:checked={track.enabled}
         on:contextmenu={handleMuteContextMenu} />
       <VStack>
-        <h1>{track.name}</h1>
+        <h2>{track.name}</h2>
         {#if track instanceof PluginTrack}
-          <h2>{track.plugin}</h2>
+          <h3>{track.plugin}</h3>
         {/if}
       </VStack>
     </HStack>

@@ -17,6 +17,7 @@
     height: 28px;
     display: flex;
     justify-content: space-between;
+    font-size: 16px;
 
     .left,
     .right {

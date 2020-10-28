@@ -1,6 +1,7 @@
 <script lang="ts">
   import uiState from "@app/stores/ui";
 
+  export let id: undefined | string = undefined;
   export let color: string = "var(--color-accent)";
   export let size: number = 20;
   export let type: "absolute" | "relative" = "absolute";
@@ -25,7 +26,7 @@
     const usedPointerLock = $uiState.usePointerLock;
 
     this.onpointermove = (e: PointerEvent) => {
-      value -= (e.movementY / 100) * (max - min) * 0.5;
+      value -= (e.movementY / 50) * (max - min) * 0.5;
     };
 
     this.onpointerup = (e: PointerEvent) => {
@@ -55,6 +56,7 @@
 
 <label class="knob">
   <input
+    {id}
     type="number"
     min={clamp && min}
     max={clamp && max}

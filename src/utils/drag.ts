@@ -4,7 +4,7 @@ interface Settable<T> extends Readable<T> {
   set(value: T): void;
 }
 
-interface DragOffset {
+export interface DragOffset {
   x: number,
   y: number,
 }
@@ -12,6 +12,7 @@ interface DragOffset {
 type MouseButtons = number | number[];
 
 export interface DragParameters {
+  invert?: boolean;
   button?: MouseButtons;
   offset: Settable<DragOffset>;
 }
@@ -39,18 +40,23 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
       return;
     }
 
+    e.stopImmediatePropagation();
+    e.preventDefault();
+
     const pointerStart: DragOffset = { x: e.clientX, y: e.clientY };
     const startOffset = { ...currentOffset };
 
     function handlePointerMove(this: HTMLElement, e: PointerEvent) {
       const delta = {
-        x: pointerStart.x - e.clientX,
-        y: pointerStart.y - e.clientY,
+        x: e.clientX - pointerStart.x,
+        y: e.clientY - pointerStart.y,
       };
 
+      const factor = parameters.invert ? -1 : 1;
+
       parameters.offset.set({
-        x: startOffset.x + delta.x,
-        y: startOffset.y + delta.y,
+        x: startOffset.x + delta.x * factor,
+        y: startOffset.y + delta.y * factor,
       });
     }
 
