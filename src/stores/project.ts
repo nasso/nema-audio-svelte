@@ -1,4 +1,5 @@
 import CompressorModule from "@api/CompressorModule";
+import DelayModule from "@api/DelayModule";
 import GainModule from "@api/GainModule";
 import { AudioGraphNode } from "@api/graph";
 import { PluginTrack, Project } from "@api/project";
@@ -21,6 +22,12 @@ project.graph.nodes.push(new AudioGraphNode({
   enabled: false,
   x: 300,
   y: 200,
+}));
+
+project.graph.nodes.push(new AudioGraphNode({
+  mod: new DelayModule(),
+  x: 450,
+  y: 100,
 }));
 
 export default writable(project);

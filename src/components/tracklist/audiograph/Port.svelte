@@ -1,6 +1,6 @@
 <script lang="ts">
   import drag from "@app/utils/drag";
-  import { writable } from "svelte/store";
+  import { spring } from "svelte/motion";
 
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
@@ -10,13 +10,19 @@
   export let stiffness:
     | number
     | ((offset: { x: number; y: number }) => number) = ({ x }) =>
-    1 + 1 / (-1 - x / 300);
+    1 + 1 / (-1 - Math.abs(x) / 300);
 
   let dragging: boolean = false;
-  let dragOffset = writable({
-    x: 0,
-    y: 0,
-  });
+  let dragOffset = spring(
+    {
+      x: 0,
+      y: 0,
+    },
+    {
+      stiffness: 0.25,
+      damping: 1,
+    }
+  );
 
   $: stiffnessValue = Math.max(
     0,
@@ -97,18 +103,19 @@
         class="circle" />
     </g>
 
-    {#if dragging}
-      <path
-        transform={`translate(${size / 2} ${size / 2})`}
-        fill="none"
-        stroke="currentColor"
-        stroke-width={linkWidth}
-        d={`
-          M 0,0
-          c ${$dragOffset.x * invStiffness},${0}
-            ${$dragOffset.x * stiffnessValue},${$dragOffset.y}
-            ${$dragOffset.x},${$dragOffset.y}
-        `} />
-    {/if}
+    <path
+      style="transition: opacity var(--anim-short)"
+      transform={`translate(${size / 2} ${size / 2})`}
+      opacity={dragging ? 1 : 0}
+      fill="none"
+      stroke="currentColor"
+      stroke-width={linkWidth}
+      stroke-linecap="round"
+      d={`
+        M 0,0
+        c ${$dragOffset.x * invStiffness},${0}
+          ${$dragOffset.x * stiffnessValue},${$dragOffset.y}
+          ${$dragOffset.x},${$dragOffset.y}
+      `} />
   </svg>
 </div>

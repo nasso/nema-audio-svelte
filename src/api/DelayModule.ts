@@ -1,5 +1,5 @@
-import type { Parameter } from "./graph
-import { AudioModule } from "./graph
+import type { Parameter } from "./graph";
+import { AudioModule } from "./graph";
 
 export default class DelayModule extends AudioModule {
   name = "Delay";
