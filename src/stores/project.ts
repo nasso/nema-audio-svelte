@@ -12,14 +12,15 @@ project.tracks.push(new PluginTrack());
 
 project.graph.nodes.push(new AudioGraphNode({
   mod: new GainModule(),
-  x: 30,
+  x: 300,
+  y: 50,
 }));
 
 project.graph.nodes.push(new AudioGraphNode({
   mod: new CompressorModule(),
   enabled: false,
-  x: 30,
-  y: 100,
+  x: 300,
+  y: 200,
 }));
 
 export default writable(project);

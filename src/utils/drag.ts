@@ -43,6 +43,8 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
     e.stopImmediatePropagation();
     e.preventDefault();
 
+    this.dispatchEvent(new CustomEvent("dragstart"));
+
     const pointerStart: DragOffset = { x: e.clientX, y: e.clientY };
     const startOffset = { ...currentOffset };
 
@@ -64,6 +66,8 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
       this.removeEventListener("pointermove", handlePointerMove);
       this.removeEventListener("pointerup", handlePointerUp);
       this.releasePointerCapture(e.pointerId);
+
+      this.dispatchEvent(new CustomEvent("dragend"));
     }
 
     this.addEventListener("pointermove", handlePointerMove);
