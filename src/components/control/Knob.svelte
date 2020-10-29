@@ -25,6 +25,10 @@
   }
 
   function handlePointerDown(e: PointerEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+
     const usedPointerLock = $uiState.usePointerLock;
 
     this.onpointermove = (e: PointerEvent) => {

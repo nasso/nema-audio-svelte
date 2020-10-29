@@ -51,6 +51,10 @@
   }
 
   function handlePointerDown(e: PointerEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+
     const usedPointerLock = $uiState.usePointerLock;
     const startValue = value;
     let deltaY = 0;

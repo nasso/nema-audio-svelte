@@ -34,6 +34,10 @@
   }
 
   function handlePointerDown(e: PointerEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+
     const factor = reverse ? -1 : 1;
     const startPos = position;
     const pointerStart = { x: e.clientX, y: e.clientY };
