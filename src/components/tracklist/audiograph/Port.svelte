@@ -1,23 +1,21 @@
 <script lang="ts">
-  import type { Writable } from "svelte/store";
   import type { NodeInput } from "@api/graph";
   import type { ViewportContext } from "./Viewport.svelte";
+
+  import { createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
-  import { getContext } from "svelte";
   import { spring } from "svelte/motion";
   import drag from "@app/utils/drag";
   import { pointAdd, rectCenter } from "@app/utils/geom";
-  import { VIEWPORT_CONTEXT } from "./Viewport.svelte";
   import Link from "./Link.svelte";
 
+  export let context: ViewportContext;
   export let input: NodeInput = undefined;
   export let links: Set<NodeInput> = undefined;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
 
-  const viewportContext: Writable<ViewportContext> = getContext(
-    VIEWPORT_CONTEXT
-  );
+  const dispatch = createEventDispatcher();
 
   let elem: Element | HTMLElement | SVGElement = undefined;
   let destRects: DOMRect[] = [];
@@ -50,7 +48,7 @@
 
     destRects = new Array(links.size);
     destUnsubs = [...links].map((link, index) => {
-      return $viewportContext.nodeMap
+      return context.nodeMap
         .get(link.node)
         ?.get(link.input)
         ?.subscribe((val) => {
@@ -60,11 +58,11 @@
   }
 
   $: if (input) {
-    let inputMap = $viewportContext.nodeMap.get(input.node);
+    let inputMap = context.nodeMap.get(input.node);
 
     if (!inputMap) {
       inputMap = new Map();
-      $viewportContext.nodeMap.set(input.node, inputMap);
+      context.nodeMap.set(input.node, inputMap);
     }
 
     let rect = inputMap.get(input.input);
@@ -104,13 +102,19 @@
 </style>
 
 <div
-  use:drag={{ button: 0, capture: $viewportContext.viewportElem, offset: dragOffset }}
+  use:drag={{ button: 0, capture: false, element: context.viewportElem, offset: dragOffset }}
   on:dragstart={() => {
     dragging = true;
+    dispatch('wireout');
   }}
   on:dragend={() => {
     dragging = false;
     $dragOffset = { x: 0, y: 0 };
+  }}
+  on:pointerup={(e) => {
+    if (input) {
+      dispatch('connect');
+    }
   }}
   class="graph-port"
   style={`

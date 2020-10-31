@@ -24,14 +24,23 @@ export const PARAMETER_DEFAULT = {
   type: ParameterRange.Absolute,
   accuracy: ParameterAccuracy.Sample,
   min: 0.0,
-  max: 0.0,
+  max: 1.0,
 };
 
 export abstract class AudioModule {
   name: string;
-  parameters: Parameter[] = [];
   inputs = 1;
   outputs = 1;
+
+  #params: ReadonlyArray<Parameter>;
+
+  constructor(parameters: Parameter[]) {
+    this.#params = parameters.map(param => Object.assign({}, PARAMETER_DEFAULT, param));
+  }
+
+  get parameters(): ReadonlyArray<Parameter> {
+    return this.#params;
+  }
 }
 
 export interface NodeInput {
@@ -39,7 +48,7 @@ export interface NodeInput {
   input: number;
 }
 
-export class Output {
+export class Outputs {
   outputs: Map<number, Set<NodeInput>> = new Map();
 
   connect(node: AudioGraphNode, input = 0, output = 0): this {
@@ -55,7 +64,7 @@ export class Output {
   }
 }
 
-export class AudioGraphNode extends Output {
+export class AudioGraphNode extends Outputs {
   id: number = ++lastNodeId;
 
   // from options

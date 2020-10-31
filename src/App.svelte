@@ -47,14 +47,7 @@
       bind:splitpos={$uiState.sidePaneWidth}
       direction="row"
       snaps={paneSnaps}>
-      <!-- <Pane /> -->
-      <Tracklist let:xscroll>
-        {#if $uiState.currentView === 'playlist'}
-          <Playlist {xscroll} />
-        {:else if $uiState.currentView === 'audio_graph'}
-          <AudioGraph {xscroll} />
-        {/if}
-      </Tracklist>
+      <Pane />
       <Tracklist let:xscroll>
         {#if $uiState.currentView === 'playlist'}
           <Playlist {xscroll} />

@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { AudioGraphNode } from "@api/graph";
-  import drag from "@app/utils/drag";
   import type { Point } from "@app/utils/geom";
+  import type { ViewportContext } from "./Viewport.svelte";
+
+  import { createEventDispatcher } from "svelte";
+  import drag from "@app/utils/drag";
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
   import Icon from "@components/Icon.svelte";
@@ -11,7 +14,10 @@
   import { writable } from "svelte/store";
   import Port from "./Port.svelte";
 
+  export let context: ViewportContext;
   export let node: AudioGraphNode;
+
+  const dispatch = createEventDispatcher();
 
   let dragOffset = writable({ x: node.x, y: node.y });
 
@@ -88,15 +94,21 @@
   <div class="inputs">
     <VStack spacing={8}>
       {#each { length: node.mod.inputs } as _, input}
-        <Port input={{ node, input }} />
+        <Port
+          bind:context
+          input={{ node, input }}
+          on:connect={() => dispatch('connect', input)} />
       {/each}
     </VStack>
   </div>
 
   <div class="outputs">
     <VStack spacing={8}>
-      {#each { length: node.mod.outputs } as _, i}
-        <Port links={node.outputs.get(i)} />
+      {#each { length: node.mod.outputs } as _, output}
+        <Port
+          bind:context
+          links={node.outputs.get(output)}
+          on:wireout={() => dispatch('wireout', output)} />
       {/each}
     </VStack>
   </div>
@@ -120,6 +132,9 @@
               <Knob
                 id={`${node.id}-${param.name}`}
                 bind:value={param.value}
+                type={param.type}
+                min={param.min}
+                max={param.max}
                 disabled={!node.enabled} />
               <label for={`${node.id}-${param.name}`}>{param.name}</label>
             </VStack>

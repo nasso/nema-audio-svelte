@@ -4,7 +4,7 @@
   export let direction: "column" | "row" = "column";
   export let splitpos: number;
   export let reverse: boolean = false;
-  export let min: undefined | number = undefined;
+  export let min: undefined | number = 100;
   export let max: undefined | number = undefined;
   export let snaps: undefined | number[] = undefined;
   export let snapdist: undefined | number = undefined;

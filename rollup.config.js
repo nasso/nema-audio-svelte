@@ -46,13 +46,18 @@ export default {
     name: "app",
     file: "public/build/bundle.js",
   },
-  onwarn(warning) {
+  onwarn(warning, rollupWarn) {
     // Skip certain warnings
     switch(warning.code) {
     case "THIS_IS_UNDEFINED":
       return;
+    case "CIRCULAR_DEPENDENCY":
+      if (["semver"].some(d => warning.importer.includes(d))) {
+        return;
+      }
+      // fall through
     default:
-      console.warn(warning.message);
+      rollupWarn(warning);
     }
   },
   plugins: [

@@ -10,7 +10,8 @@ type MouseButtons = number | number[];
 export interface DragParameters {
   invert?: boolean;
   button?: MouseButtons;
-  capture?: boolean | Element;
+  capture?: boolean;
+  element?: Element;
   offset: Settable<Point>;
 }
 
@@ -32,14 +33,8 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
 
     const pointerStart: Point = { x: e.clientX, y: e.clientY };
     const startOffset = { ...get(parameters.offset) as Point };
-    const capture = parameters.capture
-      ? (parameters.capture === true
-        ? this
-        : parameters.capture)
-      : (parameters.capture === false
-        ? null
-        : this);
-    const elem = capture || this;
+    const elem = parameters.element || this;
+    const capture = parameters.capture !== false;
 
     const handlePointerMove = (e: PointerEvent) => {
       const delta = {
@@ -60,7 +55,7 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
       elem.removeEventListener("pointerup", handlePointerUp);
 
       if (capture) {
-        capture.releasePointerCapture(e.pointerId);
+        elem.releasePointerCapture(e.pointerId);
       }
 
       this.dispatchEvent(new CustomEvent("dragend"));
@@ -70,7 +65,7 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
     elem.addEventListener("pointerup", handlePointerUp);
 
     if (capture) {
-      capture.setPointerCapture(e.pointerId);
+      elem.setPointerCapture(e.pointerId);
     }
 
     this.dispatchEvent(new CustomEvent("dragstart"));

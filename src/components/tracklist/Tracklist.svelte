@@ -1,8 +1,10 @@
 <script lang="ts">
+  import type { Track } from "@api/project";
+
   import { writable } from "svelte/store";
+  import { tick } from "svelte/internal";
 
   import drag from "@app/utils/drag";
-  import type { Track } from "@app/stores/project";
   import project from "@app/stores/project";
   import uiState from "@app/stores/ui";
   import FlexSpace from "@components/layout/FlexSpace.svelte";
@@ -11,7 +13,6 @@
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
-  import { loop_guard, tick } from "svelte/internal";
 
   let tracklist: HTMLElement;
   let scroll = writable({
