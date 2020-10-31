@@ -39,7 +39,23 @@ export interface NodeInput {
   input: number;
 }
 
-export class AudioGraphNode {
+export class Output {
+  outputs: Map<number, Set<NodeInput>> = new Map();
+
+  connect(node: AudioGraphNode, input = 0, output = 0): this {
+    let outputDests = this.outputs.get(output);
+
+    if (!outputDests) {
+      outputDests = new Set([]);
+      this.outputs.set(output, outputDests);
+    }
+
+    outputDests.add({ node, input });
+    return this;
+  }
+}
+
+export class AudioGraphNode extends Output {
   id: number = ++lastNodeId;
 
   // from options
@@ -49,9 +65,6 @@ export class AudioGraphNode {
   x: number;
   y: number;
 
-  // output destinations
-  outputs: Map<number, Set<NodeInput>>;
-
   constructor(options: {
     mod: AudioModule;
     enabled?: boolean;
@@ -59,6 +72,8 @@ export class AudioGraphNode {
     x?: number;
     y?: number;
   }) {
+    super();
+
     const params = Object.assign({
       enabled: true,
       passthrough: false,
@@ -71,20 +86,6 @@ export class AudioGraphNode {
     this.passthrough = params.passthrough;
     this.x = params.x;
     this.y = params.y;
-
-    this.outputs = new Map();
-  }
-
-  connect(node: AudioGraphNode, input = 0, output = 0): this {
-    let outputDests = this.outputs.get(output);
-
-    if (!outputDests) {
-      outputDests = new Set([]);
-      this.outputs.set(output, outputDests);
-    }
-
-    outputDests.add({ node, input });
-    return this;
   }
 }
 

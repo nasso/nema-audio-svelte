@@ -35,5 +35,6 @@ project.graph.nodes.add(compressor);
 project.graph.nodes.add(delay);
 
 gain.connect(compressor);
+project.tracks[1].connect(gain);
 
 export default writable(project);

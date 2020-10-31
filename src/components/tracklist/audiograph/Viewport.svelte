@@ -11,6 +11,7 @@
   import type { AudioGraphNode } from "@api/graph";
   import type { Track } from "@api/project";
   import project from "@app/stores/project";
+  import VStack from "@components/layout/VStack.svelte";
   import { setContext } from "svelte";
   import Node from "./Node.svelte";
   import Port from "./Port.svelte";
@@ -40,6 +41,17 @@
     position: relative;
 
     overflow: hidden;
+
+    .track-outputs {
+      position: absolute;
+
+      .track {
+        display: inline-flex;
+        height: var(--track-height);
+        flex-direction: column;
+        justify-content: space-evenly;
+      }
+    }
   }
 </style>
 
@@ -49,12 +61,15 @@
     style={`
       transform: translateX(${-xscroll}px);
     `}>
-    {#each $project.tracks as track, index}
-      <Port
-        absolute
-        x={8}
-        y={index * 4 + accumulatedHeight[index] - track.height / 2} />
-    {/each}
+    <div class="track-outputs">
+      <VStack spacing={4}>
+        {#each $project.tracks as track}
+          <div class="track" style={`--track-height: ${track.height}px`}>
+            <Port links={track.outputs.get(0)} />
+          </div>
+        {/each}
+      </VStack>
+    </div>
     {#each [...$project.graph.nodes] as node}
       <Node bind:node />
     {/each}

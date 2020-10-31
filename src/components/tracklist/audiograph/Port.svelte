@@ -77,7 +77,7 @@
     rect.set(elemRect);
   }
 
-  $: filled = dragging || (links && links.size);
+  $: filled = dragging;
   $: linkWidth = 2;
 
   function handlePointerDown(this: HTMLElement, e: PointerEvent) {

@@ -1,15 +1,12 @@
-import { AudioGraph } from "@api/graph";
+import { AudioGraph, Output } from "@api/graph";
 
-export interface Track {
-  name: string;
-  enabled: boolean;
-  height: number;
-}
-
-export class PluginTrack implements Track {
+export abstract class Track extends Output {
+  name = "Track name";
   enabled = true;
   height = 64;
-  name = "Track name";
+}
+
+export class PluginTrack extends Track {
   plugin = "Plug-in";
   volume = 1.0;
   pan = 0.0;

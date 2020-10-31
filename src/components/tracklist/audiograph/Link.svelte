@@ -35,4 +35,5 @@
       ${delta.x * stiffnessValue},${delta.y}
       ${delta.x},${delta.y}
   `} />
+<circle cx={x} cy={y} r="4" fill="currentColor" />
 <circle cx={x + delta.x} cy={y + delta.y} r="4" fill="currentColor" />
