@@ -1,8 +1,6 @@
 <script lang="ts">
-  export let x: number;
-  export let y: number;
-  export let source: DOMRect;
-  export let target: DOMRect;
+  export let source: { x: number; y: number };
+  export let target: { x: number; y: number };
   export let linkWidth: number = 2;
   export let stiffness:
     | number
@@ -10,8 +8,8 @@
     1 + 1 / (-1 - Math.abs(x) / 300);
 
   $: delta = {
-    x: target.x + target.width / 2 - (source.x + source.width / 2),
-    y: target.y + target.height / 2 - (source.y + source.height / 2),
+    x: target.x - source.x,
+    y: target.y - source.y,
   };
   $: stiffnessValue = Math.max(
     0,
@@ -30,10 +28,14 @@
   stroke-width={linkWidth}
   stroke-linecap="round"
   d={`
-    M ${x},${y}
+    M ${source.x},${source.y}
     c ${delta.x * invStiffness},${0}
       ${delta.x * stiffnessValue},${delta.y}
       ${delta.x},${delta.y}
   `} />
-<circle cx={x} cy={y} r="4" fill="currentColor" />
-<circle cx={x + delta.x} cy={y + delta.y} r="4" fill="currentColor" />
+<circle cx={source.x} cy={source.y} r="4" fill="currentColor" />
+<circle
+  cx={source.x + delta.x}
+  cy={source.y + delta.y}
+  r="4"
+  fill="currentColor" />

@@ -1,43 +1,33 @@
 <script lang="ts">
   import type { AudioGraphNode } from "@api/graph";
-  import type { DragOffset } from "@app/utils/drag";
   import drag from "@app/utils/drag";
+  import type { Point } from "@app/utils/geom";
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
   import Icon from "@components/Icon.svelte";
   import FlexSpace from "@components/layout/FlexSpace.svelte";
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
+  import { writable } from "svelte/store";
   import Port from "./Port.svelte";
 
   export let node: AudioGraphNode;
 
-  const subs = [];
+  let dragOffset = writable({ x: node.x, y: node.y });
 
-  function notifySubs({ x, y }) {
-    subs.forEach((run) => run({ x, y }));
+  // no circular dependency here because `writable` is lazy
+  function updateDragOffset(pos: Point) {
+    $dragOffset.x = pos.x;
+    $dragOffset.y = pos.y;
   }
 
-  $: notifySubs({ x: node.x, y: node.y });
+  function updateNodePos(pos: Point) {
+    node.x = pos.x;
+    node.y = pos.y;
+  }
 
-  const offset = {
-    subscribe(run: (val: DragOffset) => void) {
-      subs.push(run);
-
-      return () => {
-        const index = subs.indexOf(run);
-
-        if (index >= 0) {
-          subs.splice(index, 1);
-        }
-      };
-    },
-
-    set({ x, y }) {
-      node.x = x;
-      node.y = y;
-    },
-  };
+  $: updateDragOffset(node);
+  $: updateNodePos($dragOffset);
 </script>
 
 <style lang="scss">
@@ -93,7 +83,7 @@
   class="module"
   class:disabled={!node.enabled}
   style={`
-    transform: translate(${node.x || 0}px, ${node.y || 0}px);
+    transform: translate(${node.x}px, ${node.y}px);
   `}>
   <div class="inputs">
     <VStack spacing={8}>
@@ -112,7 +102,7 @@
   </div>
 
   <VStack>
-    <header use:drag={{ button: 0, offset }}>
+    <header use:drag={{ button: 0, offset: dragOffset }}>
       <HStack hpad={4} vpad={2} spacing={8} align="center">
         <HStack hpad={4} vpad={2} spacing={8} align="center">
           <Checkbox bind:checked={node.enabled} size={8} />

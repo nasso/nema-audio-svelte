@@ -1,12 +1,8 @@
-import { Readable, writable } from "svelte/store";
+import type { Point } from "@app/utils/geom";
+import { get, Readable, writable } from "svelte/store";
 
 interface Settable<T> extends Readable<T> {
   set(value: T): void;
-}
-
-export interface DragOffset {
-  x: number,
-  y: number,
 }
 
 type MouseButtons = number | number[];
@@ -14,24 +10,15 @@ type MouseButtons = number | number[];
 export interface DragParameters {
   invert?: boolean;
   button?: MouseButtons;
-  offset: Settable<DragOffset>;
+  capture?: boolean | Element;
+  offset: Settable<Point>;
 }
 
 interface Action<T> {
   update: (parameters: T) => void,
-  destroy: () => void,
 }
 
 export default function drag(node: HTMLElement, parameters: DragParameters): Action<DragParameters> {
-  const currentOffset: DragOffset = { x: 0, y: 0 };
-  let unsub = parameters.offset.subscribe(handleOffsetChange);
-
-  function handleOffsetChange(val: DragOffset) {
-    // copy the values
-    currentOffset.x = val.x;
-    currentOffset.y = val.y;
-  }
-
   function handlePointerDown(this: HTMLElement, e: PointerEvent) {
     if (
       (typeof parameters.button === "number" && e.button !== parameters.button) ||
@@ -43,12 +30,18 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
     e.stopImmediatePropagation();
     e.preventDefault();
 
-    this.dispatchEvent(new CustomEvent("dragstart"));
+    const pointerStart: Point = { x: e.clientX, y: e.clientY };
+    const startOffset = { ...get(parameters.offset) as Point };
+    const capture = parameters.capture
+      ? (parameters.capture === true
+        ? this
+        : parameters.capture)
+      : (parameters.capture === false
+        ? null
+        : this);
+    const elem = capture || this;
 
-    const pointerStart: DragOffset = { x: e.clientX, y: e.clientY };
-    const startOffset = { ...currentOffset };
-
-    function handlePointerMove(this: HTMLElement, e: PointerEvent) {
+    const handlePointerMove = (e: PointerEvent) => {
       const delta = {
         x: e.clientX - pointerStart.x,
         y: e.clientY - pointerStart.y,
@@ -60,40 +53,41 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
         x: startOffset.x + delta.x * factor,
         y: startOffset.y + delta.y * factor,
       });
-    }
+    };
 
-    function handlePointerUp(this: HTMLElement, e: PointerEvent) {
-      this.removeEventListener("pointermove", handlePointerMove);
-      this.removeEventListener("pointerup", handlePointerUp);
-      this.releasePointerCapture(e.pointerId);
+    const handlePointerUp = (e: PointerEvent) => {
+      elem.removeEventListener("pointermove", handlePointerMove);
+      elem.removeEventListener("pointerup", handlePointerUp);
+
+      if (capture) {
+        capture.releasePointerCapture(e.pointerId);
+      }
 
       this.dispatchEvent(new CustomEvent("dragend"));
+    };
+
+    elem.addEventListener("pointermove", handlePointerMove);
+    elem.addEventListener("pointerup", handlePointerUp);
+
+    if (capture) {
+      capture.setPointerCapture(e.pointerId);
     }
 
-    this.addEventListener("pointermove", handlePointerMove);
-    this.addEventListener("pointerup", handlePointerUp);
-    this.setPointerCapture(e.pointerId);
+    this.dispatchEvent(new CustomEvent("dragstart"));
   }
 
   node.addEventListener("pointerdown", handlePointerDown);
 
   return {
-    update(newOptions) {
-      parameters = newOptions;
-
-      unsub();
-      unsub = parameters.offset.subscribe(handleOffsetChange);
-    },
-
-    destroy() {
-      unsub();
+    update(newParams) {
+      parameters = newParams;
     },
   };
 }
 
 export function dragscroller(node: HTMLElement, button: MouseButtons = 1): Action<MouseButtons> {
   const scrollStore = writable({ x: node.scrollLeft, y: node.scrollTop });
-  const scroll: Settable<DragOffset> = {
+  const scroll: Settable<Point> = {
     subscribe: scrollStore.subscribe,
 
     set(offset) {
@@ -121,7 +115,5 @@ export function dragscroller(node: HTMLElement, button: MouseButtons = 1): Actio
         offset: scroll,
       });
     },
-
-    destroy: action.destroy,
   };
 }

@@ -1,27 +1,28 @@
 <script lang="ts">
-  import type { NodeInput } from "@api/graph";
-  import type { NodeMap } from "./Viewport.svelte";
   import type { Writable } from "svelte/store";
+  import type { NodeInput } from "@api/graph";
+  import type { ViewportContext } from "./Viewport.svelte";
   import { writable } from "svelte/store";
   import { getContext } from "svelte";
   import { spring } from "svelte/motion";
-  import { CTX_VIEWPORT_NODE_MAP } from "./Viewport.svelte";
+  import drag from "@app/utils/drag";
+  import { pointAdd, rectCenter } from "@app/utils/geom";
+  import { VIEWPORT_CONTEXT } from "./Viewport.svelte";
   import Link from "./Link.svelte";
 
   export let input: NodeInput = undefined;
   export let links: Set<NodeInput> = undefined;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
-  export let absolute: boolean = false;
-  export let x: number = 0;
-  export let y: number = 0;
-  export let stiffness:
-    | number
-    | ((offset: { x: number; y: number }) => number) = undefined;
 
-  const localNodeMap: NodeMap = getContext(CTX_VIEWPORT_NODE_MAP);
+  const viewportContext: Writable<ViewportContext> = getContext(
+    VIEWPORT_CONTEXT
+  );
 
   let elem: Element | HTMLElement | SVGElement = undefined;
+  let destRects: DOMRect[] = [];
+  let destUnsubs: (() => void)[] = [];
+  let elemRect: DOMRect;
   let dragging: boolean = false;
   let dragOffset = spring(
     {
@@ -33,15 +34,13 @@
       damping: 1,
     }
   );
-  let destRects: DOMRect[] = [];
-  let destUnsubs: (() => void)[] = [];
-  let elemRect: DOMRect;
 
   $: {
     input;
     links;
     elemRect = elem?.getBoundingClientRect();
   }
+
   $: if (links) {
     for (let unsub of destUnsubs) {
       if (unsub) {
@@ -51,20 +50,21 @@
 
     destRects = new Array(links.size);
     destUnsubs = [...links].map((link, index) => {
-      return localNodeMap
-        ?.get(link.node)
+      return $viewportContext.nodeMap
+        .get(link.node)
         ?.get(link.input)
         ?.subscribe((val) => {
           destRects[index] = val;
         });
     });
   }
+
   $: if (input) {
-    let inputMap = localNodeMap.get(input.node);
+    let inputMap = $viewportContext.nodeMap.get(input.node);
 
     if (!inputMap) {
       inputMap = new Map();
-      localNodeMap.set(input.node, inputMap);
+      $viewportContext.nodeMap.set(input.node, inputMap);
     }
 
     let rect = inputMap.get(input.input);
@@ -75,15 +75,6 @@
     }
 
     rect.set(elemRect);
-  }
-
-  $: filled = dragging;
-  $: linkWidth = 2;
-
-  function handlePointerDown(this: HTMLElement, e: PointerEvent) {
-    if (e.button !== 0) {
-      return;
-    }
   }
 </script>
 
@@ -109,33 +100,21 @@
     &:hover {
       --scale: 0.75;
     }
-
-    &.filled .circle {
-      stroke-width: 100%;
-    }
-
-    &.absolute {
-      position: absolute;
-
-      transform: translate(-50%, -50%) translate(var(--x), var(--y));
-    }
   }
 </style>
 
 <div
-  on:pointerdown={handlePointerDown}
-  on:dragstart={() => (dragging = true)}
+  use:drag={{ button: 0, capture: $viewportContext.viewportElem, offset: dragOffset }}
+  on:dragstart={() => {
+    dragging = true;
+  }}
   on:dragend={() => {
     dragging = false;
     $dragOffset = { x: 0, y: 0 };
   }}
   class="graph-port"
-  class:filled
-  class:absolute
   style={`
     color: ${color};
-    --x: ${x}px;
-    --y: ${y}px;
   `}>
   <svg width={size} height={size} bind:this={elem}>
     <clipPath id="hole-clip">
@@ -154,18 +133,24 @@
         class="circle" />
     </g>
 
-    {#if links && elemRect}
-      {#each [...links] as link, i}
-        {#if destRects[i]}
+    {#if elemRect}
+      <g transform={`translate(${-elemRect.x} ${-elemRect.y})`}>
+        {#if dragging}
           <Link
-            {linkWidth}
-            {stiffness}
-            x={size / 2}
-            y={size / 2}
-            source={elemRect}
-            target={destRects[i]} />
+            source={rectCenter(elemRect)}
+            target={pointAdd(rectCenter(elemRect), $dragOffset)} />
         {/if}
-      {/each}
+
+        {#if links}
+          {#each [...links] as link, i}
+            {#if destRects[i]}
+              <Link
+                source={rectCenter(elemRect)}
+                target={rectCenter(destRects[i])} />
+            {/if}
+          {/each}
+        {/if}
+      </g>
     {/if}
   </svg>
 </div>

@@ -1,15 +1,21 @@
 <script lang="ts" context="module">
   import type { Writable } from "svelte/store";
+  import type { AudioGraphNode, NodeInput } from "@api/graph";
+  import { writable } from "svelte/store";
 
   export type InputMap = Map<number, Writable<DOMRect>>;
   export type NodeMap = WeakMap<AudioGraphNode, InputMap>;
 
-  export const CTX_VIEWPORT_NODE_MAP = "viewport-node-map";
+  export interface ViewportContext {
+    nodeMap: NodeMap;
+    viewportElem?: Element;
+    wireConnect?: (input: NodeInput) => void;
+  }
+
+  export const VIEWPORT_CONTEXT = "viewport-node-map";
 </script>
 
 <script lang="ts">
-  import type { AudioGraphNode } from "@api/graph";
-  import type { Track } from "@api/project";
   import project from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
   import { setContext } from "svelte";
@@ -18,22 +24,11 @@
 
   export let xscroll: number;
 
-  setContext(CTX_VIEWPORT_NODE_MAP, new WeakMap() as NodeMap);
+  let context: Writable<ViewportContext> = writable({
+    nodeMap: new WeakMap(),
+  });
 
-  function accumulateHeight(tracks: Track[]) {
-    const arr = new Array();
-
-    let acc = 0;
-
-    for (const track of tracks) {
-      acc += track.height;
-      arr.push(acc);
-    }
-
-    return arr;
-  }
-
-  $: accumulatedHeight = accumulateHeight($project.tracks);
+  setContext(VIEWPORT_CONTEXT, context);
 </script>
 
 <style lang="scss">
@@ -55,7 +50,7 @@
   }
 </style>
 
-<div class="graph-viewport">
+<div class="graph-viewport" bind:this={$context.viewportElem}>
   <div
     class="graph-content"
     style={`
