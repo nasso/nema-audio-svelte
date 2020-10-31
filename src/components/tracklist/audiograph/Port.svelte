@@ -1,7 +1,15 @@
 <script lang="ts">
-  import drag from "@app/utils/drag";
+  import type { NodeInput } from "@api/graph";
+  import type { NodeMap } from "./Viewport.svelte";
+  import type { Writable } from "svelte/store";
+  import { writable } from "svelte/store";
+  import { getContext } from "svelte";
   import { spring } from "svelte/motion";
+  import { CTX_VIEWPORT_NODE_MAP } from "./Viewport.svelte";
+  import Link from "./Link.svelte";
 
+  export let input: NodeInput = undefined;
+  export let links: Set<NodeInput> = undefined;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
   export let absolute: boolean = false;
@@ -9,9 +17,11 @@
   export let y: number = 0;
   export let stiffness:
     | number
-    | ((offset: { x: number; y: number }) => number) = ({ x }) =>
-    1 + 1 / (-1 - Math.abs(x) / 300);
+    | ((offset: { x: number; y: number }) => number) = undefined;
 
+  const localNodeMap: NodeMap = getContext(CTX_VIEWPORT_NODE_MAP);
+
+  let elem: Element | HTMLElement | SVGElement = undefined;
   let dragging: boolean = false;
   let dragOffset = spring(
     {
@@ -23,17 +33,58 @@
       damping: 1,
     }
   );
+  let destRects: DOMRect[] = [];
+  let destUnsubs: (() => void)[] = [];
+  let elemRect: DOMRect;
 
-  $: stiffnessValue = Math.max(
-    0,
-    Math.min(
-      1,
-      typeof stiffness === "number" ? stiffness : stiffness({ ...$dragOffset })
-    )
-  );
-  $: invStiffness = 1.0 - stiffnessValue;
-  $: filled = dragging;
-  $: linkWidth = dragging ? 4 : 2;
+  $: {
+    input;
+    links;
+    elemRect = elem?.getBoundingClientRect();
+  }
+  $: if (links) {
+    for (let unsub of destUnsubs) {
+      if (unsub) {
+        unsub();
+      }
+    }
+
+    destRects = new Array(links.size);
+    destUnsubs = [...links].map((link, index) => {
+      return localNodeMap
+        ?.get(link.node)
+        ?.get(link.input)
+        ?.subscribe((val) => {
+          destRects[index] = val;
+        });
+    });
+  }
+  $: if (input) {
+    let inputMap = localNodeMap.get(input.node);
+
+    if (!inputMap) {
+      inputMap = new Map();
+      localNodeMap.set(input.node, inputMap);
+    }
+
+    let rect = inputMap.get(input.input);
+
+    if (!rect) {
+      rect = writable(null);
+      inputMap.set(input.input, rect);
+    }
+
+    rect.set(elemRect);
+  }
+
+  $: filled = dragging || (links && links.size);
+  $: linkWidth = 2;
+
+  function handlePointerDown(this: HTMLElement, e: PointerEvent) {
+    if (e.button !== 0) {
+      return;
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -72,7 +123,7 @@
 </style>
 
 <div
-  use:drag={{ button: 0, offset: dragOffset }}
+  on:pointerdown={handlePointerDown}
   on:dragstart={() => (dragging = true)}
   on:dragend={() => {
     dragging = false;
@@ -86,7 +137,7 @@
     --x: ${x}px;
     --y: ${y}px;
   `}>
-  <svg width={size} height={size}>
+  <svg width={size} height={size} bind:this={elem}>
     <clipPath id="hole-clip">
       <circle cx="0%" cy="0%" r="50%" />
     </clipPath>
@@ -103,19 +154,18 @@
         class="circle" />
     </g>
 
-    <path
-      style="transition: opacity var(--anim-short)"
-      transform={`translate(${size / 2} ${size / 2})`}
-      opacity={dragging ? 1 : 0}
-      fill="none"
-      stroke="currentColor"
-      stroke-width={linkWidth}
-      stroke-linecap="round"
-      d={`
-        M 0,0
-        c ${$dragOffset.x * invStiffness},${0}
-          ${$dragOffset.x * stiffnessValue},${$dragOffset.y}
-          ${$dragOffset.x},${$dragOffset.y}
-      `} />
+    {#if links && elemRect}
+      {#each [...links] as link, i}
+        {#if destRects[i]}
+          <Link
+            {linkWidth}
+            {stiffness}
+            x={size / 2}
+            y={size / 2}
+            source={elemRect}
+            target={destRects[i]} />
+        {/if}
+      {/each}
+    {/if}
   </svg>
 </div>

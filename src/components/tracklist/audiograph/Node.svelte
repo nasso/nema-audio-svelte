@@ -12,7 +12,7 @@
 
   export let node: AudioGraphNode;
 
-  let subs = [];
+  const subs = [];
 
   function notifySubs({ x, y }) {
     subs.forEach((run) => run({ x, y }));
@@ -22,10 +22,14 @@
 
   const offset = {
     subscribe(run: (val: DragOffset) => void) {
-      subs = [...subs, run];
+      subs.push(run);
 
       return () => {
-        subs = subs.filter((sub) => sub !== run);
+        const index = subs.indexOf(run);
+
+        if (index >= 0) {
+          subs.splice(index, 1);
+        }
       };
     },
 
@@ -93,8 +97,8 @@
   `}>
   <div class="inputs">
     <VStack spacing={8}>
-      {#each { length: node.mod.inputs } as _, i}
-        <Port />
+      {#each { length: node.mod.inputs } as _, input}
+        <Port input={{ node, input }} />
       {/each}
     </VStack>
   </div>
@@ -102,7 +106,7 @@
   <div class="outputs">
     <VStack spacing={8}>
       {#each { length: node.mod.outputs } as _, i}
-        <Port />
+        <Port links={node.outputs.get(i)} />
       {/each}
     </VStack>
   </div>

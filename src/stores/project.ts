@@ -11,23 +11,29 @@ project.tracks.push(new PluginTrack());
 project.tracks.push(new PluginTrack());
 project.tracks.push(new PluginTrack());
 
-project.graph.nodes.push(new AudioGraphNode({
+const gain = new AudioGraphNode({
   mod: new GainModule(),
-  x: 300,
+  x: 100,
   y: 50,
-}));
+});
 
-project.graph.nodes.push(new AudioGraphNode({
+const compressor = new AudioGraphNode({
   mod: new CompressorModule(),
   enabled: false,
   x: 300,
   y: 200,
-}));
+});
 
-project.graph.nodes.push(new AudioGraphNode({
+const delay = new AudioGraphNode({
   mod: new DelayModule(),
   x: 450,
   y: 100,
-}));
+});
+
+project.graph.nodes.add(gain);
+project.graph.nodes.add(compressor);
+project.graph.nodes.add(delay);
+
+gain.connect(compressor);
 
 export default writable(project);
