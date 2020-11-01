@@ -1,5 +1,5 @@
-<script>
-  import { PluginTrack } from "@api/project";
+<script lang="ts">
+  import { AudioTrack } from "@api/audio";
   import project from "@app/stores/project";
   import Icon from "@components/Icon.svelte";
   import { createEventDispatcher } from "svelte";
@@ -7,7 +7,7 @@
   const dispatch = createEventDispatcher();
 
   function handleClick() {
-    const track = new PluginTrack();
+    const track = new AudioTrack();
 
     $project.tracks = [...$project.tracks, track];
     dispatch("newtrack", track);

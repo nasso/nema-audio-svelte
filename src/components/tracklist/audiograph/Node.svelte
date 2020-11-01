@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AudioGraphNode } from "@api/graph";
+  import type { Effect, GraphNode } from "@api/graph";
   import type { Point } from "@app/utils/geom";
   import type { ViewportContext } from "./Viewport.svelte";
 
@@ -16,7 +16,7 @@
   import OutputPort from "./OutputPort.svelte";
 
   export let context: ViewportContext;
-  export let node: AudioGraphNode;
+  export let node: GraphNode<Effect>;
 
   const dispatch = createEventDispatcher();
 
@@ -99,6 +99,7 @@
         <InputPort
           bind:context
           link={node.inputs.get(input)}
+          on:wiretake={() => dispatch('wiretake', input)}
           on:connect={() => dispatch('connect', input)} />
       {/each}
     </VStack>

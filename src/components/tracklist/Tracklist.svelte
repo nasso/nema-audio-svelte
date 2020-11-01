@@ -13,6 +13,7 @@
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
+  import type { Source } from "@api/graph";
 
   let tracklist: HTMLElement;
   let scroll = writable({
@@ -29,7 +30,7 @@
 
   $: $scroll.x = Math.max(0, $scroll.x);
 
-  function handleSolo(e: CustomEvent<Track>) {
+  function handleSolo(e: CustomEvent<Track<any>>) {
     const track = e.detail;
 
     const isSolo = $project.tracks.every((t) => t.enabled === (t === track));

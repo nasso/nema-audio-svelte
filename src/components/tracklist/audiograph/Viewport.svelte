@@ -3,7 +3,7 @@
   import type { GraphNode } from "@api/graph";
 
   export type OutputMap = Map<number, Writable<Point>>;
-  export type NodeMap = WeakMap<GraphNode, OutputMap>;
+  export type NodeMap = WeakMap<GraphNode<any>, OutputMap>;
 
   export interface ViewportContext {
     nodeMap: NodeMap;
@@ -13,6 +13,8 @@
 
 <script lang="ts">
   import type { Point } from "@app/utils/geom";
+
+  import { get } from "svelte/store";
   import { spring } from "svelte/motion";
   import project from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
@@ -31,8 +33,9 @@
   let pointerPos: Point;
   let viewportRect: DOMRect;
 
-  let wireSource: { node: GraphNode; output: number; elem: Element };
-  let wireSourcePos = { x: 0, y: 0 };
+  let wireConnected = false;
+  let wireSource: { node: GraphNode<any>; output: number; pos: Point };
+  let wireStartPos = { x: 0, y: 0 };
   let wireEndPos = spring(
     { x: 0, y: 0 },
     {
@@ -41,23 +44,21 @@
     }
   );
 
-  // recompute the viewportRect only when we started dragging out a new wire
+  // reactive block executes when a new wire is being dragged out
   $: if (wireSource) {
+    // recompute the viewportRect
     viewportRect = context.viewportElem.getBoundingClientRect();
-  }
 
-  // set the wireSourcePos
-  $: if (wireSource?.elem) {
-    wireSourcePos = rectCenter(wireSource.elem.getBoundingClientRect());
-    wireSourcePos.x -= viewportRect.left;
-    wireSourcePos.y -= viewportRect.top;
+    // forcefully set the end position to the source pos
+    wireEndPos.set(wireSource.pos, { hard: true });
 
-    wireEndPos.set(wireSourcePos, { hard: true });
+    // keep the source pos
+    wireStartPos = wireSource.pos;
   }
 
   // make the wire go back to its source pos when cancelled (cool animation)
   $: if (wireSource === null) {
-    $wireEndPos = wireSourcePos;
+    $wireEndPos = wireStartPos;
   }
 
   $: if (wireSource) {
@@ -65,6 +66,28 @@
       x: pointerPos.x - viewportRect.left,
       y: pointerPos.y - viewportRect.top,
     };
+  }
+
+  function portCenter(elem: Element): Point {
+    viewportRect = context.viewportElem.getBoundingClientRect();
+
+    const pos = rectCenter(elem.getBoundingClientRect());
+
+    if (viewportRect) {
+      pos.x -= viewportRect.left;
+      pos.y -= viewportRect.top;
+    }
+
+    return pos;
+  }
+
+  function handleWireOut(
+    e: CustomEvent<{ portElem: Element }>,
+    node: GraphNode<any>,
+    output: number
+  ) {
+    wireSource = { node, output, pos: portCenter(e.detail.portElem) };
+    wireConnected = false;
   }
 </script>
 
@@ -119,7 +142,7 @@
             <OutputPort
               bind:context
               output={{ node: track, output: 0 }}
-              on:wireout={(e) => (wireSource = { node: track, output: 0, elem: e.detail.portElem })} />
+              on:wireout={(e) => handleWireOut(e, track, 0)} />
           </div>
         {/each}
       </VStack>
@@ -128,13 +151,23 @@
       <Node
         bind:context
         bind:node
-        on:wireout={(e) => (wireSource = { node, output: e.detail.output, elem: e.detail.portElem })}
+        on:wiretake={(e) => {
+          const input = e.detail;
+          const output = node.inputs.get(input);
+          const outputPos = context.nodeMap.get(node)?.get(input);
+
+          if (output) {
+            wireSource = { node: output.node, output: output.output, pos: get(outputPos) };
+          }
+        }}
+        on:wireout={(e) => handleWireOut(e, node, e.detail.output)}
         on:connect={(e) => {
           if (wireSource) {
             const input = e.detail;
 
             wireSource.node.connect(node, input, wireSource.output);
             wireSource = null;
+            wireConnected = true;
 
             // refresh the node
             node = node;
@@ -142,8 +175,10 @@
         }} />
     {/each}
 
-    <svg class="dragged-wire" class:visible={!!wireSource}>
-      <Link source={wireSourcePos} target={$wireEndPos} />
-    </svg>
+    {#if !wireConnected}
+      <svg class="dragged-wire" class:visible={!!wireSource}>
+        <Link source={wireStartPos} target={$wireEndPos} />
+      </svg>
+    {/if}
   </div>
 </div>

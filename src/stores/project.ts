@@ -1,31 +1,32 @@
-import CompressorModule from "@api/CompressorModule";
-import DelayModule from "@api/DelayModule";
-import GainModule from "@api/GainModule";
-import { AudioGraphNode } from "@api/graph";
-import { PluginTrack, Project } from "@api/project";
+import { AudioTrack } from "@api/audio";
+import CompressorEffect from "@api/CompressorEffect";
+import DelayEffect from "@api/DelayEffect";
+import GainEffect from "@api/GainEffect";
+import { GraphNode } from "@api/graph";
+import { Project } from "@api/project";
 import { writable } from "svelte/store";
 
 const project = new Project();
 
-project.tracks.push(new PluginTrack());
-project.tracks.push(new PluginTrack());
-project.tracks.push(new PluginTrack());
+project.tracks.push(new AudioTrack());
+project.tracks.push(new AudioTrack());
+project.tracks.push(new AudioTrack());
 
-const gain = new AudioGraphNode({
-  mod: new GainModule(),
+const gain = new GraphNode({
+  effect: new GainEffect(),
   x: 100,
   y: 50,
 });
 
-const compressor = new AudioGraphNode({
-  mod: new CompressorModule(),
+const compressor = new GraphNode({
+  effect: new CompressorEffect(),
   enabled: false,
   x: 300,
   y: 200,
 });
 
-const delay = new AudioGraphNode({
-  mod: new DelayModule(),
+const delay = new GraphNode({
+  effect: new DelayEffect(),
   x: 450,
   y: 100,
 });

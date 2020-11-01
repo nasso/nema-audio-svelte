@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NodeOutput } from "@api/graph";
+  import type { Effect, Output } from "@api/graph";
   import type { Point } from "@app/utils/geom";
   import type { ViewportContext } from "./Viewport.svelte";
 
@@ -8,7 +8,7 @@
   import Link from "./Link.svelte";
 
   export let context: ViewportContext;
-  export let link: NodeOutput;
+  export let link: Output<Effect>;
   export let size: number = 8;
   export let color: string = "var(--color-foreground-2)";
 
@@ -84,6 +84,7 @@
 
 <div
   on:pointerup={() => dispatch('connect')}
+  on:pointerdown={() => dispatch('wiretake')}
   bind:this={elem}
   class="graph-port"
   style={`

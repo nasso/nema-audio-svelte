@@ -1,6 +1,6 @@
 let lastNodeId = 0;
 
-export enum ParameterRange {
+export enum ParameterType {
   Absolute = "absolute",
   Relative = "relative",
 }
@@ -12,25 +12,25 @@ export enum ParameterAccuracy {
 
 export interface Parameter {
   name: string;
-  value?: number;
-  type?: ParameterRange;
-  accuracy?: ParameterAccuracy;
-  min?: number;
-  max?: number;
+  value: number;
+  type: ParameterType;
+  accuracy: ParameterAccuracy;
+  min: number;
+  max: number;
 }
 
 export const PARAMETER_DEFAULT = {
   value: 0.0,
-  type: ParameterRange.Absolute,
+  type: ParameterType.Absolute,
   accuracy: ParameterAccuracy.Sample,
   min: 0.0,
   max: 1.0,
 };
 
-export class AudioModule {
+export class Effect {
   name: string;
-  inputs = 1;
   outputs = 1;
+  inputs = 1;
 
   #params: ReadonlyArray<Parameter>;
 
@@ -43,55 +43,63 @@ export class AudioModule {
   }
 }
 
-export interface NodeOutput {
-  node: GraphNode;
+export class Source extends Effect {
+  inputs = 0;
+
+  constructor(parameters: Parameter[]) {
+    super(parameters);
+  }
+}
+
+export interface Output<T extends Effect> {
+  node: GraphNode<T>;
   output: number;
 }
 
-export class GraphNode {
-  inputs: Map<number, NodeOutput> = new Map();
+export class GraphNode<T extends Effect> {
+  id: number = ++lastNodeId;
 
-  connect(dest: GraphNode, input = 0, output = 0): this {
+  mod: T;
+  inputs: Map<number, Output<Effect>> = new Map();
+  x: number;
+  y: number;
+  enabled: boolean;
+  passthrough: boolean;
+
+  constructor(options: {
+    effect: T,
+    x?: number,
+    y?: number,
+    enabled?: boolean,
+    passthrough?: boolean,
+  }) {
+    options = Object.assign({}, {
+      x: 0,
+      y: 0,
+      enabled: true,
+      passthrough: false,
+    }, options);
+
+    this.mod = options.effect;
+    this.x = options.x;
+    this.y = options.y;
+    this.enabled = options.enabled;
+    this.passthrough = options.passthrough;
+  }
+
+  connect(dest: GraphNode<Effect>, input = 0, output = 0): this {
     dest.inputs.set(input, { node: this, output });
 
     return this;
   }
 }
 
-export class AudioGraphNode extends GraphNode {
-  id: number = ++lastNodeId;
-
-  // from options
-  mod: AudioModule;
-  enabled: boolean;
-  passthrough: boolean;
-  x: number;
-  y: number;
-
-  constructor(options: {
-    mod: AudioModule;
-    enabled?: boolean;
-    passthrough?: boolean;
-    x?: number;
-    y?: number;
-  }) {
-    super();
-
-    const params = Object.assign({
-      enabled: true,
-      passthrough: false,
-      x: 0,
-      y: 0,
-    }, options);
-
-    this.mod = params.mod;
-    this.enabled = params.enabled;
-    this.passthrough = params.passthrough;
-    this.x = params.x;
-    this.y = params.y;
-  }
+export class Track<T extends Source> extends GraphNode<T> {
+  name = "Track name";
+  enabled = true;
+  height = 64;
 }
 
-export class AudioGraph {
-  nodes: Set<AudioGraphNode> = new Set([]);
+export class ProcessingGraph {
+  nodes: Set<GraphNode<Effect>> = new Set([]);
 }

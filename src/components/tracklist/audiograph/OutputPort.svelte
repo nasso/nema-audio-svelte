@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NodeOutput } from "@api/graph";
+  import type { Effect, Output } from "@api/graph";
   import type { Point } from "@app/utils/geom";
   import type { ViewportContext } from "./Viewport.svelte";
 
@@ -8,7 +8,7 @@
   import { rectCenter } from "@app/utils/geom";
 
   export let context: ViewportContext;
-  export let output: NodeOutput;
+  export let output: Output<Effect>;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
 

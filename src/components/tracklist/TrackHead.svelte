@@ -2,13 +2,14 @@
   import { createEventDispatcher } from "svelte";
 
   import type { Track } from "@api/project";
-  import { PluginTrack } from "@api/project";
+  import type { Source } from "@api/graph";
+
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
 
-  export let track: Track;
+  export let track: Track<Source>;
 
   const dispatch = createEventDispatcher();
 
@@ -78,23 +79,18 @@
         on:contextmenu={handleMuteContextMenu} />
       <VStack>
         <h2>{track.name}</h2>
-        {#if track instanceof PluginTrack}
-          <h3>{track.plugin}</h3>
-        {/if}
       </VStack>
     </HStack>
     <div class="knobs">
       <VStack spacing={8} hpad={8}>
-        {#if track instanceof PluginTrack}
+        {#each track.mod.parameters as param}
           <Knob
-            type="absolute"
-            disabled={!track.enabled}
-            bind:value={track.volume} />
-          <Knob
-            type="relative"
-            disabled={!track.enabled}
-            bind:value={track.pan} />
-        {/if}
+            type={param.type}
+            min={param.min}
+            max={param.max}
+            bind:value={param.value}
+            disabled={!track.enabled} />
+        {/each}
       </VStack>
     </div>
   </HStack>
