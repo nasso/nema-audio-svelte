@@ -56,9 +56,10 @@
 </script>
 
 <style lang="scss">
-  .graph-port {
+  .output-port {
     line-height: 0;
     --scale: 0.5;
+    --link-width: 2px;
 
     svg {
       overflow: visible;
@@ -76,6 +77,7 @@
 
     &:hover {
       --scale: 0.75;
+      --link-width: 4px;
     }
   }
 </style>
@@ -90,7 +92,7 @@
     dragging = false;
     $dragOffset = { x: 0, y: 0 };
   }}
-  class="graph-port"
+  class="output-port"
   style={`
     color: ${color};
   `}>
@@ -113,16 +115,19 @@
 
     {#if elemRect}
       <g transform={`translate(${-elemRect.x} ${-elemRect.y})`}>
-        {#if dragging}
-          <Link
-            source={rectCenter(elemRect)}
-            target={pointAdd(rectCenter(elemRect), $dragOffset)} />
-        {/if}
+        <g style="pointer-events: none">
+          {#if dragging}
+            <Link
+              source={rectCenter(elemRect)}
+              target={pointAdd(rectCenter(elemRect), $dragOffset)} />
+          {/if}
+        </g>
 
         {#if links}
           {#each [...links] as _, i}
             {#if destRects[i]}
               <Link
+                linkWidth="var(--link-width)"
                 source={rectCenter(elemRect)}
                 target={rectCenter(destRects[i])} />
             {/if}

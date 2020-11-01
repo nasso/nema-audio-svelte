@@ -1,7 +1,7 @@
 <script lang="ts">
   export let source: { x: number; y: number };
   export let target: { x: number; y: number };
-  export let linkWidth: number = 2;
+  export let linkWidth: string = "2";
   export let stiffness:
     | number
     | ((offset: { x: number; y: number }) => number) = ({ x }) =>
@@ -21,8 +21,15 @@
   $: invStiffness = 1.0 - stiffnessValue;
 </script>
 
+<style lang="scss">
+  .link {
+    transition: opacity var(--anim-short);
+    transition: stroke-width var(--anim-short);
+  }
+</style>
+
 <path
-  style="transition: opacity var(--anim-short)"
+  class="link"
   fill="none"
   stroke="currentColor"
   stroke-width={linkWidth}
