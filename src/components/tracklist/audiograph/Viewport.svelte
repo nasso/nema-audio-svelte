@@ -15,7 +15,7 @@
   import project from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
   import Node from "./Node.svelte";
-  import Port from "./Port.svelte";
+  import OutputPort from "./OutputPort.svelte";
 
   export let xscroll: number;
 
@@ -60,7 +60,7 @@
       <VStack spacing={4}>
         {#each $project.tracks as track}
           <div class="track" style={`--track-height: ${track.height}px`}>
-            <Port
+            <OutputPort
               bind:context
               links={track.outputs.get(0)}
               on:wireout={() => (wireSource = { node: track, output: 0 })} />

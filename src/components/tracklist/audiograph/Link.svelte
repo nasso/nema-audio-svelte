@@ -26,7 +26,6 @@
   fill="none"
   stroke="currentColor"
   stroke-width={linkWidth}
-  stroke-linecap="round"
   d={`
     M ${source.x},${source.y}
     c ${delta.x * invStiffness},${0}

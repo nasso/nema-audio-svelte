@@ -12,7 +12,8 @@
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
   import { writable } from "svelte/store";
-  import Port from "./Port.svelte";
+  import InputPort from "./InputPort.svelte";
+  import OutputPort from "./OutputPort.svelte";
 
   export let context: ViewportContext;
   export let node: AudioGraphNode;
@@ -94,7 +95,7 @@
   <div class="inputs">
     <VStack spacing={8}>
       {#each { length: node.mod.inputs } as _, input}
-        <Port
+        <InputPort
           bind:context
           input={{ node, input }}
           on:connect={() => dispatch('connect', input)} />
@@ -105,7 +106,7 @@
   <div class="outputs">
     <VStack spacing={8}>
       {#each { length: node.mod.outputs } as _, output}
-        <Port
+        <OutputPort
           bind:context
           links={node.outputs.get(output)}
           on:wireout={() => dispatch('wireout', output)} />

@@ -3,14 +3,12 @@
   import type { ViewportContext } from "./Viewport.svelte";
 
   import { createEventDispatcher } from "svelte";
-  import { writable } from "svelte/store";
   import { spring } from "svelte/motion";
   import drag from "@app/utils/drag";
   import { pointAdd, rectCenter } from "@app/utils/geom";
   import Link from "./Link.svelte";
 
   export let context: ViewportContext;
-  export let input: NodeInput = undefined;
   export let links: Set<NodeInput> = undefined;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
@@ -34,7 +32,6 @@
   );
 
   $: {
-    input;
     links;
     elemRect = elem?.getBoundingClientRect();
   }
@@ -55,24 +52,6 @@
           destRects[index] = val;
         });
     });
-  }
-
-  $: if (input) {
-    let inputMap = context.nodeMap.get(input.node);
-
-    if (!inputMap) {
-      inputMap = new Map();
-      context.nodeMap.set(input.node, inputMap);
-    }
-
-    let rect = inputMap.get(input.input);
-
-    if (!rect) {
-      rect = writable(null);
-      inputMap.set(input.input, rect);
-    }
-
-    rect.set(elemRect);
   }
 </script>
 
@@ -111,11 +90,6 @@
     dragging = false;
     $dragOffset = { x: 0, y: 0 };
   }}
-  on:pointerup={(e) => {
-    if (input) {
-      dispatch('connect');
-    }
-  }}
   class="graph-port"
   style={`
     color: ${color};
@@ -146,7 +120,7 @@
         {/if}
 
         {#if links}
-          {#each [...links] as link, i}
+          {#each [...links] as _, i}
             {#if destRects[i]}
               <Link
                 source={rectCenter(elemRect)}
