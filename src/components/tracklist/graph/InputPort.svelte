@@ -39,13 +39,15 @@
       .get(link.node)
       ?.get(link.output)
       ?.subscribe((val) => {
-        const rect = elem.getBoundingClientRect();
-        const center = rectCenter(rect, true);
+        if (val) {
+          const rect = elem.getBoundingClientRect();
+          const center = rectCenter(rect, true);
 
-        linkTarget = {
-          x: val.x - rect.left - center.x,
-          y: val.y - rect.top - center.y,
-        };
+          linkTarget = {
+            x: val.x - rect.left - center.x,
+            y: val.y - rect.top - center.y,
+          };
+        }
       });
   }
 

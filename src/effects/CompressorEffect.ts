@@ -1,4 +1,4 @@
-import { Effect, ParameterAccuracy, ParameterType } from "./graph";
+import { Effect, ParameterAccuracy, ParameterType } from "@api/graph";
 
 export default class CompressorEffect extends Effect {
   name = "Compressor";
