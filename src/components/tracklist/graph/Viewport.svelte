@@ -33,7 +33,7 @@
   let pointerPos: Point;
   let viewportRect: DOMRect;
 
-  let wireConnected = false;
+  let wireVisible = false;
   let wireSource: { node: GraphNode<any>; output: number; pos: Point };
   let wireStartPos = { x: 0, y: 0 };
   let wireEndPos = spring(
@@ -49,45 +49,41 @@
     // recompute the viewportRect
     viewportRect = context.viewportElem.getBoundingClientRect();
 
-    // forcefully set the end position to the source pos
-    wireEndPos.set(wireSource.pos, { hard: true });
-
     // keep the source pos
     wireStartPos = wireSource.pos;
   }
 
   // make the wire go back to its source pos when cancelled (cool animation)
+  // then hide it
   $: if (wireSource === null) {
-    $wireEndPos = wireStartPos;
+    wireEndPos.set(wireStartPos).then(() => {
+      wireVisible = false;
+    });
   }
 
   $: if (wireSource) {
-    $wireEndPos = {
-      x: pointerPos.x - viewportRect.left,
-      y: pointerPos.y - viewportRect.top,
+    $wireEndPos = toViewportSpace(pointerPos);
+  }
+
+  function toViewportSpace(p: Point): Point {
+    viewportRect = context.viewportElem.getBoundingClientRect();
+
+    return {
+      x: p.x - viewportRect.left,
+      y: p.y - viewportRect.top,
     };
   }
 
   function portCenter(elem: Element): Point {
-    viewportRect = context.viewportElem.getBoundingClientRect();
-
-    const pos = rectCenter(elem.getBoundingClientRect());
-
-    if (viewportRect) {
-      pos.x -= viewportRect.left;
-      pos.y -= viewportRect.top;
-    }
-
-    return pos;
+    return toViewportSpace(rectCenter(elem.getBoundingClientRect()));
   }
 
-  function handleWireOut(
-    e: CustomEvent<{ portElem: Element }>,
-    node: GraphNode<any>,
-    output: number
-  ) {
-    wireSource = { node, output, pos: portCenter(e.detail.portElem) };
-    wireConnected = false;
+  function handleWireOut(pos: Point, node: GraphNode<any>, output: number) {
+    wireSource = { node, output, pos };
+    wireVisible = true;
+
+    // forcefully set the end position to the source pos
+    wireEndPos.set(wireSource.pos, { hard: true });
   }
 </script>
 
@@ -142,7 +138,7 @@
             <OutputPort
               bind:context
               output={{ node: track, output: 0 }}
-              on:wireout={(e) => handleWireOut(e, track, 0)} />
+              on:wireout={(e) => handleWireOut(portCenter(e.detail.portElem), track, 0)} />
           </div>
         {/each}
       </VStack>
@@ -154,20 +150,25 @@
         on:wiretake={(e) => {
           const input = e.detail;
           const output = node.inputs.get(input);
-          const outputPos = context.nodeMap.get(node)?.get(input);
+          const outputPos = context.nodeMap
+            .get(output.node)
+            ?.get(output.output);
+
+          node = node.disconnectInput(input);
 
           if (output) {
-            wireSource = { node: output.node, output: output.output, pos: get(outputPos) };
+            handleWireOut(toViewportSpace(get(outputPos)), output.node, output.output);
+            wireEndPos.set(toViewportSpace(pointerPos), { hard: true });
           }
         }}
-        on:wireout={(e) => handleWireOut(e, node, e.detail.output)}
+        on:wireout={(e) => handleWireOut(portCenter(e.detail.portElem), node, e.detail.output)}
         on:connect={(e) => {
           if (wireSource) {
             const input = e.detail;
 
             wireSource.node.connect(node, input, wireSource.output);
             wireSource = null;
-            wireConnected = true;
+            wireVisible = false;
 
             // refresh the node
             node = node;
@@ -175,7 +176,7 @@
         }} />
     {/each}
 
-    {#if !wireConnected}
+    {#if wireVisible}
       <svg class="dragged-wire" class:visible={!!wireSource}>
         <Link source={wireStartPos} target={$wireEndPos} />
       </svg>

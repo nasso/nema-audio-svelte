@@ -88,7 +88,35 @@ export class GraphNode<T extends Effect> {
   }
 
   connect(dest: GraphNode<Effect>, input = 0, output = 0): this {
-    dest.inputs.set(input, { node: this, output });
+    dest.connectInput(input, { node: this, output });
+
+    return this;
+  }
+
+  disconnect(dest: GraphNode<Effect>, input = 0, output?: number): this {
+    const connected = dest.inputs.get(input);
+
+    if (connected.node !== this) {
+      return this;
+    }
+
+    if (typeof output === "number" && connected.output !== output) {
+      return this;
+    }
+
+    dest.disconnectInput(input);
+
+    return this;
+  }
+
+  connectInput(input: number, output: Output<Effect>): this {
+    this.inputs.set(input, output);
+
+    return this;
+  }
+
+  disconnectInput(input: number): this {
+    this.inputs.delete(input);
 
     return this;
   }
