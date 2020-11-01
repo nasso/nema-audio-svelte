@@ -1,8 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  import type { Track } from "@api/project";
-  import type { Source } from "@api/graph";
+  import type { Source, Track } from "@api/graph";
 
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";
@@ -79,6 +78,9 @@
         on:contextmenu={handleMuteContextMenu} />
       <VStack>
         <h2>{track.name}</h2>
+        {#if track.description}
+          <h3>{track.description}</h3>
+        {/if}
       </VStack>
     </HStack>
     <div class="knobs">

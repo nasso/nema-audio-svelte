@@ -24,6 +24,7 @@ export class AudioPlayer extends Source {
 }
 
 export class AudioTrack extends Track<AudioPlayer> {
+  description = "Audio";
   volume = 1.0;
   pan = 0.0;
 

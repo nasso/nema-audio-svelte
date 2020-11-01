@@ -124,6 +124,7 @@ export class GraphNode<T extends Effect> {
 
 export class Track<T extends Source> extends GraphNode<T> {
   name = "Track name";
+  description: string;
   enabled = true;
   height = 64;
 }
