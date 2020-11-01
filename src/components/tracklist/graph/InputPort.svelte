@@ -102,7 +102,7 @@
   </svg>
 
   {#if linkTarget}
-    <svg width="0" height="0" class="link">
+    <svg class="link">
       <Link source={{ x: 0, y: 0 }} target={linkTarget} />
     </svg>
   {/if}
