@@ -14,7 +14,7 @@
   }
 </style>
 
-<label class="checkbox" on:contextmenu>
+<label class="checkbox" on:contextmenu on:pointerdown|stopPropagation>
   <input type="checkbox" hidden bind:checked />
   <svg width={size} height={size}>
     <circle
