@@ -27,7 +27,7 @@ export const PARAMETER_DEFAULT = {
   max: 1.0,
 };
 
-export abstract class AudioModule {
+export class AudioModule {
   name: string;
   inputs = 1;
   outputs = 1;
@@ -43,28 +43,22 @@ export abstract class AudioModule {
   }
 }
 
-export interface NodeInput {
-  node: AudioGraphNode;
-  input: number;
+export interface NodeOutput {
+  node: GraphNode;
+  output: number;
 }
 
-export class Outputs {
-  outputs: Map<number, Set<NodeInput>> = new Map();
+export class GraphNode {
+  inputs: Map<number, NodeOutput> = new Map();
 
-  connect(node: AudioGraphNode, input = 0, output = 0): this {
-    let outputDests = this.outputs.get(output);
+  connect(dest: GraphNode, input = 0, output = 0): this {
+    dest.inputs.set(input, { node: this, output });
 
-    if (!outputDests) {
-      outputDests = new Set([]);
-      this.outputs.set(output, outputDests);
-    }
-
-    outputDests.add({ node, input });
     return this;
   }
 }
 
-export class AudioGraphNode extends Outputs {
+export class AudioGraphNode extends GraphNode {
   id: number = ++lastNodeId;
 
   // from options

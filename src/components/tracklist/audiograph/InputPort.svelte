@@ -1,82 +1,106 @@
 <script lang="ts">
-  import type { NodeInput } from "@api/graph";
+  import type { NodeOutput } from "@api/graph";
+  import type { Point } from "@app/utils/geom";
   import type { ViewportContext } from "./Viewport.svelte";
 
-  import { createEventDispatcher } from "svelte";
-  import { writable } from "svelte/store";
+  import { createEventDispatcher, onDestroy } from "svelte";
+  import { rectCenter } from "@app/utils/geom";
+  import Link from "./Link.svelte";
 
   export let context: ViewportContext;
-  export let input: NodeInput = undefined;
-  export let size: number = 16;
+  export let link: NodeOutput;
+  export let size: number = 8;
   export let color: string = "var(--color-foreground-2)";
 
   const dispatch = createEventDispatcher();
 
-  let elem: Element | HTMLElement | SVGElement = undefined;
-  let elemRect: DOMRect;
+  let elem: HTMLElement = null;
+  let linkTarget: Point = null;
+  let linkTargetUnsub: () => void = null;
 
-  $: {
-    input;
-    elemRect = elem?.getBoundingClientRect();
+  // unlink!
+  $: if (!link) {
+    linkTarget = null;
+
+    if (linkTargetUnsub) {
+      linkTargetUnsub();
+      linkTargetUnsub = null;
+    }
   }
 
-  $: if (input) {
-    let inputMap = context.nodeMap.get(input.node);
-
-    if (!inputMap) {
-      inputMap = new Map();
-      context.nodeMap.set(input.node, inputMap);
+  // link!
+  $: if (link && elem) {
+    if (linkTargetUnsub) {
+      linkTargetUnsub();
+      linkTargetUnsub = null;
     }
 
-    let rect = inputMap.get(input.input);
+    linkTargetUnsub = context.nodeMap
+      .get(link.node)
+      ?.get(link.output)
+      ?.subscribe((val) => {
+        const rect = elem.getBoundingClientRect();
+        const center = rectCenter(rect, true);
 
-    if (!rect) {
-      rect = writable(null);
-      inputMap.set(input.input, rect);
-    }
-
-    rect.set(elemRect);
+        linkTarget = {
+          x: val.x - rect.left - center.x,
+          y: val.y - rect.top - center.y,
+        };
+      });
   }
+
+  onDestroy(() => {
+    if (linkTargetUnsub) {
+      linkTargetUnsub();
+    }
+  });
 </script>
 
 <style lang="scss">
   .graph-port {
+    padding: 4px;
+    position: relative;
     line-height: 0;
-    --scale: 0.5;
-
-    svg {
-      overflow: visible;
-    }
-
-    .port-group {
-      transition: transform var(--anim-short);
-
-      transform: translate(50%, 50%) scale(var(--scale));
-    }
-
-    .circle {
-      transition: stroke-width var(--anim-short);
-    }
+    --dot-size: 25%;
 
     &:hover {
-      --scale: 0.75;
+      --dot-size: 40%;
+    }
+
+    .port-dot {
+      transition: r var(--anim-short);
+    }
+
+    .link {
+      color: var(--color-foreground-2);
+      overflow: visible;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      pointer-events: none;
     }
   }
 </style>
 
 <div
-  on:pointerup={(e) => {
-    if (input) {
-      dispatch('connect');
-    }
-  }}
+  on:pointerup={() => dispatch('connect')}
+  bind:this={elem}
   class="graph-port"
   style={`
     color: ${color};
   `}>
-  <svg width={size} height={size} bind:this={elem}>
-    <g class="port-group">
-      <circle cx="0%" cy="0%" r="25%" fill="currentColor" class="circle" />
-    </g>
+  <svg width={size} height={size}>
+    <circle
+      class="port-dot"
+      style="r: var(--dot-size)"
+      cx={size / 2}
+      cy={size / 2}
+      fill="currentColor" />
   </svg>
+
+  {#if linkTarget}
+    <svg width="0" height="0" class="link">
+      <Link source={{ x: 0, y: 0 }} target={linkTarget} />
+    </svg>
+  {/if}
 </div>

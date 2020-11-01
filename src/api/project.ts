@@ -1,15 +1,9 @@
-import { AudioGraph, Outputs } from "@api/graph";
+import { AudioGraph, GraphNode } from "@api/graph";
 
-export abstract class Track extends Outputs {
-  name: string;
+export class Track extends GraphNode {
+  name = "Track name";
   enabled = true;
   height = 64;
-
-  constructor(name = "Track name") {
-    super();
-
-    this.name = name;
-  }
 }
 
 export class PluginTrack extends Track {

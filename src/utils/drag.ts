@@ -19,8 +19,8 @@ interface Action<T> {
   update: (parameters: T) => void,
 }
 
-export default function drag(node: HTMLElement, parameters: DragParameters): Action<DragParameters> {
-  function handlePointerDown(this: HTMLElement, e: PointerEvent) {
+export default function drag(node: Element, parameters: DragParameters): Action<DragParameters> {
+  function handlePointerDown(this: Element, e: PointerEvent) {
     if (
       (typeof parameters.button === "number" && e.button !== parameters.button) ||
       (Array.isArray(parameters.button) && !parameters.button.includes(e.button))
@@ -80,7 +80,7 @@ export default function drag(node: HTMLElement, parameters: DragParameters): Act
   };
 }
 
-export function dragscroller(node: HTMLElement, button: MouseButtons = 1): Action<MouseButtons> {
+export function dragscroller(node: Element, button: MouseButtons = 1): Action<MouseButtons> {
   const scrollStore = writable({ x: node.scrollLeft, y: node.scrollTop });
   const scroll: Settable<Point> = {
     subscribe: scrollStore.subscribe,

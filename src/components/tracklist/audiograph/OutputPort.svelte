@@ -1,57 +1,60 @@
 <script lang="ts">
-  import type { NodeInput } from "@api/graph";
+  import type { NodeOutput } from "@api/graph";
+  import type { Point } from "@app/utils/geom";
   import type { ViewportContext } from "./Viewport.svelte";
 
   import { createEventDispatcher } from "svelte";
-  import { spring } from "svelte/motion";
-  import drag from "@app/utils/drag";
-  import { pointAdd, rectCenter } from "@app/utils/geom";
-  import Link from "./Link.svelte";
+  import { writable } from "svelte/store";
+  import { rectCenter } from "@app/utils/geom";
 
   export let context: ViewportContext;
-  export let links: Set<NodeInput> = undefined;
+  export let output: NodeOutput;
   export let size: number = 16;
   export let color: string = "var(--color-foreground-2)";
 
   const dispatch = createEventDispatcher();
 
   let elem: Element | HTMLElement | SVGElement = undefined;
-  let destRects: DOMRect[] = [];
-  let destUnsubs: (() => void)[] = [];
-  let elemRect: DOMRect;
-  let dragging: boolean = false;
-  let dragOffset = spring(
-    {
-      x: 0,
-      y: 0,
-    },
-    {
-      stiffness: 0.25,
-      damping: 1,
-    }
-  );
+  let elemCenter: Point;
 
-  $: {
-    links;
-    elemRect = elem?.getBoundingClientRect();
+  $: if (elem) {
+    // be reactive to output.node and output.output
+    // when the node moves, output.node is changed because it contains the
+    // position
+    output;
+
+    // update the center of this port
+    elemCenter = rectCenter(elem.getBoundingClientRect());
   }
 
-  $: if (links) {
-    for (let unsub of destUnsubs) {
-      if (unsub) {
-        unsub();
-      }
+  // maintain ourselves in the outputMap
+  $: if (output) {
+    // get the (number => point) map for this node
+    let outputMap = context.nodeMap.get(output.node);
+
+    // it can be undefined if this is the first output (id=0)
+    if (!outputMap) {
+      // create it empty
+      outputMap = new Map();
+
+      // assign it to the nodeMap
+      context.nodeMap.set(output.node, outputMap);
     }
 
-    destRects = new Array(links.size);
-    destUnsubs = [...links].map((link, index) => {
-      return context.nodeMap
-        .get(link.node)
-        ?.get(link.input)
-        ?.subscribe((val) => {
-          destRects[index] = val;
-        });
-    });
+    // get the store storing the point
+    let point = outputMap.get(output.output);
+
+    // it can be undefined if this is the first time we set it
+    if (!point) {
+      // create an empty store for it
+      point = writable(null);
+
+      // assign it to this node's outputMap
+      outputMap.set(output.output, point);
+    }
+
+    // update it
+    point.set(elemCenter);
   }
 </script>
 
@@ -83,20 +86,13 @@
 </style>
 
 <div
-  use:drag={{ button: 0, capture: false, element: context.viewportElem, offset: dragOffset }}
-  on:dragstart={() => {
-    dragging = true;
-    dispatch('wireout');
-  }}
-  on:dragend={() => {
-    dragging = false;
-    $dragOffset = { x: 0, y: 0 };
-  }}
+  on:pointerdown={(e) => dispatch('wireout', { portElem: e.currentTarget })}
+  bind:this={elem}
   class="output-port"
   style={`
     color: ${color};
   `}>
-  <svg width={size} height={size} bind:this={elem}>
+  <svg width={size} height={size}>
     <clipPath id="hole-clip">
       <circle cx="0%" cy="0%" r="50%" />
     </clipPath>
@@ -112,28 +108,5 @@
         fill="none"
         class="circle" />
     </g>
-
-    {#if elemRect}
-      <g transform={`translate(${-elemRect.x} ${-elemRect.y})`}>
-        <g style="pointer-events: none">
-          {#if dragging}
-            <Link
-              source={rectCenter(elemRect)}
-              target={pointAdd(rectCenter(elemRect), $dragOffset)} />
-          {/if}
-        </g>
-
-        {#if links}
-          {#each [...links] as _, i}
-            {#if destRects[i]}
-              <Link
-                linkWidth="var(--link-width)"
-                source={rectCenter(elemRect)}
-                target={rectCenter(destRects[i])} />
-            {/if}
-          {/each}
-        {/if}
-      </g>
-    {/if}
   </svg>
 </div>

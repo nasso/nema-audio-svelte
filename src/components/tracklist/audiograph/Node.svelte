@@ -55,7 +55,8 @@
       display: flex;
       align-items: center;
       position: absolute;
-      height: 100%;
+      top: 0;
+      bottom: 0;
     }
 
     .inputs {
@@ -97,7 +98,7 @@
       {#each { length: node.mod.inputs } as _, input}
         <InputPort
           bind:context
-          input={{ node, input }}
+          link={node.inputs.get(input)}
           on:connect={() => dispatch('connect', input)} />
       {/each}
     </VStack>
@@ -108,8 +109,11 @@
       {#each { length: node.mod.outputs } as _, output}
         <OutputPort
           bind:context
-          links={node.outputs.get(output)}
-          on:wireout={() => dispatch('wireout', output)} />
+          output={{ node, output }}
+          on:wireout={(e) => dispatch('wireout', {
+              output,
+              portElem: e.detail.portElem,
+            })} />
       {/each}
     </VStack>
   </div>
