@@ -22,6 +22,7 @@
     // when the node moves, output.node is changed because it contains the
     // position
     output;
+    context.xscroll;
 
     // update the center of this port
     elemCenter = rectCenter(elem.getBoundingClientRect());

@@ -6,6 +6,7 @@
   export type NodeMap = WeakMap<GraphNode<any>, OutputMap>;
 
   export interface ViewportContext {
+    xscroll: number;
     nodeMap: NodeMap;
     viewportElem?: Element;
   }
@@ -26,6 +27,7 @@
   export let xscroll: number;
 
   let context: ViewportContext = {
+    xscroll,
     nodeMap: new WeakMap(),
     viewportElem: null,
   };
@@ -43,6 +45,8 @@
       damping: 1,
     }
   );
+
+  $: context.xscroll = xscroll;
 
   // reactive block executes when a new wire is being dragged out
   $: if (wireSource) {
@@ -157,6 +161,7 @@
           node = node.disconnectInput(input);
 
           if (output) {
+            console.log(get(outputPos));
             handleWireOut(toViewportSpace(get(outputPos)), output.node, output.output);
             wireEndPos.set(toViewportSpace(pointerPos), { hard: true });
           }
@@ -175,11 +180,11 @@
           }
         }} />
     {/each}
-
-    {#if wireVisible}
-      <svg class="dragged-wire" class:visible={!!wireSource}>
-        <Link source={wireStartPos} target={$wireEndPos} />
-      </svg>
-    {/if}
   </div>
+
+  {#if wireVisible}
+    <svg class="dragged-wire" class:visible={!!wireSource}>
+      <Link source={wireStartPos} target={$wireEndPos} />
+    </svg>
+  {/if}
 </div>
