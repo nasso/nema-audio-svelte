@@ -1,4 +1,4 @@
-import { AudioTrack } from "@api/audio";
+import { AudioClip, AudioTrack } from "@api/audio";
 import { GraphNode } from "@api/graph";
 import { Project } from "@api/project";
 import ChannelMergerEffect from "@app/effects/ChannelMergerEffect";
@@ -67,5 +67,8 @@ merger.connect(output);
 
 project.tracks[0].connect(splitter);
 project.tracks[1].connect(gain);
+
+project.tracks[0].insert(new AudioClip(0, 8, 16));
+project.tracks[2].insert(new AudioClip(8, 8));
 
 export default writable(project);

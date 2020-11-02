@@ -56,6 +56,14 @@ export interface Output<T extends Effect> {
   output: number;
 }
 
+export interface GraphNodeOptions<T> {
+    effect: T,
+    x?: number,
+    y?: number,
+    enabled?: boolean,
+    passthrough?: boolean,
+}
+
 export class GraphNode<T extends Effect> {
   id: number = ++lastNodeId;
 
@@ -66,13 +74,7 @@ export class GraphNode<T extends Effect> {
   enabled: boolean;
   passthrough: boolean;
 
-  constructor(options: {
-    effect: T,
-    x?: number,
-    y?: number,
-    enabled?: boolean,
-    passthrough?: boolean,
-  }) {
+  constructor(options: GraphNodeOptions<T>) {
     options = Object.assign({}, {
       x: 0,
       y: 0,
@@ -120,13 +122,6 @@ export class GraphNode<T extends Effect> {
 
     return this;
   }
-}
-
-export class Track<T extends Source> extends GraphNode<T> {
-  name = "Track name";
-  description: string;
-  enabled = true;
-  height = 64;
 }
 
 export class ProcessingGraph {

@@ -1,10 +1,11 @@
 <script lang="ts">
-  import type { Track } from "@api/project";
+  import type { Source } from "@api/graph";
+  import type { Track } from "@api/playlist";
 
   import { writable } from "svelte/store";
   import { tick } from "svelte/internal";
 
-  import drag from "@app/utils/drag";
+  import drag from "@components/actions/drag";
   import project from "@app/stores/project";
   import uiState from "@app/stores/ui";
   import FlexSpace from "@components/layout/FlexSpace.svelte";
@@ -13,7 +14,6 @@
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
-  import type { Source } from "@api/graph";
 
   let tracklist: HTMLElement;
   let scroll = writable({
@@ -30,7 +30,7 @@
 
   $: $scroll.x = Math.max(0, $scroll.x);
 
-  function handleSolo(e: CustomEvent<Track<any>>) {
+  function handleSolo(e: CustomEvent<Track<Source>>) {
     const track = e.detail;
 
     const isSolo = $project.tracks.every((t) => t.enabled === (t === track));

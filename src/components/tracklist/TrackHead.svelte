@@ -1,7 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  import type { Source, Track } from "@api/graph";
+  import type { Source } from "@api/graph";
+  import type { Track } from "@api/playlist";
 
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";

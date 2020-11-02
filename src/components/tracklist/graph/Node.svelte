@@ -4,7 +4,7 @@
   import type { ViewportContext } from "./Viewport.svelte";
 
   import { createEventDispatcher } from "svelte";
-  import drag from "@app/utils/drag";
+  import drag from "@components/actions/drag";
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
   import Icon from "@components/Icon.svelte";

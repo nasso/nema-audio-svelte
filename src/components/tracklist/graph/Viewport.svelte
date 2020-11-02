@@ -1,9 +1,9 @@
 <script lang="ts" context="module">
   import type { Writable } from "svelte/store";
-  import type { GraphNode } from "@api/graph";
+  import type { Effect, GraphNode } from "@api/graph";
 
   export type OutputMap = Map<number, Writable<Point>>;
-  export type NodeMap = WeakMap<GraphNode<any>, OutputMap>;
+  export type NodeMap = WeakMap<GraphNode<Effect>, OutputMap>;
 
   export interface ViewportContext {
     xscroll: number;
@@ -36,7 +36,7 @@
   let viewportRect: DOMRect;
 
   let wireVisible = false;
-  let wireSource: { node: GraphNode<any>; output: number; pos: Point };
+  let wireSource: { node: GraphNode<Effect>; output: number; pos: Point };
   let wireStartPos = { x: 0, y: 0 };
   let wireEndPos = spring(
     { x: 0, y: 0 },
@@ -82,7 +82,7 @@
     return toViewportSpace(rectCenter(elem.getBoundingClientRect()));
   }
 
-  function handleWireOut(pos: Point, node: GraphNode<any>, output: number) {
+  function handleWireOut(pos: Point, node: GraphNode<Effect>, output: number) {
     wireSource = { node, output, pos };
     wireVisible = true;
 

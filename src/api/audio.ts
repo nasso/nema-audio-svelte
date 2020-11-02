@@ -1,4 +1,15 @@
-import { ParameterAccuracy, ParameterType, Source, Track } from "@api/graph";
+import { ParameterAccuracy, ParameterType, Source } from "@api/graph";
+import { Clip, Track } from "@api/playlist";
+
+export class AudioClip extends Clip {
+  constructor(time: number, length: number, extent = length) {
+    super();
+
+    this.start = time;
+    this.length = length;
+    this.extent = extent;
+  }
+}
 
 export class AudioPlayer extends Source {
   constructor() {
