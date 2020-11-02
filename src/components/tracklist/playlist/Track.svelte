@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
   import type { Track } from "@api/playlist";
-  import Clip from "./Clip.svelte";
+  import ClipComponent from "./ClipComponent.svelte";
 
   export let track: Track<Source>;
   export let visualScale: number;
@@ -92,7 +92,7 @@
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <Clip bind:clip {visualScale} />
+      <ClipComponent {visualScale} bind:clip />
     {/each}
   </div>
 </div>
