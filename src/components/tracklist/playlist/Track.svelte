@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
-  import type { Track } from "@api/playlist";
+  import type { ClipInstance, Track } from "@api/playlist";
   import Clip from "./Clip.svelte";
 
   export let track: Track<Source>;
   export let xscroll: number;
   export let barWidth: number;
   export let beatWidth: number;
-  export let snap: number;
 </script>
 
 <style lang="scss">
@@ -74,6 +73,7 @@
 <div
   class="track"
   class:disabled={!track.enabled}
+  on:pointerenter
   style={`
     height: ${track.height}px;
     --xscroll: ${xscroll}px;
@@ -82,7 +82,7 @@
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <Clip bind:clip {barWidth} {snap} />
+      <Clip bind:clip {barWidth} on:cliptake />
     {/each}
   </div>
 </div>

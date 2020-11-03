@@ -1,4 +1,8 @@
 <script lang="ts">
+  import type { Source } from "@api/graph";
+  import type { Clip, Track } from "@api/playlist";
+  import type { Point } from "@app/utils/geom";
+
   import project from "@app/stores/project";
   import uiState from "@app/stores/ui";
   import VStack from "@components/layout/VStack.svelte";
@@ -9,8 +13,9 @@
 
   let beatWidth: number;
   let barWidth: number;
-  let snapDisable: boolean;
   let snap: number;
+  let movedClip: { clip: Clip; start: number; track: Track<Source> } = null;
+  let pointerStart: Point;
   let animatedZoom = spring($uiState.playlistBarWidth, {
     stiffness: 0.25,
     damping: 1.0,
@@ -44,23 +49,52 @@
   }
 
   function handleGlobalKeyDown(this: HTMLElement, e: KeyboardEvent) {
-    e.preventDefault();
     if (e.key === "Alt") {
-      snapDisable = true;
+      e.preventDefault();
     }
   }
 
   function handleGlobalKeyUp(this: HTMLElement, e: KeyboardEvent) {
-    e.preventDefault();
     if (e.key === "Alt") {
-      snapDisable = false;
+      e.preventDefault();
     }
   }
 </script>
 
 <svelte:window on:keydown={handleGlobalKeyDown} on:keyup={handleGlobalKeyUp} />
 
-<div on:wheel={handleWheel}>
+<div
+  on:wheel={handleWheel}
+  on:pointerdown={(e) => {
+    if (e.button !== 0) {
+      return;
+    }
+
+    pointerStart = { x: e.clientX, y: e.clientY };
+  }}
+  on:pointerup={(e) => {
+    if (e.button !== 0) {
+      return;
+    }
+
+    movedClip = null;
+  }}
+  on:pointermove={(e) => {
+    if (movedClip) {
+      let delta = e.clientX - pointerStart.x;
+
+      if (!e.altKey) {
+        const withoutSnap = movedClip.start + delta / barWidth;
+        const snapped = Math.round(withoutSnap / snap) * snap;
+
+        delta = (snapped - movedClip.start) * barWidth;
+      }
+
+      delta = Math.max(delta, -movedClip.start * barWidth);
+      movedClip.clip.start = movedClip.start + delta / barWidth;
+      $project.tracks = $project.tracks;
+    }
+  }}>
   <VStack spacing={4}>
     {#each $project.tracks as track}
       <PlaylistTrack
@@ -68,7 +102,14 @@
         {xscroll}
         {beatWidth}
         {barWidth}
-        snap={snapDisable ? 0 : snap} />
+        on:pointerenter={() => {
+          if (movedClip) {
+            movedClip.track.remove(movedClip.clip);
+            track = track.insert(movedClip.clip);
+            movedClip.track = track;
+          }
+        }}
+        on:cliptake={(e) => (movedClip = { clip: e.detail, start: e.detail.start, track })} />
     {/each}
   </VStack>
 </div>
