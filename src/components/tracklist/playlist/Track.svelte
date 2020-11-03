@@ -1,23 +1,13 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
   import type { Track } from "@api/playlist";
-  import ClipComponent from "./ClipComponent.svelte";
+  import Clip from "./Clip.svelte";
 
   export let track: Track<Source>;
-  export let visualScale: number;
   export let xscroll: number;
-
-  let beatWidth: number;
-
-  $: {
-    const barWidth = visualScale;
-
-    beatWidth = barWidth;
-
-    for (let i = 0; i < 4 && beatWidth / 2 >= 20; i++) {
-      beatWidth /= 2;
-    }
-  }
+  export let barWidth: number;
+  export let beatWidth: number;
+  export let snap: number;
 </script>
 
 <style lang="scss">
@@ -87,12 +77,12 @@
   style={`
     height: ${track.height}px;
     --xscroll: ${xscroll}px;
-    --bar-width: ${visualScale}px;
+    --bar-width: ${barWidth}px;
     --beat-width: ${beatWidth}px;
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <ClipComponent {visualScale} bind:clip />
+      <Clip bind:clip {barWidth} {snap} />
     {/each}
   </div>
 </div>

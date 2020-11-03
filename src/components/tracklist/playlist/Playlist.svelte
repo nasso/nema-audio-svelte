@@ -7,12 +7,28 @@
 
   export let xscroll: number;
 
+  let beatWidth: number;
+  let barWidth: number;
+  let snapDisable: boolean;
+  let snap: number;
   let animatedZoom = spring($uiState.playlistBarWidth, {
     stiffness: 0.25,
     damping: 1.0,
   });
 
   $: $animatedZoom = $uiState.playlistBarWidth;
+  $: barWidth = $animatedZoom;
+
+  $: {
+    // snap is 1 bar by default
+    snap = 1;
+    beatWidth = barWidth;
+
+    for (let i = 0; i < 4 && beatWidth / 2 >= 15; i++) {
+      beatWidth /= 2;
+      snap /= 2;
+    }
+  }
 
   function handleWheel(this: HTMLElement, e: WheelEvent) {
     if (e.ctrlKey) {
@@ -26,12 +42,33 @@
       );
     }
   }
+
+  function handleGlobalKeyDown(this: HTMLElement, e: KeyboardEvent) {
+    e.preventDefault();
+    if (e.key === "Alt") {
+      snapDisable = true;
+    }
+  }
+
+  function handleGlobalKeyUp(this: HTMLElement, e: KeyboardEvent) {
+    e.preventDefault();
+    if (e.key === "Alt") {
+      snapDisable = false;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleGlobalKeyDown} on:keyup={handleGlobalKeyUp} />
 
 <div on:wheel={handleWheel}>
   <VStack spacing={4}>
     {#each $project.tracks as track}
-      <PlaylistTrack bind:track {xscroll} visualScale={$animatedZoom} />
+      <PlaylistTrack
+        bind:track
+        {xscroll}
+        {beatWidth}
+        {barWidth}
+        snap={snapDisable ? 0 : snap} />
     {/each}
   </VStack>
 </div>

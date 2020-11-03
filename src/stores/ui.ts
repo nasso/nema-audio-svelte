@@ -13,16 +13,18 @@ interface UiState {
   currentView: string;
   usePointerLock: boolean;
   playlistBarWidth: number;
+  playlistSnapScale: number;
 }
 
 const uiState: Writable<UiState> = writable({
-  version: "0.1.3",
+  version: "0.1.4",
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
   trackHeadsWidth: 150,
   currentView: "playlist",
   usePointerLock: false,
   playlistBarWidth: 60,
+  playlistSnapScale: 1,
 });
 
 function patch(state: UiState, newValues: Record<string, unknown>) {
