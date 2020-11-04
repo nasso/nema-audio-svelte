@@ -27,24 +27,22 @@
 
       const start = {
         x: e.clientX,
-        time: side === ResizeSide.Start ? clip.start : clip.extent,
-        start: clip.start,
+        timePoint: side === ResizeSide.Start ? clip.extentPast : clip.extent,
         extent: clip.extent,
       };
 
       const pointermove = (e: PointerEvent) => {
         const dt = (e.clientX - start.x) / barWidth;
-        let t = start.time + dt;
+        let t = start.timePoint + dt;
 
         if (!e.altKey) {
           t = Math.round(t / snap) * snap;
         }
 
         if (side === ResizeSide.Start) {
-          clip.start = t;
-          clip.extent = start.extent - t + start.start;
+          clip.extentPast = Math.max(Math.min(t, 0), -clip.start);
         } else {
-          clip.extent = t;
+          clip.extent = Math.max(t, 0);
         }
       };
 
@@ -141,11 +139,16 @@
   class="clip"
   style={`
     --clip-color: ${color};
-    transform: translateX(${clip.start * barWidth}px);
+    transform: translateX(${(clip.start + clip.extentPast) * barWidth}px);
   `}>
   <div class="resize-handle" use:resizer={'start'} />
-  <div class="content" style={`width: ${clip.extent * barWidth}px`}>
-    <div class="data" style={`width: ${clip.length * barWidth}px`} />
+  <div class="content" style={`width: ${clip.totalExtent * barWidth}px`}>
+    <div
+      class="data"
+      style={`
+        transform: translateX(${-clip.extentPast * barWidth}px);
+        width: ${clip.length * barWidth}px
+      `} />
   </div>
   <div class="resize-handle" use:resizer={'end'} />
 </div>

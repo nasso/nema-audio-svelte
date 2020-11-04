@@ -5,10 +5,11 @@ import { Source, GraphNode } from "./graph";
 
 export class Clip {
   timestampStore: Writable<number>;
-  length: number;
-  extent: number;
+  length = 1;
+  extent = 1;
+  extentPast = 0;
 
-  #start: number;
+  #start = 0;
 
   constructor() {
     this.timestampStore = writable(0);
@@ -24,6 +25,10 @@ export class Clip {
 
   set start(val: number) {
     this.timestampStore.set(val);
+  }
+
+  get totalExtent(): number {
+    return this.extent - this.extentPast;
   }
 }
 

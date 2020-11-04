@@ -88,7 +88,7 @@
         start = Math.round(start / snap) * snap;
       }
 
-      start = Math.max(0, start);
+      start = Math.max(-movedClip.clip.extentPast, start);
       movedClip.clip.start = start;
 
       $project.tracks = $project.tracks;
