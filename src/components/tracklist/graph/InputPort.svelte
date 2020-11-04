@@ -85,8 +85,8 @@
 </style>
 
 <div
-  on:pointerup={() => dispatch('connect')}
-  on:pointerdown={() => dispatch('wiretake')}
+  on:pointerup={(e) => e.button === 0 && dispatch('connect')}
+  on:pointerdown={(e) => e.button === 0 && dispatch('wiretake')}
   bind:this={elem}
   class="graph-port"
   style={`
