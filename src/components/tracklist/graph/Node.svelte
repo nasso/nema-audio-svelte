@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Effect, GraphNode } from "@api/graph";
   import type { Point } from "@app/utils/geom";
-  import type { ViewportContext } from "./Viewport.svelte";
+  import type { ViewportContext } from "./Graph.svelte";
 
   import { createEventDispatcher } from "svelte";
   import drag from "@components/actions/drag";

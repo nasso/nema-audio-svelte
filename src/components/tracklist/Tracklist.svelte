@@ -7,28 +7,37 @@
 
   import drag from "@components/actions/drag";
   import project from "@app/stores/project";
-  import uiState from "@app/stores/ui";
+  import uiState, { TracklistMode } from "@app/stores/ui";
   import FlexSpace from "@components/layout/FlexSpace.svelte";
   import SplitBar from "@components/layout/SplitBar.svelte";
   import SplitPane from "@components/layout/SplitPane.svelte";
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
+  import Playlist from "./playlist/Playlist.svelte";
+  import Graph from "./graph/Graph.svelte";
 
   let tracklist: HTMLElement;
-  let scroll = writable({
+  let playlistScroll: number = 0;
+  let graphScroll: number = 0;
+  let scrollDelta = writable({
     x: 0,
     y: 0,
   });
 
   $: if (tracklist) {
-    tracklist.scrollTop = $scroll.y;
-    // the user-agent clamps scrollTop for us... tysm user-agent :)
-    // we'll kindly steal your value :)
-    $scroll.y = tracklist.scrollTop;
+    tracklist.scrollTop += $scrollDelta.y;
   }
 
-  $: $scroll.x = Math.max(0, $scroll.x);
+  $: switch ($uiState.tracklistMode) {
+    case TracklistMode.Playlist:
+      playlistScroll = Math.max($scrollDelta.x + playlistScroll, 0);
+      console.log($scrollDelta.x);
+      break;
+    case TracklistMode.Graph:
+      graphScroll = Math.max($scrollDelta.x + graphScroll, 0);
+      break;
+  }
 
   function handleSolo(e: CustomEvent<Track<Source>>) {
     const track = e.detail;
@@ -41,16 +50,9 @@
     }
   }
 
-  function handleScroll(this: HTMLElement) {
-    // $scroll.x = this.scrollLeft;
-    // SIKE! don't touch horizontal scrolling, we take care of it without the ua
-
-    $scroll.y = this.scrollTop;
-  }
-
   async function handleNewTrack() {
     await tick();
-    $scroll.y = tracklist.scrollHeight - tracklist.clientHeight;
+    tracklist.scrollTop = tracklist.scrollHeight - tracklist.clientHeight;
   }
 </script>
 
@@ -70,8 +72,7 @@
 <div
   bind:this={tracklist}
   class="tracklist"
-  use:drag={{ button: 1, offset: scroll, invert: true }}
-  on:scroll={handleScroll}>
+  use:drag={{ button: 1, offset: scrollDelta, invert: true, relative: true }}>
   <SplitPane
     direction="row"
     min={150}
@@ -91,7 +92,11 @@
       <NewTrackHead on:newtrack={handleNewTrack} />
     </VStack>
     <div class="content">
-      <slot xscroll={$scroll.x} />
+      {#if $uiState.tracklistMode === TracklistMode.Playlist}
+        <Playlist xscroll={playlistScroll} />
+      {:else if $uiState.tracklistMode === TracklistMode.Graph}
+        <Graph xscroll={graphScroll} />
+      {/if}
     </div>
   </SplitPane>
 </div>

@@ -12,6 +12,7 @@ export interface DragParameters {
   button?: MouseButtons;
   capture?: boolean;
   element?: Element;
+  relative?: boolean;
   offset: Settable<Point>;
 }
 
@@ -42,6 +43,11 @@ export default function drag(node: Element, parameters: DragParameters): Action<
         y: e.clientY - pointerStart.y,
       };
 
+      if (parameters.relative) {
+        pointerStart.x = e.clientX;
+        pointerStart.y = e.clientY;
+      }
+
       const factor = parameters.invert ? -1 : 1;
 
       parameters.offset.set({
@@ -51,6 +57,13 @@ export default function drag(node: Element, parameters: DragParameters): Action<
     };
 
     const handlePointerUp = (e: PointerEvent) => {
+      if (parameters.relative) {
+        parameters.offset.set({
+          x: startOffset.x,
+          y: startOffset.y,
+        });
+      }
+
       elem.removeEventListener("pointermove", handlePointerMove);
       elem.removeEventListener("pointerup", handlePointerUp);
 

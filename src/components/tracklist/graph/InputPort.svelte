@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Effect, Output } from "@api/graph";
   import type { Point } from "@app/utils/geom";
-  import type { ViewportContext } from "./Viewport.svelte";
+  import type { ViewportContext } from "./Graph.svelte";
 
   import { createEventDispatcher, onDestroy } from "svelte";
   import { rectCenter } from "@app/utils/geom";

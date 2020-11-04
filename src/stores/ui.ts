@@ -5,23 +5,28 @@ import eq from "semver/functions/eq";
 const LOCAL_STORAGE_KEY = "nema-audio-ui-state";
 const STORE_TIMEOUT = 200;
 
+export enum TracklistMode {
+  Playlist = "playlist",
+  Graph = "graph",
+}
+
 interface UiState {
   readonly version: string;
   sidePaneWidth: number;
   bottomPaneHeight: number;
   trackHeadsWidth: number,
-  currentView: string;
+  tracklistMode: TracklistMode;
   usePointerLock: boolean;
   playlistBarWidth: number;
   playlistSnapScale: number;
 }
 
 const uiState: Writable<UiState> = writable({
-  version: "0.1.4",
+  version: "0.1.5",
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
   trackHeadsWidth: 150,
-  currentView: "playlist",
+  tracklistMode: TracklistMode.Playlist,
   usePointerLock: false,
   playlistBarWidth: 60,
   playlistSnapScale: 1,

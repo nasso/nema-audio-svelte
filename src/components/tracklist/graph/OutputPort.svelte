@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Effect, Output } from "@api/graph";
   import type { Point } from "@app/utils/geom";
-  import type { ViewportContext } from "./Viewport.svelte";
+  import type { ViewportContext } from "./Graph.svelte";
 
   import { createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
@@ -87,7 +87,13 @@
 </style>
 
 <div
-  on:pointerdown={(e) => dispatch('wireout', { portElem: e.currentTarget })}
+  on:pointerdown={(e) => {
+    if (e.button !== 0) {
+      return;
+    }
+
+    dispatch('wireout', { portElem: e.currentTarget });
+  }}
   bind:this={elem}
   class="output-port"
   style={`

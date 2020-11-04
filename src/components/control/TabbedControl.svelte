@@ -3,11 +3,11 @@
 
   interface TabDescriptor {
     icon: string;
-    name: string;
+    name: unknown;
   }
 
   export let tabs: Array<TabDescriptor>;
-  export let selected: string;
+  export let selected: unknown;
 </script>
 
 <style lang="scss">

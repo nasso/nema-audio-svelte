@@ -1,8 +1,6 @@
 <script lang="ts">
   import uiState from "@app/stores/ui";
   import Pane from "@components/Pane.svelte";
-  import Viewport from "@components/tracklist/graph/Viewport.svelte";
-  import Playlist from "@components/tracklist/playlist/Playlist.svelte";
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";
   import Tracklist from "@components/tracklist/Tracklist.svelte";
@@ -46,13 +44,7 @@
       direction="row"
       snaps={paneSnaps}>
       <Pane />
-      <Tracklist let:xscroll>
-        {#if $uiState.currentView === 'playlist'}
-          <Playlist {xscroll} />
-        {:else if $uiState.currentView === 'audio_graph'}
-          <Viewport {xscroll} />
-        {/if}
-      </Tracklist>
+      <Tracklist />
     </SplitPane>
     <Pane />
   </SplitPane>
