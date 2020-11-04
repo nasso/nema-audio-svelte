@@ -81,17 +81,16 @@
   }}
   on:pointermove={(e) => {
     if (movedClip) {
-      let delta = e.clientX - pointerStart.x;
+      const delta = e.clientX - pointerStart.x;
+      let start = movedClip.start + delta / barWidth;
 
       if (!e.altKey) {
-        const withoutSnap = movedClip.start + delta / barWidth;
-        const snapped = Math.round(withoutSnap / snap) * snap;
-
-        delta = (snapped - movedClip.start) * barWidth;
+        start = Math.round(start / snap) * snap;
       }
 
-      delta = Math.max(delta, -movedClip.start * barWidth);
-      movedClip.clip.start = movedClip.start + delta / barWidth;
+      start = Math.max(0, start);
+      movedClip.clip.start = start;
+
       $project.tracks = $project.tracks;
     }
   }}>
@@ -102,6 +101,7 @@
         {xscroll}
         {beatWidth}
         {barWidth}
+        {snap}
         on:pointerenter={() => {
           if (movedClip) {
             movedClip.track.remove(movedClip.clip);
@@ -109,7 +109,9 @@
             movedClip.track = track;
           }
         }}
-        on:cliptake={(e) => (movedClip = { clip: e.detail, start: e.detail.start, track })} />
+        on:cliptake={(e) => {
+          movedClip = { clip: e.detail, start: e.detail.start, track };
+        }} />
     {/each}
   </VStack>
 </div>

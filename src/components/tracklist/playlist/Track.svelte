@@ -5,6 +5,7 @@
 
   export let track: Track<Source>;
   export let xscroll: number;
+  export let snap: number;
   export let barWidth: number;
   export let beatWidth: number;
 </script>
@@ -82,7 +83,7 @@
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <Clip bind:clip {barWidth} on:cliptake />
+      <Clip bind:clip {barWidth} {snap} on:cliptake />
     {/each}
   </div>
 </div>
