@@ -115,7 +115,7 @@
 
       cursor: ew-resize;
 
-      &::before {
+      &::after {
         content: "";
 
         position: absolute;
@@ -123,6 +123,8 @@
         left: -4px;
         bottom: 0;
         width: 8px;
+
+        z-index: 1;
       }
     }
   }
@@ -142,7 +144,9 @@
     transform: translateX(${(clip.start + clip.extentPast) * barWidth}px);
   `}>
   <div class="resize-handle" use:resizer={'start'} />
-  <div class="content" style={`width: ${clip.totalExtent * barWidth}px`}>
+  <div
+    class="content"
+    style={`width: ${Math.max(clip.totalExtent * barWidth, 1)}px`}>
     <div
       class="data"
       style={`

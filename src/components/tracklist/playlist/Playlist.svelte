@@ -61,7 +61,16 @@
   }
 </script>
 
-<svelte:window on:keydown={handleGlobalKeyDown} on:keyup={handleGlobalKeyUp} />
+<svelte:window
+  on:keydown={handleGlobalKeyDown}
+  on:keyup={handleGlobalKeyUp}
+  on:pointerup={(e) => {
+    if (e.button !== 0) {
+      return;
+    }
+
+    movedClip = null;
+  }} />
 
 <div
   on:wheel={handleWheel}
@@ -71,13 +80,6 @@
     }
 
     pointerStart = { x: e.clientX, y: e.clientY };
-  }}
-  on:pointerup={(e) => {
-    if (e.button !== 0) {
-      return;
-    }
-
-    movedClip = null;
   }}
   on:pointermove={(e) => {
     if (movedClip) {
