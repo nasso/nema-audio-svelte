@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+  enum ResizeSide {
+    Start = "start",
+    End = "end",
+  }
+</script>
+
 <script lang="ts">
   import type { Clip } from "@api/playlist";
   import { createEventDispatcher } from "svelte";
@@ -9,37 +16,60 @@
 
   const dispatch = createEventDispatcher();
 
-  function handleResizePointerDown(this: HTMLElement, e: PointerEvent) {
-    if (e.button !== 0) {
-      return;
-    }
-
-    e.stopPropagation();
-    e.preventDefault();
-
-    const startX = e.clientX;
-    const startExtent = clip.extent;
-
-    const pointermove = (e: PointerEvent) => {
-      const deltaX = e.clientX - startX;
-      let extent = startExtent + deltaX / barWidth;
-
-      if (!e.altKey) {
-        extent = Math.round(extent / snap) * snap;
+  function resizer(node: HTMLElement, side: ResizeSide) {
+    function handlePointerDown(this: HTMLElement, e: PointerEvent) {
+      if (e.button !== 0) {
+        return;
       }
 
-      clip.extent = extent;
-    };
+      e.stopPropagation();
+      e.preventDefault();
 
-    const pointerup = (e: PointerEvent) => {
-      this.removeEventListener("pointermove", pointermove);
-      this.removeEventListener("pointerup", pointerup);
-      this.releasePointerCapture(e.pointerId);
-    };
+      const start = {
+        x: e.clientX,
+        time: side === ResizeSide.Start ? clip.start : clip.extent,
+        start: clip.start,
+        extent: clip.extent,
+      };
 
-    this.addEventListener("pointermove", pointermove);
-    this.addEventListener("pointerup", pointerup);
-    this.setPointerCapture(e.pointerId);
+      const pointermove = (e: PointerEvent) => {
+        const dt = (e.clientX - start.x) / barWidth;
+        let t = start.time + dt;
+
+        if (!e.altKey) {
+          t = Math.round(t / snap) * snap;
+        }
+
+        if (side === ResizeSide.Start) {
+          clip.start = t;
+          clip.extent = start.extent - t + start.start;
+        } else {
+          clip.extent = t;
+        }
+      };
+
+      const pointerup = (e: PointerEvent) => {
+        this.removeEventListener("pointermove", pointermove);
+        this.removeEventListener("pointerup", pointerup);
+        this.releasePointerCapture(e.pointerId);
+      };
+
+      this.addEventListener("pointermove", pointermove);
+      this.addEventListener("pointerup", pointerup);
+      this.setPointerCapture(e.pointerId);
+    }
+
+    node.addEventListener("pointerdown", handlePointerDown);
+
+    return {
+      update(newSide: ResizeSide) {
+        side = newSide;
+      },
+
+      destroy() {
+        node.removeEventListener("pointerdown", handlePointerDown);
+      },
+    };
   }
 </script>
 
@@ -58,25 +88,44 @@
       border-radius: 8px;
       overflow: hidden;
 
-      .region {
-        background: var(--clip-color);
+      position: relative;
 
-        &.instance {
-          opacity: 0.5;
-        }
+      &::before {
+        content: "";
+
+        opacity: 0.5;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        background: var(--clip-color);
+      }
+
+      .data {
+        background: var(--clip-color);
       }
     }
 
     .resize-handle {
-      position: absolute;
-      top: 0;
-      right: -4px;
-      bottom: 0;
-      width: 8px;
+      flex-basis: 0;
 
-      display: grid;
+      position: relative;
+      width: 0px;
 
       cursor: ew-resize;
+
+      &::before {
+        content: "";
+
+        position: absolute;
+        top: 0;
+        left: -4px;
+        bottom: 0;
+        width: 8px;
+      }
     }
   }
 </style>
@@ -94,15 +143,9 @@
     --clip-color: ${color};
     transform: translateX(${clip.start * barWidth}px);
   `}>
-  <div class="content">
-    <div
-      class="region master"
-      style={`width: ${Math.min(clip.length, clip.extent) * barWidth}px`} />
-    {#if clip.extent > clip.length}
-      <div
-        class="region instance"
-        style={`width: ${(clip.extent - clip.length) * barWidth}px`} />
-    {/if}
+  <div class="resize-handle" use:resizer={'start'} />
+  <div class="content" style={`width: ${clip.extent * barWidth}px`}>
+    <div class="data" style={`width: ${clip.length * barWidth}px`} />
   </div>
-  <div class="resize-handle" on:pointerdown={handleResizePointerDown} />
+  <div class="resize-handle" use:resizer={'end'} />
 </div>
