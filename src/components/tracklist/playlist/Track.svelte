@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
-  import type { ClipInstance, Track } from "@api/playlist";
+  import type { Track } from "@api/playlist";
   import Clip from "./Clip.svelte";
 
   export let track: Track<Source>;
-  export let xscroll: number;
+  export let viewRegion: [number, number];
   export let snap: number;
   export let barWidth: number;
   export let beatWidth: number;
@@ -77,7 +77,7 @@
   on:pointerenter
   style={`
     height: ${track.height}px;
-    --xscroll: ${xscroll}px;
+    --xscroll: ${viewRegion[0] * barWidth}px;
     --bar-width: ${barWidth}px;
     --beat-width: ${beatWidth}px;
   `}>

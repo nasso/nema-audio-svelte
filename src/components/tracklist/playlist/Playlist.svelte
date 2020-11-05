@@ -3,26 +3,38 @@
   import type { Clip, Track } from "@api/playlist";
   import type { Point } from "@app/utils/geom";
 
-  import project from "@app/stores/project";
-  import uiState from "@app/stores/ui";
-  import VStack from "@components/layout/VStack.svelte";
   import { spring } from "svelte/motion";
+  import project from "@app/stores/project";
+  import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
 
-  export let xscroll: number;
-
+  let playlistWidth = 300;
+  let viewRegion: [number, number] = [0, 32];
   let beatWidth: number;
   let barWidth: number;
   let snap: number;
   let movedClip: { clip: Clip; start: number; track: Track<Source> } = null;
   let pointerStart: Point;
-  let animatedZoom = spring($uiState.playlistBarWidth, {
+  let animatedViewRegion = spring(viewRegion, {
     stiffness: 0.25,
     damping: 1.0,
   });
 
-  $: $animatedZoom = $uiState.playlistBarWidth;
-  $: barWidth = $animatedZoom;
+  let cursorTime: number = 2;
+
+  export function scrollBy(xdelta: number) {
+    const span = viewRegion[1] - viewRegion[0];
+
+    viewRegion[0] = Math.max(0, viewRegion[0] + xdelta / barWidth);
+    viewRegion[1] = viewRegion[0] + span;
+  }
+
+  $: $animatedViewRegion = viewRegion;
+
+  $: barWidth =
+    playlistWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
+
+  $: cursorPos = (cursorTime - $animatedViewRegion[0]) * barWidth;
 
   $: {
     // snap is 1 bar by default
@@ -35,16 +47,25 @@
     }
   }
 
+  function initPlaylistWidth(node: HTMLElement) {
+    playlistWidth = node.getBoundingClientRect().width;
+  }
+
   function handleWheel(this: HTMLElement, e: WheelEvent) {
     if (e.ctrlKey) {
       e.preventDefault();
 
-      const delta = Math.sign(e.deltaY);
+      const rect = this.getBoundingClientRect();
+      const wheelDelta = Math.sign(e.deltaY);
+      const scaling = 1.0 + wheelDelta * 0.1;
+      const aimedTime = viewRegion[0] + (e.clientX - rect.left) / barWidth;
 
-      $uiState.playlistBarWidth = Math.min(
-        1000,
-        $uiState.playlistBarWidth * (1.0 - delta * 0.25)
-      );
+      for (let i = 0; i < 2; i++) {
+        const t = viewRegion[i];
+        const d = t - aimedTime;
+
+        viewRegion[i] = Math.max(0, aimedTime + d * scaling);
+      }
     }
   }
 
@@ -61,6 +82,28 @@
   }
 </script>
 
+<style lang="scss">
+  .playlist {
+    position: relative;
+
+    overflow: hidden;
+
+    .cursor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+
+      background: var(--color-accent);
+
+      opacity: 0.5;
+
+      transform: translateX(var(--x));
+    }
+  }
+</style>
+
 <svelte:window
   on:keydown={handleGlobalKeyDown}
   on:keyup={handleGlobalKeyUp}
@@ -73,6 +116,9 @@
   }} />
 
 <div
+  class="playlist"
+  use:initPlaylistWidth
+  bind:clientWidth={playlistWidth}
   on:wheel={handleWheel}
   on:pointerdown={(e) => {
     if (e.button !== 0) {
@@ -100,7 +146,7 @@
     {#each $project.tracks as track}
       <PlaylistTrack
         bind:track
-        {xscroll}
+        viewRegion={$animatedViewRegion}
         {beatWidth}
         {barWidth}
         {snap}
@@ -116,4 +162,5 @@
         }} />
     {/each}
   </VStack>
+  <div class="cursor" style={`--x: ${cursorPos}px`} />
 </div>

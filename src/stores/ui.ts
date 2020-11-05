@@ -17,19 +17,15 @@ interface UiState {
   trackHeadsWidth: number,
   tracklistMode: TracklistMode;
   usePointerLock: boolean;
-  playlistBarWidth: number;
-  playlistSnapScale: number;
 }
 
 const uiState: Writable<UiState> = writable({
-  version: "0.1.5",
+  version: "0.2.0",
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
   trackHeadsWidth: 150,
   tracklistMode: TracklistMode.Playlist,
   usePointerLock: false,
-  playlistBarWidth: 60,
-  playlistSnapScale: 1,
 });
 
 function patch(state: UiState, newValues: Record<string, unknown>) {

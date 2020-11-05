@@ -24,7 +24,11 @@
   import OutputPort from "./OutputPort.svelte";
   import { rectCenter } from "@app/utils/geom";
 
-  export let xscroll: number;
+  export function scrollBy(xdelta: number) {
+    xscroll = Math.max(0, xscroll + xdelta);
+  }
+
+  let xscroll = 0;
 
   let context: ViewportContext = {
     xscroll,

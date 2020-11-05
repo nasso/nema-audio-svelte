@@ -18,8 +18,8 @@
   import Graph from "./graph/Graph.svelte";
 
   let tracklist: HTMLElement;
-  let playlistScroll: number = 0;
-  let graphScroll: number = 0;
+  let playlist: Playlist;
+  let graph: Graph;
   let scrollDelta = writable({
     x: 0,
     y: 0,
@@ -31,11 +31,10 @@
 
   $: switch ($uiState.tracklistMode) {
     case TracklistMode.Playlist:
-      playlistScroll = Math.max($scrollDelta.x + playlistScroll, 0);
-      console.log($scrollDelta.x);
+      playlist?.scrollBy($scrollDelta.x);
       break;
     case TracklistMode.Graph:
-      graphScroll = Math.max($scrollDelta.x + graphScroll, 0);
+      graph?.scrollBy($scrollDelta.x);
       break;
   }
 
@@ -93,9 +92,9 @@
     </VStack>
     <div class="content">
       {#if $uiState.tracklistMode === TracklistMode.Playlist}
-        <Playlist xscroll={playlistScroll} />
+        <Playlist bind:this={playlist} />
       {:else if $uiState.tracklistMode === TracklistMode.Graph}
-        <Graph xscroll={graphScroll} />
+        <Graph bind:this={graph} />
       {/if}
     </div>
   </SplitPane>
