@@ -6,8 +6,7 @@
   import ToggleButton from "@components/control/ToggleButton.svelte";
   import TempoInput from "./TempoInput.svelte";
   import PlayButton from "./PlayButton.svelte";
-
-  let bpm = 128;
+  import projectStore from "@app/stores/project";
 </script>
 
 <style lang="scss">
@@ -54,7 +53,7 @@
       <Button>
         <Icon name="basic/stopwatch" />
       </Button>
-      <TempoInput bind:value={bpm} />
+      <TempoInput bind:value={$projectStore.tempo} />
     </div>
 
     <Button>

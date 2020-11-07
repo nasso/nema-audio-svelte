@@ -8,6 +8,8 @@
 <script lang="ts">
   import type { Clip } from "@api/playlist";
   import { createEventDispatcher } from "svelte";
+  import { AudioClip } from "@api/audio";
+  import AudioWaveform from "./AudioWaveform.svelte";
 
   export let clip: Clip;
   export let snap: number;
@@ -152,7 +154,11 @@
       style={`
         transform: translateX(${-clip.extentPast * barWidth}px);
         width: ${clip.length * barWidth}px
-      `} />
+      `}>
+      {#if clip instanceof AudioClip}
+        <AudioWaveform blob={clip.blob} />
+      {/if}
+    </div>
   </div>
   <div class="resize-handle" use:resizer={'end'} />
 </div>

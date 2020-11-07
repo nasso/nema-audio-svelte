@@ -1,13 +1,14 @@
 import { AudioClip, AudioTrack } from "@api/audio";
 import { GraphNode } from "@api/graph";
 import { Project } from "@api/project";
+import player from "./player";
 import ChannelMergerEffect from "@app/effects/ChannelMergerEffect";
 import ChannelSplitterEffect from "@app/effects/ChannelSplitterEffect";
 import CompressorEffect from "@app/effects/CompressorEffect";
 import DelayEffect from "@app/effects/DelayEffect";
 import GainEffect from "@app/effects/GainEffect";
 import OutputEffect from "@app/effects/OutputEffect";
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 
 const project = new Project();
 
@@ -68,7 +69,20 @@ merger.connect(output);
 project.tracks[0].connect(splitter);
 project.tracks[1].connect(gain);
 
-project.tracks[0].insert(new AudioClip(0, 8, 16));
-project.tracks[2].insert(new AudioClip(8, 8));
+const projectStore = writable(project);
 
-export default writable(project);
+(async () => {
+  const amenbreak = await fetch("data/AmenVN_4barOrig.wav");
+  const amenbreakBlob = await amenbreak.blob();
+
+  const audioBuffer = await get(player).decodeBlob(amenbreakBlob);
+  const length = project.tempo / audioBuffer.duration;
+
+  projectStore.update((project) => {
+    project.tracks[0].insert(new AudioClip(amenbreakBlob, 0, length));
+
+    return project;
+  });
+})();
+
+export default projectStore;

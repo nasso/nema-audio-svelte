@@ -1,17 +1,21 @@
+import { Player } from "@api/player";
 import { ParameterAccuracy, ParameterType, Source } from "@api/graph";
 import { Clip, Track } from "@api/playlist";
 
 export class AudioClip extends Clip {
-  constructor(time: number, length: number, extent = length) {
+  blob: Blob;
+
+  constructor(blob: Blob, time: number, length: number, extent = length) {
     super();
 
+    this.blob = blob;
     this.start = time;
     this.length = length;
     this.extent = extent;
   }
 }
 
-export class AudioPlayer extends Source {
+export class AudioClipPlayer extends Source {
   constructor() {
     super([
       {
@@ -34,14 +38,50 @@ export class AudioPlayer extends Source {
   }
 }
 
-export class AudioTrack extends Track<AudioPlayer> {
+export class AudioTrack extends Track<AudioClipPlayer> {
   description = "Audio";
   volume = 1.0;
   pan = 0.0;
 
   constructor() {
     super({
-      effect: new AudioPlayer(),
+      effect: new AudioClipPlayer(),
     });
+  }
+}
+
+export class AudioPlayer extends Player {
+  #ctx: BaseAudioContext;
+  #decodedBlobs: WeakMap<Blob, AudioBuffer> = new WeakMap();
+
+  constructor(ctx: BaseAudioContext) {
+    super();
+
+    this.#ctx = ctx;
+  }
+
+  start(start?: number, end?: number): void {
+    throw new Error("Method not implemented.");
+  }
+
+  stop(): void {
+    throw new Error("Method not implemented.");
+  }
+
+  get sampleRate(): number {
+    return this.#ctx.sampleRate;
+  }
+
+  async decodeBlob(blob: Blob): Promise<AudioBuffer> {
+    let buffer = this.#decodedBlobs.get(blob);
+
+    if (!buffer) {
+      const arrayBuffer = await blob.arrayBuffer();
+
+      buffer = await this.#ctx.decodeAudioData(arrayBuffer);
+      this.#decodedBlobs.set(blob, buffer);
+    }
+
+    return buffer;
   }
 }
