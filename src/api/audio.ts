@@ -1,4 +1,4 @@
-import { Player } from "@api/player";
+import type { Player } from "@api/player";
 import { ParameterAccuracy, ParameterType, Source } from "@api/graph";
 import { Clip, Track } from "@api/playlist";
 
@@ -50,26 +50,50 @@ export class AudioTrack extends Track<AudioClipPlayer> {
   }
 }
 
-export class AudioPlayer extends Player {
+export class AudioPlayer implements Player {
+  loop = true;
+  startCursor = 0;
+  endCursor = 0;
+
   #ctx: BaseAudioContext;
   #decodedBlobs: WeakMap<Blob, Promise<AudioBuffer>> = new WeakMap();
+  #playing = false;
+  #startTime = 0;
 
   constructor(ctx: BaseAudioContext) {
-    super();
-
     this.#ctx = ctx;
   }
 
-  start(start?: number, end?: number): void {
-    throw new Error("Method not implemented.");
+  start(start = this.startCursor, end = this.endCursor): void {
+    this.#startTime = this.#ctx.currentTime;
   }
 
   stop(): void {
-    throw new Error("Method not implemented.");
+    //
+  }
+
+  set playing(value: boolean) {
+    if (this.#playing !== value) {
+      this.#playing = value;
+
+      if (this.#playing) {
+        this.start();
+      } else {
+        this.stop();
+      }
+    }
+  }
+
+  get playing(): boolean {
+    return this.#playing;
   }
 
   get sampleRate(): number {
     return this.#ctx.sampleRate;
+  }
+
+  get currentTime(): number {
+    return this.#playing ? this.#ctx.currentTime - this.#startTime : this.startCursor;
   }
 
   decodeBlob(blob: Blob): Promise<AudioBuffer> {

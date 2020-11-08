@@ -7,9 +7,11 @@
   import project from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
+  import player from "@app/stores/player";
 
+  let cursorPos = 0;
   let playlistWidth = 300;
-  let viewRegion: [number, number] = [0, 32];
+  let viewRegion: [number, number] = [0, 20];
   let beatWidth: number;
   let barWidth: number;
   let snap: number;
@@ -19,8 +21,6 @@
     stiffness: 0.25,
     damping: 1.0,
   });
-
-  let cursorTime: number = 2;
 
   export function scrollBy(xdelta: number) {
     const span = viewRegion[1] - viewRegion[0];
@@ -34,7 +34,22 @@
   $: barWidth =
     playlistWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
 
-  $: cursorPos = (cursorTime - $animatedViewRegion[0]) * barWidth;
+  $: if ($player.playing) {
+    const update = () => {
+      cursorPos =
+        ($project.timeToBars($player.currentTime) - $animatedViewRegion[0]) *
+        barWidth;
+      requestAnimationFrame(update);
+    };
+
+    update();
+  } else {
+    cursorPos =
+      ($project.timeToBars($player.startCursor) - $animatedViewRegion[0]) *
+      barWidth;
+  }
+
+  $: console.log($player.currentTime, $player.startCursor);
 
   $: {
     // snap is 1 bar by default

@@ -76,9 +76,9 @@ const projectStore = writable(project);
   const amenbreakBlob = await amenbreak.blob();
 
   const audioBuffer = await get(player).decodeBlob(amenbreakBlob);
-  const length = project.tempo / audioBuffer.duration;
 
   projectStore.update((project) => {
+    const length = project.timeToBars(audioBuffer.duration);
     project.tracks[0].insert(new AudioClip(amenbreakBlob, 0, length));
 
     return project;

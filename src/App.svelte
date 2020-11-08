@@ -4,8 +4,11 @@
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";
   import Tracklist from "@components/tracklist/Tracklist.svelte";
+  import player from "./stores/player";
 
   const paneSnaps = [200];
+
+  let releasedSpacebar = true;
 </script>
 
 <style lang="scss">
@@ -32,6 +35,19 @@
     }
   }
 </style>
+
+<svelte:window
+  on:keydown={(e) => {
+    if (e.key === ' ' && releasedSpacebar) {
+      releasedSpacebar = false;
+      $player.playing = !$player.playing;
+    }
+  }}
+  on:keyup={(e) => {
+    if (e.key === ' ') {
+      releasedSpacebar = true;
+    }
+  }} />
 
 <main>
   <Toolbar />

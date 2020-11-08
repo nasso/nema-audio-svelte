@@ -1,6 +1,7 @@
-export abstract class Player {
-  loop = true;
+export interface Player {
+  loop: boolean;
+  playing: boolean;
 
-  abstract start(start?: number, end?: number): void;
-  abstract stop(): void;
+  start(start?: number, end?: number): void;
+  stop(): void;
 }
