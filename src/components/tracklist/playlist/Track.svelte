@@ -1,10 +1,9 @@
 <script lang="ts">
-  import type { Source } from "@api/graph";
   import type { Track } from "@api/playlist";
   import project from "@app/stores/project";
   import Clip from "./Clip.svelte";
 
-  export let track: Track<Source>;
+  export let track: Track<any>;
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;

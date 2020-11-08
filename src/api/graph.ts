@@ -46,14 +46,15 @@ export abstract class Effect {
   }
 }
 
-export abstract class Source<P extends Player, C extends Clip> extends Effect {
+export abstract class Source<P extends Player> extends Effect {
   inputs = 0;
 
   constructor(parameters: Parameter[]) {
     super(parameters);
   }
 
-  abstract playClip(player: P, clip: C): void;
+  abstract playClip(player: P, clip: Clip): void;
+  abstract canPlay(clip: Clip): boolean;
 }
 
 export interface Output<T extends Effect> {

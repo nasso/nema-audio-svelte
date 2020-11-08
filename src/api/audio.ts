@@ -20,11 +20,11 @@ export abstract class AudioEffect extends Effect {
   abstract createAudioNodes(player: AudioPlayer, outputs: ([AudioNode, number] | AudioParam)[][]): () => void;
 }
 
-export abstract class AudioSource<C extends Clip> extends Source<AudioPlayer, C> {
+export abstract class AudioSource extends Source<AudioPlayer> {
   abstract createAudioNodes(player: AudioPlayer, outputs: ([AudioNode, number] | AudioParam)[][]): () => void;
 }
 
-export class AudioClipPlayer extends AudioSource<AudioClip> {
+export class AudioClipPlayer extends AudioSource {
   source: AudioBufferSourceNode = null;
 
   constructor() {
@@ -69,15 +69,23 @@ export class AudioClipPlayer extends AudioSource<AudioClip> {
     return () => source.disconnect();
   }
 
-  playClip(player: AudioPlayer, clip: AudioClip): void {
+  playClip(player: AudioPlayer, clip: Clip): void {
+    if (!this.canPlay(clip)) {
+      return;
+    }
+
     player.decodeBlob(clip.blob).then(buffer => {
       this.source.buffer = buffer;
       this.source.start();
     });
   }
+
+  canPlay(clip: Clip): clip is AudioClip {
+    return clip instanceof AudioClip;
+  }
 }
 
-export class AudioTrack extends Track<AudioClip, AudioClipPlayer> {
+export class AudioTrack extends Track<AudioClipPlayer> {
   description = "Audio";
   volume = 1.0;
   pan = 0.0;

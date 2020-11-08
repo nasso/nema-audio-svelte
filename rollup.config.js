@@ -17,6 +17,19 @@ const production = !process.env.ROLLUP_WATCH;
 const projectDir = path.resolve(__dirname);
 const srcDir = path.resolve(projectDir, "src");
 
+const scssAliases = aliases => {
+  return url => {
+    for (const [alias, aliasPath] of Object.entries(aliases)) {
+      if (url.indexOf(alias) === 0) {
+        return {
+          file: url.replace(alias, aliasPath),
+        };
+      }
+    }
+    return url;
+  };
+};
+
 function serve() {
   let server;
 
@@ -73,9 +86,13 @@ export default {
         sourceMap: !production,
         scss: {
           importer(url) {
-            return {
-              file: url.replace("@app", srcDir),
-            };
+            if (url.match(/^@app/)) {
+              return {
+                file: url.replace(/^@app/, srcDir),
+              };
+            }
+
+            return null;
           },
         },
       }),

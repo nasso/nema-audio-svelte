@@ -2,18 +2,25 @@
   import type { Source } from "@api/graph";
   import type { Clip, Track } from "@api/playlist";
   import type { Point } from "@app/utils/geom";
+  import type { Player } from "@api/player";
 
   import { spring } from "svelte/motion";
   import project, { player } from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
 
+  interface MovedClip<C extends Clip> {
+    clip: C;
+    start: number;
+    track: Track<Source<Player>>;
+  }
+
   let cursorPos = 0;
   let playlistWidth = 300;
   let viewRegion: [number, number] = [0, 14];
   let secWidth: number;
   let snap: number;
-  let movedClip: { clip: Clip; start: number; track: Track<Source> } = null;
+  let movedClip: MovedClip<Clip> = null;
   let pointerStart: Point;
   let animatedViewRegion = spring(viewRegion, {
     stiffness: 0.25,
@@ -157,7 +164,7 @@
         {secWidth}
         {snap}
         on:pointerenter={() => {
-          if (movedClip) {
+          if (movedClip && track.mod.canPlay(movedClip.clip)) {
             movedClip.track.remove(movedClip.clip);
             track = track.insert(movedClip.clip);
             movedClip.track = track;

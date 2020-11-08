@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Source } from "@api/graph";
   import type { Track } from "@api/playlist";
 
   import { writable } from "svelte/store";
@@ -38,7 +37,7 @@
       break;
   }
 
-  function handleSolo(e: CustomEvent<Track<Source>>) {
+  function handleSolo(e: CustomEvent<Track<any>>) {
     const track = e.detail;
 
     const isSolo = $project.tracks.every((t) => t.enabled === (t === track));

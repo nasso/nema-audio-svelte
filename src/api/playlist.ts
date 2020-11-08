@@ -2,6 +2,7 @@ import { writable, Writable } from "svelte/store";
 
 import TimedSequence from "@app/utils/TimedSequence";
 import { Source, GraphNode } from "./graph";
+import type { Player } from "@api/player";
 
 export class Clip {
   timestampStore: Writable<number>;
@@ -36,7 +37,7 @@ export class ClipInstance extends Clip {
   master: Clip;
 }
 
-export class Track<C extends Clip, T extends Source<C>> extends GraphNode<T> {
+export class Track<T extends Source<Player>> extends GraphNode<T> {
   name = "Track name";
   description: string;
   enabled = true;

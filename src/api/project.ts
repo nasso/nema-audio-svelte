@@ -1,4 +1,5 @@
-import type { Track } from "@api/playlist";
+import type { Clip, Track } from "@api/playlist";
+import type { Player } from "@api/player";
 import { ProcessingGraph, Source } from "@api/graph";
 
 export class Project {
@@ -6,7 +7,7 @@ export class Project {
   sampleRate = 48000;
   tempo = 136;
   signature = [4, 4];
-  tracks: Array<Track<Source>> = [];
+  tracks: Track<Source<Player>>[] = [];
   graph: ProcessingGraph = new ProcessingGraph();
 
   timeToBeats(timeInSeconds: number): number {

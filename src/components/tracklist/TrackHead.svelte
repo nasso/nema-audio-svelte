@@ -9,7 +9,7 @@
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
 
-  export let track: Track<Source>;
+  export let track: Track<Source<any>>;
 
   const dispatch = createEventDispatcher();
 
