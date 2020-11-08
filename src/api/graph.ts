@@ -1,3 +1,6 @@
+import type { Player } from "@api/player";
+import type { Clip } from "@api/playlist";
+
 let lastNodeId = 0;
 
 export enum ParameterType {
@@ -27,7 +30,7 @@ export const PARAMETER_DEFAULT = {
   max: 1.0,
 };
 
-export class Effect {
+export abstract class Effect {
   name: string;
   outputs = 1;
   inputs = 1;
@@ -43,12 +46,14 @@ export class Effect {
   }
 }
 
-export class Source extends Effect {
+export abstract class Source<P extends Player, C extends Clip> extends Effect {
   inputs = 0;
 
   constructor(parameters: Parameter[]) {
     super(parameters);
   }
+
+  abstract playClip(player: P, clip: C): void;
 }
 
 export interface Output<T extends Effect> {

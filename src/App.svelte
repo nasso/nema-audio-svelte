@@ -4,7 +4,7 @@
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";
   import Tracklist from "@components/tracklist/Tracklist.svelte";
-  import player from "./stores/player";
+  import { player } from "./stores/project";
 
   const paneSnaps = [200];
 

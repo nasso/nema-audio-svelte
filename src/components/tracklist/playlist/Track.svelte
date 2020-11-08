@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
   import type { Track } from "@api/playlist";
+  import project from "@app/stores/project";
   import Clip from "./Clip.svelte";
 
   export let track: Track<Source>;
   export let viewRegion: [number, number];
   export let snap: number;
-  export let barWidth: number;
-  export let beatWidth: number;
+  export let secWidth: number;
 </script>
 
 <style lang="scss">
@@ -49,7 +49,7 @@
       right: 0;
       bottom: 0;
 
-      background-size: var(--beat-width) 1px;
+      background-size: var(--snap-width) 1px;
       background-position: var(--background-xshift) 0px;
       background-image: linear-gradient(
         to right,
@@ -77,13 +77,14 @@
   on:pointerenter
   style={`
     height: ${track.height}px;
-    --xscroll: ${viewRegion[0] * barWidth}px;
-    --bar-width: ${barWidth}px;
-    --beat-width: ${beatWidth}px;
+    --xscroll: ${viewRegion[0] * secWidth}px;
+    --snap-width: ${snap * secWidth}px;
+    --bar-width: ${$project.barsToTime(1) * secWidth}px;
+    --beat-width: ${$project.beatsToTime(1) * secWidth}px;
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <Clip bind:clip {barWidth} {snap} on:cliptake />
+      <Clip bind:clip {secWidth} {snap} on:cliptake />
     {/each}
   </div>
 </div>

@@ -9,11 +9,19 @@ export class Project {
   tracks: Array<Track<Source>> = [];
   graph: ProcessingGraph = new ProcessingGraph();
 
+  timeToBeats(timeInSeconds: number): number {
+    return timeInSeconds / 60 * this.tempo;
+  }
+
+  beatsToTime(beats: number): number {
+    return beats / this.tempo * 60;
+  }
+
   timeToBars(timeInSeconds: number): number {
-    return timeInSeconds / 60 * (this.tempo / this.signature[0]);
+    return this.timeToBeats(timeInSeconds) / this.signature[0];
   }
 
   barsToTime(bars: number): number {
-    return 60 * bars * this.signature[0] / this.tempo;
+    return this.beatsToTime(bars * this.signature[0]);
   }
 }

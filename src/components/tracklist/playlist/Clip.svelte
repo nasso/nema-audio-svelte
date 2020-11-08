@@ -13,7 +13,7 @@
 
   export let clip: Clip;
   export let snap: number;
-  export let barWidth: number;
+  export let secWidth: number;
   export let color = "var(--color-red)";
 
   const dispatch = createEventDispatcher();
@@ -34,7 +34,7 @@
       };
 
       const pointermove = (e: PointerEvent) => {
-        const dt = (e.clientX - start.x) / barWidth;
+        const dt = (e.clientX - start.x) / secWidth;
         let t = start.timePoint + dt;
 
         if (!e.altKey) {
@@ -144,17 +144,17 @@
   class="clip"
   style={`
     --clip-color: ${color};
-    transform: translateX(${(clip.start + clip.extentPast) * barWidth}px);
+    transform: translateX(${(clip.start + clip.extentPast) * secWidth}px);
   `}>
   <div class="resize-handle" use:resizer={'start'} />
   <div
     class="content"
-    style={`width: ${Math.max(clip.totalExtent * barWidth, 1)}px`}>
+    style={`width: ${Math.max(clip.totalExtent * secWidth, 1)}px`}>
     <div
       class="data"
       style={`
-        transform: translateX(${-clip.extentPast * barWidth}px);
-        width: ${clip.length * barWidth}px
+        transform: translateX(${-clip.extentPast * secWidth}px);
+        width: ${clip.length * secWidth}px
       `}>
       {#if clip instanceof AudioClip}
         <AudioWaveform blob={clip.blob} />

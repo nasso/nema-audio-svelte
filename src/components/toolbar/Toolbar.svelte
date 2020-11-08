@@ -6,8 +6,7 @@
   import ToggleButton from "@components/control/ToggleButton.svelte";
   import TempoInput from "./TempoInput.svelte";
   import PlayButton from "./PlayButton.svelte";
-  import project from "@app/stores/project";
-  import player from "@app/stores/player";
+  import project, { player } from "@app/stores/project";
 </script>
 
 <style lang="scss">

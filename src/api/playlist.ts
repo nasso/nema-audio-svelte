@@ -36,7 +36,7 @@ export class ClipInstance extends Clip {
   master: Clip;
 }
 
-export class Track<T extends Source> extends GraphNode<T> {
+export class Track<C extends Clip, T extends Source<C>> extends GraphNode<T> {
   name = "Track name";
   description: string;
   enabled = true;

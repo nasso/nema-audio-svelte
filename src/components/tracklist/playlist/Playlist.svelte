@@ -4,16 +4,14 @@
   import type { Point } from "@app/utils/geom";
 
   import { spring } from "svelte/motion";
-  import project from "@app/stores/project";
+  import project, { player } from "@app/stores/project";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
-  import player from "@app/stores/player";
 
   let cursorPos = 0;
   let playlistWidth = 300;
-  let viewRegion: [number, number] = [0, 20];
-  let beatWidth: number;
-  let barWidth: number;
+  let viewRegion: [number, number] = [0, 14];
+  let secWidth: number;
   let snap: number;
   let movedClip: { clip: Clip; start: number; track: Track<Source> } = null;
   let pointerStart: Point;
@@ -25,41 +23,35 @@
   export function scrollBy(xdelta: number) {
     const span = viewRegion[1] - viewRegion[0];
 
-    viewRegion[0] = Math.max(0, viewRegion[0] + xdelta / barWidth);
+    viewRegion[0] = Math.max(0, viewRegion[0] + xdelta / secWidth);
     viewRegion[1] = viewRegion[0] + span;
   }
 
   $: $animatedViewRegion = viewRegion;
 
-  $: barWidth =
+  $: secWidth =
     playlistWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
+
+  $: {
+    // snap is 1 bar by default
+    snap = $project.barsToTime(1);
+
+    for (let i = 0; i < 4 && (snap / 2) * secWidth >= 20; i++) {
+      snap /= 2;
+    }
+  }
 
   $: if ($player.playing) {
     const update = () => {
-      cursorPos =
-        ($project.timeToBars($player.currentTime) - $animatedViewRegion[0]) *
-        barWidth;
-      requestAnimationFrame(update);
+      if ($player.playing) {
+        cursorPos = ($player.currentTime - $animatedViewRegion[0]) * secWidth;
+        requestAnimationFrame(update);
+      }
     };
 
     update();
   } else {
-    cursorPos =
-      ($project.timeToBars($player.startCursor) - $animatedViewRegion[0]) *
-      barWidth;
-  }
-
-  $: console.log($player.currentTime, $player.startCursor);
-
-  $: {
-    // snap is 1 bar by default
-    snap = 1;
-    beatWidth = barWidth;
-
-    for (let i = 0; i < 4 && beatWidth / 2 >= 15; i++) {
-      beatWidth /= 2;
-      snap /= 2;
-    }
+    cursorPos = ($player.startCursor - $animatedViewRegion[0]) * secWidth;
   }
 
   function initPlaylistWidth(node: HTMLElement) {
@@ -73,7 +65,7 @@
       const rect = this.getBoundingClientRect();
       const wheelDelta = Math.sign(e.deltaY);
       const scaling = 1.0 + wheelDelta * 0.1;
-      const aimedTime = viewRegion[0] + (e.clientX - rect.left) / barWidth;
+      const aimedTime = viewRegion[0] + (e.clientX - rect.left) / secWidth;
 
       for (let i = 0; i < 2; i++) {
         const t = viewRegion[i];
@@ -145,7 +137,7 @@
   on:pointermove={(e) => {
     if (movedClip) {
       const delta = e.clientX - pointerStart.x;
-      let start = movedClip.start + delta / barWidth;
+      let start = movedClip.start + delta / secWidth;
 
       if (!e.altKey) {
         start = Math.round(start / snap) * snap;
@@ -162,8 +154,7 @@
       <PlaylistTrack
         bind:track
         viewRegion={$animatedViewRegion}
-        {beatWidth}
-        {barWidth}
+        {secWidth}
         {snap}
         on:pointerenter={() => {
           if (movedClip) {

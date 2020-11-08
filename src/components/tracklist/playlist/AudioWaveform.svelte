@@ -1,5 +1,5 @@
 <script lang="ts">
-  import player from "@app/stores/player";
+  import { player } from "@app/stores/project";
 
   export let blob: Blob;
   export let detail = 3;

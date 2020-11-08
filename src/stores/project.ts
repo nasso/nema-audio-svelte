@@ -1,20 +1,19 @@
-import { AudioClip, AudioTrack } from "@api/audio";
+import { AudioClip, AudioPlayer, AudioTrack } from "@api/audio";
 import { GraphNode } from "@api/graph";
 import { Project } from "@api/project";
-import player from "./player";
 import ChannelMergerEffect from "@app/effects/ChannelMergerEffect";
 import ChannelSplitterEffect from "@app/effects/ChannelSplitterEffect";
 import CompressorEffect from "@app/effects/CompressorEffect";
 import DelayEffect from "@app/effects/DelayEffect";
 import GainEffect from "@app/effects/GainEffect";
 import OutputEffect from "@app/effects/OutputEffect";
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 
-const project = new Project();
+const proj = new Project();
 
-project.tracks.push(new AudioTrack());
-project.tracks.push(new AudioTrack());
-project.tracks.push(new AudioTrack());
+proj.tracks.push(new AudioTrack());
+proj.tracks.push(new AudioTrack());
+proj.tracks.push(new AudioTrack());
 
 const output = new GraphNode({
   effect: new OutputEffect(),
@@ -53,12 +52,12 @@ const merger = new GraphNode({
   y: 150,
 });
 
-project.graph.nodes.add(gain);
-project.graph.nodes.add(compressor);
-project.graph.nodes.add(delay);
-project.graph.nodes.add(splitter);
-project.graph.nodes.add(merger);
-project.graph.nodes.add(output);
+proj.graph.nodes.add(gain);
+proj.graph.nodes.add(compressor);
+proj.graph.nodes.add(delay);
+proj.graph.nodes.add(splitter);
+proj.graph.nodes.add(merger);
+proj.graph.nodes.add(output);
 
 splitter.connect(delay, 0, 1);
 delay.connect(merger, 0);
@@ -66,23 +65,24 @@ gain.connect(compressor);
 compressor.connect(merger, 1);
 merger.connect(output);
 
-project.tracks[0].connect(splitter);
-project.tracks[1].connect(gain);
+proj.tracks[0].connect(splitter);
+proj.tracks[1].connect(gain);
 
-const projectStore = writable(project);
+const project = writable(proj);
+const playerValue = new AudioPlayer(new AudioContext(), proj);
 
 (async () => {
   const amenbreak = await fetch("data/AmenVN_4barOrig.wav");
   const amenbreakBlob = await amenbreak.blob();
 
-  const audioBuffer = await get(player).decodeBlob(amenbreakBlob);
+  const audioBuffer = await playerValue.decodeBlob(amenbreakBlob);
 
-  projectStore.update((project) => {
-    const length = project.timeToBars(audioBuffer.duration);
-    project.tracks[0].insert(new AudioClip(amenbreakBlob, 0, length));
+  project.update((project) => {
+    project.tracks[0].insert(new AudioClip(amenbreakBlob, 0, audioBuffer.duration));
 
     return project;
   });
 })();
 
-export default projectStore;
+export const player = writable(playerValue);
+export default project;
