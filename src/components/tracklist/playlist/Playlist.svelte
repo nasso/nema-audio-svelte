@@ -75,8 +75,6 @@
       const aimedTime =
         $animatedViewRegion[0] + (e.clientX - rect.left) / secWidth;
 
-      $player.startCursor = aimedTime;
-
       for (let i = 0; i < 2; i++) {
         const t = viewRegion[i];
         const d = t - aimedTime;

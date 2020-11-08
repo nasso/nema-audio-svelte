@@ -11,6 +11,7 @@ import { writable } from "svelte/store";
 
 const proj = new Project();
 
+proj.tempo = 150;
 proj.tracks.push(new AudioTrack());
 proj.tracks.push(new AudioTrack());
 proj.tracks.push(new AudioTrack());
@@ -72,13 +73,13 @@ const project = writable(proj);
 const playerValue = new AudioPlayer(new AudioContext(), proj);
 
 (async () => {
-  const amenbreak = await fetch("data/AmenVN_4barOrig.wav");
-  const amenbreakBlob = await amenbreak.blob();
+  const sample = await fetch("data/BRLY_ALV_MORE_DRUMS_Drumloop_150_OnHoldC78.wav");
+  const blob = await sample.blob();
 
-  const audioBuffer = await playerValue.decodeBlob(amenbreakBlob);
+  const audioBuffer = await playerValue.decodeBlob(blob);
 
   project.update((project) => {
-    project.tracks[0].insert(new AudioClip(amenbreakBlob, 0, audioBuffer.duration));
+    project.tracks[0].insert(new AudioClip(blob, 0, audioBuffer.duration));
 
     return project;
   });

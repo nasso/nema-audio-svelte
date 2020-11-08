@@ -57,13 +57,14 @@
       const data = buffer.getChannelData(channel);
 
       for (let x = detail / 2, i = 0; x < rangeWidth; x += detail, i++) {
-        const t = range[0] + rangeDuration * (x / rangeWidth);
-        const firstSample = (t * buffer.sampleRate) | 0;
+        const t0 = range[0] + rangeDuration * (x / rangeWidth);
+        const t1 = Math.min(t0 + detailSamples / buffer.sampleRate, range[1]);
+        const firstSample = (t0 * buffer.sampleRate) | 0;
+        const lastSample = (t1 * buffer.sampleRate) | 0;
 
         bars[i] = bars[i] ?? [1, -1];
-        for (let s = 0; s < detailSamples; s++) {
-          const sample =
-            (((firstSample + s) % data.length) + data.length) % data.length;
+        for (let s = firstSample; s < lastSample; s++) {
+          const sample = ((s % data.length) + data.length) % data.length;
           const sampleValue = data[sample];
 
           bars[i][0] = Math.min(bars[i][0], sampleValue);
