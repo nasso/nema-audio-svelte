@@ -9,9 +9,8 @@
 
   let decodedBuffer: AudioBuffer;
   let width: number;
-  let height: number;
-  let renderWidth: number = 1;
-  let renderHeight: number = 1;
+  let renderWidth: number = 0;
+  let renderRange: [number, number] = [0, 0];
 
   let redrawFrame: number;
   let path: string = "";
@@ -22,7 +21,10 @@
     }
   });
 
-  $: if (width && height && detail) {
+  $: if (
+    visibleRange[0] !== renderRange[0] ||
+    visibleRange[1] !== renderRange[1]
+  ) {
     scheduleRender(decodedBuffer, visibleRange);
   }
 
@@ -45,9 +47,9 @@
       return "";
     }
 
-    const rangeWidth = (width * rangeDuration) / buffer.duration;
+    const rangeWidth = width * (rangeDuration / buffer.duration);
     const rangeSamples = rangeDuration * buffer.sampleRate;
-    const detailSamples = (rangeSamples * detail) / rangeWidth;
+    const detailSamples = rangeSamples * (detail / rangeWidth);
 
     const bars: [number, number][] = new Array((rangeWidth / detail) | 0);
 
@@ -70,19 +72,32 @@
       }
     }
 
-    const halfh = height / 2;
+    for (let i = 0; i < bars.length - 1; i++) {
+      const bar = bars[i];
+      const next = bars[i + 1];
+
+      if (bar[0] > next[1]) {
+        bar[0] = next[1];
+      } else if (bar[1] < next[0]) {
+        bar[1] = next[1];
+      }
+    }
+
     const xoffset = (width * range[0]) / buffer.duration;
 
-    path = bars
-      .map(
-        (p, i) =>
-          `M ${xoffset + detail * (i + 0.5)},${halfh * (p[0] + 1)}` +
-          `V ${halfh * (p[1] + 1)}`
-      )
-      .join(" ");
+    if (detailSamples > 1) {
+      path = bars
+        .map((p, i) => `M ${xoffset + detail * i},${p[0]} V ${p[1]}`)
+        .join(" ");
+    } else {
+      path =
+        `M ${xoffset},0 L` +
+        bars.map((p, i) => `${xoffset + detail * i},${p[0]}`).join(" ");
+    }
 
+    renderRange[0] = range[0];
+    renderRange[1] = range[1];
     renderWidth = width;
-    renderHeight = height;
   }
 </script>
 
@@ -93,52 +108,43 @@
     width: 100%;
     height: 100%;
 
-    position: relative;
-
     svg {
       overflow: visible;
 
-      $margin: 10%;
-
       width: 100%;
-      height: 100% - $margin * 2;
-
-      position: absolute;
-      top: $margin;
-      bottom: $margin;
-      left: 0;
+      height: 100%;
     }
   }
 </style>
 
-<div class="audio-waveform" bind:clientWidth={width} bind:clientHeight={height}>
-  <svg
-    preserveAspectRatio="none"
-    viewBox={`0 0 ${renderWidth} ${renderHeight}`}>
+<div class="audio-waveform" bind:clientWidth={width}>
+  <svg preserveAspectRatio="none" viewBox={`0 0 ${renderWidth} 2`}>
     <path
-      d={path}
+      transform="translate(0 1) scale(1 0.9)"
       fill="none"
+      vector-effect="non-scaling-stroke"
       stroke="currentColor"
+      stroke-width={lineWidth}
       stroke-linecap="round"
-      stroke-width={lineWidth} />
+      d={path} />
 
     {#if decodedBuffer && debugRange}
       <path
         d={`
-          M ${width * (visibleRange[0] / decodedBuffer.duration)},${height / 2}
-          h 30
-          m -30,0
-          l 10,10
-          m -10,-10
-          l 10,-10
+            M ${width * (visibleRange[0] / decodedBuffer.duration)},0
+            h 30
+            m -30,0
+            l 10,10
+            m -10,-10
+            l 10,-10
 
-          M ${width * (visibleRange[1] / decodedBuffer.duration)},${height / 2}
-          h -30
-          m 30,0
-          l -10,10
-          m 10,-10
-          l -10,-10
-        `}
+            M ${width * (visibleRange[1] / decodedBuffer.duration)},0
+            h -30
+            m 30,0
+            l -10,10
+            m 10,-10
+            l -10,-10
+          `}
         fill="none"
         stroke="var(--color-background-0)"
         stroke-width="2" />
