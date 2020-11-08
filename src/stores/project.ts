@@ -80,6 +80,8 @@ const playerValue = new AudioPlayer(new AudioContext(), proj);
 
   project.update((project) => {
     project.tracks[0].insert(new AudioClip(blob, 0, audioBuffer.duration));
+    project.tracks[1].insert(new AudioClip(blob, 0, audioBuffer.duration));
+    project.tracks[2].insert(new AudioClip(blob, 0, audioBuffer.duration));
 
     return project;
   });
