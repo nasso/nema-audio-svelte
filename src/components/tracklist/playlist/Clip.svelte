@@ -1,10 +1,3 @@
-<script lang="ts" context="module">
-  enum ResizeSide {
-    Start = "start",
-    End = "end",
-  }
-</script>
-
 <script lang="ts">
   import type { Clip } from "@api/playlist";
   import { createEventDispatcher } from "svelte";
@@ -12,9 +5,15 @@
   import AudioWaveform from "./AudioWaveform.svelte";
 
   export let clip: Clip;
+  export let visibleRange: [number, number];
   export let snap: number;
   export let secWidth: number;
   export let color = "var(--color-red)";
+
+  enum ResizeSide {
+    Start = "start",
+    End = "end",
+  }
 
   const dispatch = createEventDispatcher();
 
@@ -157,7 +156,7 @@
         width: ${clip.length * secWidth}px
       `}>
       {#if clip instanceof AudioClip}
-        <AudioWaveform blob={clip.blob} />
+        <AudioWaveform blob={clip.blob} {visibleRange} />
       {/if}
     </div>
   </div>

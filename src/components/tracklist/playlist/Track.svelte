@@ -83,7 +83,12 @@
   `}>
   <div class="clips">
     {#each track.clips as clip}
-      <Clip bind:clip {secWidth} {snap} on:cliptake />
+      <Clip
+        bind:clip
+        {secWidth}
+        {snap}
+        visibleRange={[Math.max(viewRegion[0] - clip.start - clip.extentPast, 0) + clip.extentPast, clip.extent + Math.min(viewRegion[1] - clip.start - clip.extent, 0)]}
+        on:cliptake />
     {/each}
   </div>
 </div>
