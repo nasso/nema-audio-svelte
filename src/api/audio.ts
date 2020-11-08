@@ -52,7 +52,7 @@ export class AudioTrack extends Track<AudioClipPlayer> {
 
 export class AudioPlayer extends Player {
   #ctx: BaseAudioContext;
-  #decodedBlobs: WeakMap<Blob, AudioBuffer> = new WeakMap();
+  #decodedBlobs: WeakMap<Blob, Promise<AudioBuffer>> = new WeakMap();
 
   constructor(ctx: BaseAudioContext) {
     super();
@@ -72,16 +72,15 @@ export class AudioPlayer extends Player {
     return this.#ctx.sampleRate;
   }
 
-  async decodeBlob(blob: Blob): Promise<AudioBuffer> {
-    let buffer = this.#decodedBlobs.get(blob);
+  decodeBlob(blob: Blob): Promise<AudioBuffer> {
+    let promise = this.#decodedBlobs.get(blob);
 
-    if (!buffer) {
-      const arrayBuffer = await blob.arrayBuffer();
+    if (!promise) {
+      promise = blob.arrayBuffer().then(buffer => this.#ctx.decodeAudioData(buffer));
 
-      buffer = await this.#ctx.decodeAudioData(arrayBuffer);
-      this.#decodedBlobs.set(blob, buffer);
+      this.#decodedBlobs.set(blob, promise);
     }
 
-    return buffer;
+    return promise;
   }
 }

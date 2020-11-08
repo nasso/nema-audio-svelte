@@ -105,6 +105,7 @@
       }
 
       .data {
+        flex-shrink: 0;
         background: var(--clip-color);
       }
     }

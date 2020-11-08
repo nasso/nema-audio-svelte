@@ -3,8 +3,6 @@ import { AudioPlayer } from "@api/audio";
 
 const context = new AudioContext();
 
-const player = new AudioPlayer(context);
+const player = writable(new AudioPlayer(context));
 
-const store = writable(player);
-
-export default store;
+export default player;

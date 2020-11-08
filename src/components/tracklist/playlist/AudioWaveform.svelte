@@ -1,51 +1,59 @@
-<script lang="ts" context="module">
-  import type { AudioPlayer } from "@api/audio";
+<script lang="ts">
   import player from "@app/stores/player";
 
-  const waveformCache: WeakMap<Blob, Promise<string>> = new WeakMap();
+  export let blob: Blob;
+  export let detail = 3;
+  export let lineWidth = 2;
 
-  const quantum = 2400;
+  let width: number;
+  let height: number;
 
-  async function computeWaveform(
-    player: AudioPlayer,
-    blob: Blob
-  ): Promise<string> {
-    const buffer = await player.decodeBlob(blob);
+  let redrawFrame: number;
+  let path: string = "";
 
-    const samples = new Array((buffer.length / quantum) | 0);
+  $: if (width && height && detail) {
+    $player.decodeBlob(blob).then((buffer) => scheduleRedraw(buffer));
+  }
+
+  function scheduleRedraw(buffer: AudioBuffer) {
+    if (redrawFrame) {
+      cancelAnimationFrame(redrawFrame);
+    }
+
+    redrawFrame = requestAnimationFrame(() => {
+      redrawFrame = null;
+      redrawWaveform(buffer);
+    });
+  }
+
+  function redrawWaveform(buffer: AudioBuffer) {
+    const points: [number, number][] = new Array((width / detail) | 0);
 
     for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
       const data = buffer.getChannelData(channel);
 
-      for (let i = 0; i < samples.length; i++) {
-        samples[i] =
-          (samples[i] ?? 0) + data[i * quantum] / buffer.numberOfChannels;
+      for (let x = detail / 2, p = 0; x < width; x += detail, p++) {
+        const sampleRange = [
+          Math.min(((data.length * x) / width) | 0, data.length - 1),
+          Math.min(((data.length * (x + detail)) / width) | 0, data.length - 1),
+        ];
+
+        points[p] = points[p] ?? [0, 0];
+        for (let s = sampleRange[0]; s < sampleRange[1]; s++) {
+          points[p][0] = Math.min(points[p][0], data[s]);
+          points[p][1] = Math.max(points[p][1], data[s]);
+        }
       }
     }
 
-    const points: Array<[number, number]> = samples.map((sample, i) => [
-      i / samples.length,
-      sample,
-    ]);
-
-    return `0,0 ${points.map((point) => point.join(",")).join(" ")} 1,0`;
+    path = points
+      .map(
+        (p, i) =>
+          `M ${detail / 2 + i * detail},${(height / 2) * (p[0] + 1)}` +
+          `V ${(height / 2) * (p[1] + 1)}`
+      )
+      .join(" ");
   }
-
-  function getWaveform(player: AudioPlayer, blob: Blob) {
-    let waveform = waveformCache.get(blob);
-
-    if (!waveform) {
-      waveformCache.set(blob, computeWaveform(player, blob));
-    }
-
-    return waveform;
-  }
-</script>
-
-<script lang="ts">
-  export let blob: Blob;
-
-  $: waveform = getWaveform($player, blob);
 </script>
 
 <style lang="scss">
@@ -54,12 +62,30 @@
 
     width: 100%;
     height: 100%;
+
+    position: relative;
+
+    svg {
+      $margin: 10%;
+
+      width: 100%;
+      height: 100% - $margin * 2;
+
+      position: absolute;
+      top: $margin;
+      bottom: $margin;
+      left: 0;
+    }
   }
 </style>
 
-{#await waveform then points}
-  <svg class="audio-waveform" viewBox="0 -1 1 2" preserveAspectRatio="none">
-    <polyline id="waveform" {points} fill="currentColor" />
-    <use href="#waveform" transform="scale(1, -1)" />
+<div class="audio-waveform" bind:clientWidth={width} bind:clientHeight={height}>
+  <svg preserveAspectRatio="none" viewBox={`0 0 ${width ?? 1} ${height ?? 1}`}>
+    <path
+      d={path}
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-width={lineWidth} />
   </svg>
-{/await}
+</div>
