@@ -17,7 +17,7 @@
 
   let cursorPos = 0;
   let playlistWidth = 300;
-  let viewRegion: [number, number] = [0, 14];
+  let viewRegion: [number, number] = [0, 20];
   let secWidth: number;
   let snap: number;
   let movedClip: MovedClip<Clip> = null;
@@ -72,7 +72,10 @@
       const rect = this.getBoundingClientRect();
       const wheelDelta = Math.sign(e.deltaY);
       const scaling = 1.0 + wheelDelta * 0.1;
-      const aimedTime = viewRegion[0] + (e.clientX - rect.left) / secWidth;
+      const aimedTime =
+        $animatedViewRegion[0] + (e.clientX - rect.left) / secWidth;
+
+      $player.startCursor = aimedTime;
 
       for (let i = 0; i < 2; i++) {
         const t = viewRegion[i];
