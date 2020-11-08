@@ -22,28 +22,21 @@ export interface Parameter {
   max: number;
 }
 
-export const PARAMETER_DEFAULT = {
-  value: 0.0,
-  type: ParameterType.Absolute,
-  accuracy: ParameterAccuracy.Sample,
-  min: 0.0,
-  max: 1.0,
-};
-
 export abstract class Effect {
   name: string;
   outputs = 1;
   inputs = 1;
 
-  #params: ReadonlyArray<Parameter>;
+  parameters: Parameter[];
 
   constructor(parameters: Parameter[]) {
-    this.#params = parameters.map(param => Object.assign({}, PARAMETER_DEFAULT, param));
+    this.parameters = parameters;
   }
+}
 
-  get parameters(): ReadonlyArray<Parameter> {
-    return this.#params;
-  }
+export interface SourceScheduler {
+  playClip(clip: Clip, when?: number, offset?: number): void;
+  stop(): void;
 }
 
 export abstract class Source<P extends Player> extends Effect {
@@ -53,8 +46,8 @@ export abstract class Source<P extends Player> extends Effect {
     super(parameters);
   }
 
-  abstract playClip(player: P, clip: Clip): void;
   abstract canPlay(clip: Clip): boolean;
+  abstract createScheduler(player: P): SourceScheduler;
 }
 
 export interface Output<T extends Effect> {

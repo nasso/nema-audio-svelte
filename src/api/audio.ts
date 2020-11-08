@@ -1,7 +1,7 @@
 import type { Player } from "@api/player";
-import { Effect, ParameterAccuracy, ParameterType, Source } from "@api/graph";
-import { Clip, Track } from "@api/playlist";
 import type { Project } from "@api/project";
+import { ParameterAccuracy, ParameterType, Source, SourceScheduler } from "@api/graph";
+import { Clip, Track } from "@api/playlist";
 
 export class AudioClip extends Clip {
   blob: Blob;
@@ -16,17 +16,15 @@ export class AudioClip extends Clip {
   }
 }
 
-export abstract class AudioEffect extends Effect {
-  abstract createAudioNodes(player: AudioPlayer, outputs: ([AudioNode, number] | AudioParam)[][]): () => void;
+export interface AudioSourceScheduler extends SourceScheduler {
+  connect(destination: AudioParam | AudioNode, output?: number, input?: number): void;
 }
 
 export abstract class AudioSource extends Source<AudioPlayer> {
-  abstract createAudioNodes(player: AudioPlayer, outputs: ([AudioNode, number] | AudioParam)[][]): () => void;
+  abstract createScheduler(player: AudioPlayer): AudioSourceScheduler;
 }
 
 export class AudioClipPlayer extends AudioSource {
-  source: AudioBufferSourceNode = null;
-
   constructor() {
     super([
       {
@@ -48,36 +46,38 @@ export class AudioClipPlayer extends AudioSource {
     ]);
   }
 
-  createAudioNodes(player: AudioPlayer, outputs: ([AudioNode, number] | AudioParam)[][]): () => void {
+  createScheduler(player: AudioPlayer): AudioSourceScheduler {
     const ctx = player.context;
-    const source = ctx.createBufferSource();
+    const outNode = ctx.createGain();
+    outNode.gain.value = 1.0;
 
-    for (let out = 0; out < source.numberOfOutputs && out < outputs.length; out++) {
-      const output = outputs[out];
-
-      for (const dest of output) {
-        if (dest instanceof AudioParam) {
-          source.connect(dest, out);
+    return {
+      connect(destination: AudioParam | AudioNode, output = 0, input = 0) {
+        if (destination instanceof AudioParam) {
+          outNode.connect(destination, output);
         } else {
-          source.connect(dest[0], dest[1], out);
+          outNode.connect(destination, output, input);
         }
-      }
-    }
+      },
 
-    this.source = source;
+      playClip(clip: AudioClip, when = 0, offset = 0): void {
+        const source = ctx.createBufferSource();
+        source.loop = true;
 
-    return () => source.disconnect();
-  }
+        source.connect(outNode);
 
-  playClip(player: AudioPlayer, clip: Clip): void {
-    if (!this.canPlay(clip)) {
-      return;
-    }
+        player.decodeBlob(clip.blob).then(buffer => {
+          source.buffer = buffer;
 
-    player.decodeBlob(clip.blob).then(buffer => {
-      this.source.buffer = buffer;
-      this.source.start();
-    });
+          source.start(ctx.currentTime + when, offset);
+          source.stop(ctx.currentTime + when + clip.totalExtent);
+        });
+      },
+
+      stop(): void {
+        outNode.disconnect();
+      },
+    };
   }
 
   canPlay(clip: Clip): clip is AudioClip {
@@ -100,15 +100,14 @@ export class AudioTrack extends Track<AudioClipPlayer> {
 export class AudioPlayer implements Player {
   project: Project;
   loop = true;
-  startCursor = 0;
+  startCursor = 5;
   endCursor = 0;
 
   #ctx: BaseAudioContext;
   #decodedBlobs: WeakMap<Blob, Promise<AudioBuffer>> = new WeakMap();
   #playing = false;
   #startTime = 0;
-  #timeouts: Set<number> = new Set();
-  #disconnections: Set<() => void> = new Set();
+  #runningJobs: Set<AudioSourceScheduler> = new Set();
 
   constructor(ctx: BaseAudioContext, project: Project) {
     this.#ctx = ctx;
@@ -126,22 +125,27 @@ export class AudioPlayer implements Player {
     for (const track of this.project.tracks) {
       const source = track.mod;
 
-      if (!(source instanceof AudioSource)) {
-        continue;
-      }
+      if (source instanceof AudioSource) {
+        const scheduler = source.createScheduler(this);
 
-      for (let i = 0; i < track.clips.length; i++) {
-        const clip = track.clips[i];
+        scheduler.connect(this.#ctx.destination);
+        this.#runningJobs.add(scheduler);
 
-        this.#disconnections.add(source.createAudioNodes(this, [
-          [
-            [this.#ctx.destination, 0],
-          ],
-        ]));
+        for (let i = 0; i < track.clips.length; i++) {
+          const clip = track.clips[i];
 
-        this.#timeouts.add(setTimeout(() => {
-          source.playClip(this, clip);
-        }, 1000 * (clip.start - this.currentTime)));
+          if (this.currentTime > clip.start + clip.extent) {
+            continue;
+          }
+
+          let when = clip.start + clip.extentPast - this.currentTime;
+          let offset = Math.max(this.currentTime - clip.start, clip.extentPast);
+          offset = (offset % clip.length + clip.length) % clip.length;
+
+          when = Math.max(when, 0);
+
+          scheduler.playClip(clip, when, offset);
+        }
       }
     }
   }
@@ -152,10 +156,8 @@ export class AudioPlayer implements Player {
     }
 
     this.#playing = false;
-    this.#timeouts.forEach(clearTimeout);
-    this.#timeouts.clear();
-    this.#disconnections.forEach(disconnect => disconnect());
-    this.#disconnections.clear();
+    this.#runningJobs.forEach(job => job.stop());
+    this.#runningJobs.clear();
   }
 
   set playing(value: boolean) {
