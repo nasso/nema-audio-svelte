@@ -2,17 +2,24 @@
   import { player } from "@app/stores/project";
 
   export let blob: Blob;
-  export let detail = 3;
-  export let lineWidth = 2;
+  export let detail = 1;
+  export let lineWidth = 1;
 
+  let decodedBuffer: AudioBuffer;
   let width: number;
   let height: number;
 
   let redrawFrame: number;
   let path: string = "";
 
+  $: $player.decodeBlob(blob).then((buffer) => {
+    if (decodedBuffer !== buffer) {
+      decodedBuffer = buffer;
+    }
+  });
+
   $: if (width && height && detail) {
-    $player.decodeBlob(blob).then((buffer) => scheduleRedraw(buffer));
+    scheduleRedraw(decodedBuffer);
   }
 
   function scheduleRedraw(buffer: AudioBuffer) {
@@ -22,7 +29,11 @@
 
     redrawFrame = requestAnimationFrame(() => {
       redrawFrame = null;
+
+      const t0 = performance.now();
       redrawWaveform(buffer);
+      const t1 = performance.now();
+      console.log(`redrawing took ${t1 - t0}ms`);
     });
   }
 
@@ -38,7 +49,7 @@
           Math.min(((data.length * (x + detail)) / width) | 0, data.length - 1),
         ];
 
-        points[p] = points[p] ?? [0, 0];
+        points[p] = points[p] ?? [1, -1];
         for (let s = sampleRange[0]; s < sampleRange[1]; s++) {
           points[p][0] = Math.min(points[p][0], data[s]);
           points[p][1] = Math.max(points[p][1], data[s]);
