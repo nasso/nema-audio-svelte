@@ -23,7 +23,8 @@
 
   $: if (
     visibleRange[0] !== renderRange[0] ||
-    visibleRange[1] !== renderRange[1]
+    visibleRange[1] !== renderRange[1] ||
+    width !== renderWidth
   ) {
     scheduleRender(decodedBuffer, visibleRange);
   }
@@ -50,51 +51,62 @@
     const rangeWidth = width * (rangeDuration / buffer.duration);
     const rangeSamples = rangeDuration * buffer.sampleRate;
     const detailSamples = rangeSamples * (detail / rangeWidth);
+    const sampleRange = range.map((t) => Math.round(t * buffer.sampleRate));
 
-    const bars: [number, number][] = new Array((rangeWidth / detail) | 0);
+    const xoffset = (width * range[0]) / buffer.duration;
+    let pathBuilder = "";
 
-    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-      const data = buffer.getChannelData(channel);
+    const channels: Float32Array[] = new Array(buffer.numberOfChannels);
 
-      for (let x = detail / 2, i = 0; x < rangeWidth; x += detail, i++) {
-        const t0 = range[0] + rangeDuration * (x / rangeWidth);
-        const t1 = Math.min(t0 + detailSamples / buffer.sampleRate, range[1]);
-        const firstSample = (t0 * buffer.sampleRate) | 0;
-        const lastSample = (t1 * buffer.sampleRate) | 0;
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+      channels[i] = buffer.getChannelData(i);
+    }
 
-        bars[i] = bars[i] ?? [1, -1];
-        for (let s = firstSample; s < lastSample; s++) {
-          const sample = ((s % data.length) + data.length) % data.length;
-          const sampleValue = data[sample];
+    if (detailSamples > 1) {
+      let lastMin = -1;
+      let lastMax = 1;
 
-          bars[i][0] = Math.min(bars[i][0], sampleValue);
-          bars[i][1] = Math.max(bars[i][1], sampleValue);
+      for (let bar = 0; bar * detail < rangeWidth; bar++) {
+        const sample = sampleRange[0] + bar * detailSamples;
+        let min = 1;
+        let max = -1;
+
+        for (const channel of channels) {
+          for (let s = sample | 0; s < sample + detailSamples; s++) {
+            const i = ((s % channel.length) + channel.length) % channel.length;
+
+            min = Math.min(min, channel[i]);
+            max = Math.max(max, channel[i]);
+          }
+        }
+
+        min = Math.min(min, lastMax);
+        max = Math.max(max, lastMin);
+
+        lastMin = min;
+        lastMax = max;
+
+        pathBuilder += `M${xoffset + detail * bar},${min}V${max}`;
+      }
+    } else {
+      const sampleWidth = rangeWidth / (sampleRange[1] - sampleRange[0]);
+
+      for (const channel of channels) {
+        for (let s = sampleRange[0]; s < sampleRange[1]; s++) {
+          const i = ((s % channel.length) + channel.length) % channel.length;
+
+          if (s === sampleRange[0]) {
+            pathBuilder += `M${xoffset},${channel[i]}`;
+          } else {
+            pathBuilder += `V${channel[i]}`;
+          }
+
+          pathBuilder += `h${sampleWidth}`;
         }
       }
     }
 
-    for (let i = 0; i < bars.length - 1; i++) {
-      const bar = bars[i];
-      const next = bars[i + 1];
-
-      if (bar[0] > next[1]) {
-        bar[0] = next[1];
-      } else if (bar[1] < next[0]) {
-        bar[1] = next[1];
-      }
-    }
-
-    const xoffset = (width * range[0]) / buffer.duration;
-
-    if (detailSamples > 1) {
-      path = bars
-        .map((p, i) => `M ${xoffset + detail * i},${p[0]} V ${p[1]}`)
-        .join(" ");
-    } else {
-      path =
-        `M ${xoffset},0 L` +
-        bars.map((p, i) => `${xoffset + detail * i},${p[0]}`).join(" ");
-    }
+    path = pathBuilder;
 
     renderRange[0] = range[0];
     renderRange[1] = range[1];
@@ -126,7 +138,6 @@
       vector-effect="non-scaling-stroke"
       stroke="currentColor"
       stroke-width={lineWidth}
-      stroke-linecap="round"
       d={path} />
 
     {#if decodedBuffer && debugRange}

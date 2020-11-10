@@ -6,13 +6,14 @@ import { Clip, Track } from "@api/playlist";
 export class AudioClip extends Clip {
   blob: Blob;
 
-  constructor(blob: Blob, time: number, length: number, extent = length) {
+  constructor(blob: Blob, time: number, length: number, extent = length, extentPast = 0) {
     super();
 
     this.blob = blob;
     this.start = time;
     this.length = length;
     this.extent = extent;
+    this.extentPast = extentPast;
   }
 }
 

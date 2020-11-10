@@ -89,10 +89,9 @@
 
       position: relative;
 
-      &::before {
+      &::before,
+      &::after {
         content: "";
-
-        opacity: 0.5;
 
         position: absolute;
         top: 0;
@@ -100,12 +99,21 @@
         bottom: 0;
         right: 0;
 
-        background: var(--clip-color);
+        border-radius: inherit;
+      }
+
+      &::before {
+        background: var(--color-background-2);
+      }
+
+      &::after {
+        border: 1px solid var(--color-foreground-2);
+        opacity: 0.5;
       }
 
       .data {
         flex-shrink: 0;
-        background: var(--clip-color);
+        background: var(--color-background-0);
       }
     }
 
