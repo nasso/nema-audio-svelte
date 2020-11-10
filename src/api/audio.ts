@@ -129,6 +129,10 @@ export class AudioPlayer implements Player {
     for (const track of this.project.tracks) {
       const source = track.mod;
 
+      if (!track.enabled) {
+        continue;
+      }
+
       if (source instanceof AudioSource) {
         const scheduler = source.createScheduler(this);
 
