@@ -62,6 +62,9 @@ export class AudioClipPlayer extends AudioSource {
       },
 
       playClip(clip: AudioClip, when = 0, offset = 0): void {
+        const duration = clip.extent - offset;
+        const wrappedOffset = (offset % clip.length + clip.length) % clip.length;
+
         const source = ctx.createBufferSource();
         source.loop = true;
 
@@ -70,8 +73,8 @@ export class AudioClipPlayer extends AudioSource {
         player.decodeBlob(clip.blob).then(buffer => {
           source.buffer = buffer;
 
-          source.start(ctx.currentTime + when, offset);
-          source.stop(ctx.currentTime + when + clip.totalExtent);
+          source.start(ctx.currentTime + when, wrappedOffset);
+          source.stop(ctx.currentTime + when + duration);
         });
       },
 
@@ -140,8 +143,7 @@ export class AudioPlayer implements Player {
           }
 
           let when = clip.start + clip.extentPast - this.currentTime;
-          let offset = Math.max(this.currentTime - clip.start, clip.extentPast);
-          offset = (offset % clip.length + clip.length) % clip.length;
+          const offset = Math.max(this.currentTime - clip.start, clip.extentPast);
 
           when = Math.max(when, 0);
 
