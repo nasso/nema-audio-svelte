@@ -5,7 +5,7 @@
   import AudioWaveform from "./AudioWaveform.svelte";
 
   export let clip: Clip;
-  export let visibleRange: [number, number];
+  export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
   export let color = "var(--color-red)";
@@ -16,6 +16,12 @@
   }
 
   const dispatch = createEventDispatcher();
+
+  let visibleRange: [number, number];
+  $: visibleRange = [
+    Math.max(viewRegion[0] - clip.start - clip.extentPast, 0) + clip.extentPast,
+    clip.extent + Math.min(viewRegion[1] - clip.start - clip.extent, 0),
+  ];
 
   function resizer(node: HTMLElement, side: ResizeSide) {
     function handlePointerDown(this: HTMLElement, e: PointerEvent) {

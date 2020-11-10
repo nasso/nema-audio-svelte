@@ -79,9 +79,9 @@ const playerValue = new AudioPlayer(new AudioContext(), proj);
   const audioBuffer = await playerValue.decodeBlob(blob);
 
   project.update((project) => {
-    project.tracks[0].insert(new AudioClip(blob, 0, audioBuffer.duration));
-    project.tracks[1].insert(new AudioClip(blob, 0, audioBuffer.duration, audioBuffer.duration * 2));
-    project.tracks[2].insert(new AudioClip(blob, 2, audioBuffer.duration, audioBuffer.duration * 1.5, -1));
+    project.tracks[0].clips.push(new AudioClip(blob, 0, audioBuffer.duration));
+    project.tracks[1].clips.push(new AudioClip(blob, 0, audioBuffer.duration, audioBuffer.duration * 2));
+    project.tracks[2].clips.push(new AudioClip(blob, 2, audioBuffer.duration, audioBuffer.duration * 1.5, -1));
 
     return project;
   });

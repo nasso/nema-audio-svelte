@@ -1,12 +1,77 @@
 <script lang="ts">
   import type { Track } from "@api/playlist";
-  import project from "@app/stores/project";
-  import Clip from "./Clip.svelte";
+  import { Clip } from "@api/playlist";
+
+  import { AudioClip } from "@api/audio";
+  import project, { player } from "@app/stores/project";
+  import ClipComponent from "./Clip.svelte";
 
   export let track: Track<any>;
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
+
+  let ghostClip: Clip = null;
+  const audioTypes = /^audio\/.+/;
+
+  async function insertAudioClip(time: number, blob: Blob) {
+    const buffer = await $player.decodeBlob(blob);
+    const clip = new AudioClip(blob, 0, buffer.duration);
+
+    clip.start = time;
+    track.clips = [...track.clips, clip];
+  }
+
+  function computeDropTime(e: MouseEvent) {
+    const target = e.currentTarget;
+    let time = viewRegion[0] + e.clientX / secWidth;
+
+    if (target instanceof HTMLElement) {
+      const rect = target.getBoundingClientRect();
+
+      time -= rect.x / secWidth;
+    }
+
+    if (!e.altKey) {
+      time = Math.round(time / snap) * snap;
+    }
+
+    return time;
+  }
+
+  function handleDragOver(e: DragEvent) {
+    if (e.dataTransfer.types.includes("Files")) {
+      const time = computeDropTime(e);
+
+      if (!ghostClip) {
+        ghostClip = new Clip();
+        ghostClip.length = ghostClip.extent = $project.barsToTime(1);
+      }
+
+      ghostClip.start = time;
+
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    }
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    ghostClip = null;
+  }
+
+  function handleDrop(this: HTMLElement, e: DragEvent) {
+    e.preventDefault();
+    ghostClip = null;
+
+    const files = e.dataTransfer.files;
+    const time = computeDropTime(e);
+
+    for (const file of files) {
+      if (file.type.match(audioTypes)) {
+        insertAudioClip(time, file);
+      }
+    }
+  }
 </script>
 
 <style lang="scss">
@@ -59,13 +124,19 @@
       opacity: 0.5;
     }
 
-    .clips {
+    .clips,
+    .ghost-clip {
       position: absolute;
       top: 0;
       left: 0;
       bottom: 0;
 
       transform: translateX(calc(var(--xscroll) * -1));
+    }
+
+    .ghost-clip {
+      opacity: 0.5;
+      pointer-events: none;
     }
   }
 </style>
@@ -74,6 +145,9 @@
   class="track"
   class:disabled={!track.enabled}
   on:pointerenter
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
+  on:drop={handleDrop}
   style={`
     height: ${track.height}px;
     --xscroll: ${viewRegion[0] * secWidth}px;
@@ -82,13 +156,19 @@
     --beat-width: ${$project.beatsToTime(1) * secWidth}px;
   `}>
   <div class="clips">
-    {#each track.clips as clip}
-      <Clip
-        bind:clip
+    {#each track.clips as clip (clip)}
+      <ClipComponent bind:clip {secWidth} {snap} {viewRegion} on:cliptake />
+    {/each}
+  </div>
+
+  <div class="ghost-clip">
+    {#if ghostClip}
+      <ClipComponent
+        bind:clip={ghostClip}
         {secWidth}
         {snap}
-        visibleRange={[Math.max(viewRegion[0] - clip.start - clip.extentPast, 0) + clip.extentPast, clip.extent + Math.min(viewRegion[1] - clip.start - clip.extent, 0)]}
+        {viewRegion}
         on:cliptake />
-    {/each}
+    {/if}
   </div>
 </div>

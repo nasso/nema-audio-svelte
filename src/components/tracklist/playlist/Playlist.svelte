@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
-  import type { Clip, Track } from "@api/playlist";
+  import type { Clip, ClipInstance, Track } from "@api/playlist";
   import type { Point } from "@app/utils/geom";
   import type { Player } from "@api/player";
 
@@ -166,8 +166,8 @@
         {snap}
         on:pointerenter={() => {
           if (movedClip && track.mod.canPlay(movedClip.clip)) {
-            movedClip.track.remove(movedClip.clip);
-            track = track.insert(movedClip.clip);
+            movedClip.track.clips = movedClip.track.clips.filter((clip) => clip !== movedClip.clip);
+            track.clips = [...track.clips, movedClip.clip];
             movedClip.track = track;
           }
         }}
