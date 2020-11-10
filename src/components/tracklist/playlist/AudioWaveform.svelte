@@ -12,7 +12,7 @@
   let renderWidth: number = 0;
   let renderRange: [number, number] = [0, 0];
 
-  let redrawFrame: number;
+  let redrawTimeout: number;
   let path: string = "";
 
   $: $player.decodeBlob(blob).then((buffer) => {
@@ -30,15 +30,17 @@
   }
 
   function scheduleRender(buffer: AudioBuffer, range: [number, number]) {
-    if (redrawFrame) {
-      cancelAnimationFrame(redrawFrame);
+    if (redrawTimeout) {
+      clearTimeout(redrawTimeout);
     }
 
-    redrawFrame = requestAnimationFrame(() => {
-      redrawFrame = null;
+    redrawTimeout = setTimeout(() => {
+      redrawTimeout = null;
 
-      renderWaveform(buffer, range);
-    });
+      requestAnimationFrame(() => {
+        renderWaveform(buffer, range);
+      });
+    }, 100);
   }
 
   function renderWaveform(buffer: AudioBuffer, range: [number, number]) {
