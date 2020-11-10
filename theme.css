@@ -5,9 +5,6 @@
   --anim-long: 500ms;
 }
 
-body {
-}
-
 /* Colors */
 @media (prefers-color-scheme: light) {
   :root {
