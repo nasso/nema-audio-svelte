@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Clip } from "@api/playlist";
   import { createEventDispatcher } from "svelte";
+  import project from "@app/stores/project";
   import { AudioClip } from "@api/audio";
   import AudioWaveform from "./AudioWaveform.svelte";
 
@@ -8,7 +9,7 @@
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
-  export let color = "var(--color-red)";
+  export let color = "var(--color-foreground-2)";
 
   enum ResizeSide {
     Start = "start",
@@ -109,17 +110,47 @@
       }
 
       &::before {
-        background: var(--color-background-2);
+        background: var(--clip-color);
+        opacity: 0.05;
       }
 
       &::after {
-        border: 1px solid var(--color-foreground-2);
+        border: 1px solid var(--clip-color);
         opacity: 0.5;
       }
 
       .data {
         flex-shrink: 0;
-        background: var(--color-background-0);
+
+        position: relative;
+
+        &::before {
+          content: "";
+
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+
+          background: var(--clip-color);
+          opacity: 0.1;
+        }
+      }
+    }
+
+    &.selected .content {
+      &::before {
+        background: var(--color-accent);
+      }
+
+      &::after {
+        border-color: var(--color-accent);
+      }
+
+      .data::before {
+        background: var(--color-accent);
+        opacity: 0.1;
       }
     }
 
@@ -152,12 +183,15 @@
       return;
     }
 
+    $project.selectedClips = $project.selectedClips.add(clip);
+
     dispatch('cliptake', clip);
   }}
   class="clip"
+  class:selected={$project.selectedClips.has(clip)}
   style={`
     --clip-color: ${color};
-    transform: translateX(${(clip.start + clip.extentPast) * secWidth}px);
+    transform: translateX(${Math.round((clip.start + clip.extentPast) * secWidth)}px);
   `}>
   <div class="resize-handle" use:resizer={'start'} />
   <div

@@ -135,9 +135,14 @@
   use:initPlaylistWidth
   bind:clientWidth={playlistWidth}
   on:wheel={handleWheel}
-  on:pointerdown={(e) => {
+  on:pointerdown|capture={(e) => {
     if (e.button !== 0) {
       return;
+    }
+
+    if (!e.shiftKey) {
+      $project.selectedClips.clear();
+      $project = $project;
     }
 
     pointerStart = { x: e.clientX, y: e.clientY };

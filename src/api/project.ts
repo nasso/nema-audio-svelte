@@ -1,4 +1,4 @@
-import type { Track } from "@api/playlist";
+import type { Clip, Track } from "@api/playlist";
 import type { Player } from "@api/player";
 import { ProcessingGraph, Source } from "@api/graph";
 
@@ -9,6 +9,7 @@ export class Project {
   signature = [4, 4];
   tracks: Track<Source<Player>>[] = [];
   graph: ProcessingGraph = new ProcessingGraph();
+  selectedClips: Set<Clip> = new Set();
 
   timeToBeats(timeInSeconds: number): number {
     return timeInSeconds / 60 * this.tempo;
