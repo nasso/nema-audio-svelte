@@ -96,7 +96,10 @@ export default function drag(
   };
 }
 
-export function dragscroller(node: Element, button: MouseButtons = 1): Action<MouseButtons> {
+export function dragscroller(
+  node: Element,
+  button: MouseButtons = 1,
+): Action<MouseButtons> {
   const scrollStore = writable({ x: node.scrollLeft, y: node.scrollTop });
   const scroll: Settable<Point> = {
     subscribe: scrollStore.subscribe,

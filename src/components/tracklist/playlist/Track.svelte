@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Track } from "@api/playlist";
-  import { Clip } from "@api/playlist";
+  import type { Clip } from "@api/playlist";
 
   import { createEventDispatcher } from "svelte";
+  import { AbstractClip, Track } from "@api/playlist";
   import { AudioClip } from "@api/audio";
   import project, { player } from "@app/stores/project";
   import ClipComponent from "./Clip.svelte";
@@ -15,7 +15,7 @@
 
   const dispatch = createEventDispatcher();
 
-  let ghostClip: Clip = null;
+  let ghostClip: AbstractClip = null;
   const audioTypes = /^audio\/.+/;
 
   async function insertAudioClip(time: number, blob: Blob) {
@@ -48,7 +48,7 @@
       const time = computeDropTime(e);
 
       if (!ghostClip) {
-        ghostClip = new Clip();
+        ghostClip = new AbstractClip();
         ghostClip.length = ghostClip.extent = $project.barsToTime(1);
       }
 

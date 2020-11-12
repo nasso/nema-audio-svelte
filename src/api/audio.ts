@@ -1,24 +1,49 @@
 import type { Player } from "@api/player";
 import type { Project } from "@api/project";
-import { ParameterAccuracy, ParameterType, Source, SourceScheduler } from "@api/graph";
 import { Clip, Track } from "@api/playlist";
+import {
+  ParameterAccuracy,
+  ParameterType,
+  Source,
+  SourceScheduler,
+} from "@api/graph";
 
 export class AudioClip extends Clip {
   blob: Blob;
 
-  constructor(blob: Blob, time: number, length: number, extent = length, extentPast = 0) {
+  constructor(
+    blob: Blob,
+    start: number,
+    length: number,
+    extent = length,
+    extentPast = 0,
+  ) {
     super();
 
     this.blob = blob;
-    this.start = time;
+    this.start = start;
     this.length = length;
     this.extent = extent;
     this.extentPast = extentPast;
   }
+
+  duplicate(): Clip {
+    return new AudioClip(
+      this.blob,
+      this.start,
+      this.length,
+      this.extent,
+      this.extentPast,
+    );
+  }
 }
 
 export interface AudioSourceScheduler extends SourceScheduler {
-  connect(destination: AudioParam | AudioNode, output?: number, input?: number): void;
+  connect(
+    destination: AudioParam | AudioNode,
+    output?: number,
+    input?: number,
+  ): void;
 }
 
 export abstract class AudioSource extends Source<AudioPlayer> {
@@ -63,7 +88,8 @@ export class AudioClipPlayer extends AudioSource {
 
       playClip(clip: AudioClip, when = 0, offset = 0): void {
         const duration = clip.extent - offset;
-        const wrappedOffset = (offset % clip.length + clip.length) % clip.length;
+        const wrappedOffset =
+          (offset % clip.length + clip.length) % clip.length;
 
         const source = ctx.createBufferSource();
         source.loop = true;
@@ -118,7 +144,8 @@ export class AudioPlayer implements Player {
     this.project = project;
   }
 
-  start(start = this.startCursor, end = this.endCursor): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  start(start = this.startCursor, _end = this.endCursor): void {
     if (this.#playing) {
       return;
     }
@@ -147,7 +174,10 @@ export class AudioPlayer implements Player {
           }
 
           let when = clip.start + clip.extentPast - this.currentTime;
-          const offset = Math.max(this.currentTime - clip.start, clip.extentPast);
+          const offset = Math.max(
+            this.currentTime - clip.start,
+            clip.extentPast,
+          );
 
           when = Math.max(when, 0);
 
@@ -184,7 +214,9 @@ export class AudioPlayer implements Player {
   }
 
   get currentTime(): number {
-    return this.#playing ? this.#ctx.currentTime - this.#startTime : this.startCursor;
+    return (
+      this.#playing ? this.#ctx.currentTime - this.#startTime : this.startCursor
+    );
   }
 
   get context(): BaseAudioContext {
@@ -195,7 +227,9 @@ export class AudioPlayer implements Player {
     let promise = this.#decodedBlobs.get(blob);
 
     if (!promise) {
-      promise = blob.arrayBuffer().then(buffer => this.#ctx.decodeAudioData(buffer));
+      promise = blob
+        .arrayBuffer()
+        .then(buffer => this.#ctx.decodeAudioData(buffer));
 
       this.#decodedBlobs.set(blob, promise);
     }

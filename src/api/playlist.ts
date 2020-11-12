@@ -1,7 +1,7 @@
 import { Source, GraphNode } from "./graph";
 import type { Player } from "@api/player";
 
-export class Clip {
+export abstract class Clip {
   length = 1;
   extent = 1;
   extentPast = 0;
@@ -11,10 +11,20 @@ export class Clip {
   get totalExtent(): number {
     return this.extent - this.extentPast;
   }
+
+  abstract duplicate(): Clip;
 }
 
-export class ClipInstance extends Clip {
-  master: Clip;
+export class AbstractClip extends Clip {
+  duplicate(): Clip {
+    const clip = new AbstractClip();
+    clip.length = this.length;
+    clip.extent = this.extent;
+    clip.extentPast = this.extentPast;
+    clip.start = this.start;
+
+    return clip;
+  }
 }
 
 export class Track<T extends Source<Player>> extends GraphNode<T> {

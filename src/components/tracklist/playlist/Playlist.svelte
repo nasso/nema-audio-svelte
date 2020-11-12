@@ -17,7 +17,6 @@
   }
 
   let selectedClips: Set<Clip> = new Set();
-  let selectedClipsTracks: WeakMap<Clip, Track<any>> = new WeakMap();
   let cursorPos = 0;
   let playlistWidth = 300;
   let viewRegion: [number, number] = [0, 20];
@@ -142,14 +141,28 @@
   on:command={(e) => {
     switch (e.detail) {
       case 'playlist.clip.delete':
-        for (const clip of selectedClips) {
-          const track = selectedClipsTracks.get(clip);
-          const index = track.clips.indexOf(clip);
-
-          track.clips.splice(index, 1);
+        for (const track of $project.tracks) {
+          track.clips = track.clips.filter((clip) => !selectedClips.has(clip));
         }
 
         selectedClips.clear();
+        selectedClips = selectedClips;
+        break;
+      case 'playlist.clip.duplicate':
+        for (const track of $project.tracks) {
+          const duplicatedClips = track.clips.filter((clip) =>
+            selectedClips.has(clip)
+          );
+
+          for (const clip of duplicatedClips) {
+            // create a clone and leave it here
+            track.clips.push(clip.duplicate());
+
+            // move the selected clip forward
+            clip.start += clip.totalExtent;
+          }
+        }
+
         selectedClips = selectedClips;
         break;
     }
@@ -203,7 +216,6 @@
 
           movedClip = { clip: e.detail.clip, start: e.detail.clip.start, track };
           selectedClips = selectedClips.add(e.detail.clip);
-          selectedClipsTracks.set(e.detail.clip, track);
         }} />
     {/each}
   </VStack>
