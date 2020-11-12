@@ -1,5 +1,5 @@
 <script lang="ts">
-  import uiState, { TracklistMode } from "@app/stores/ui";
+  import { TracklistMode, ui } from "@app/stores/settings";
   import Icon from "@components/Icon.svelte";
   import Button from "@components/control/Button.svelte";
   import TabbedControl from "@components/control/TabbedControl.svelte";
@@ -71,7 +71,7 @@
     </div>
 
     <TabbedControl
-      bind:selected={$uiState.tracklistMode}
+      bind:selected={$ui.tracklistMode}
       tabs={[{ icon: 'edit/list_ul', name: TracklistMode.Playlist }, { icon: 'basic/path', name: TracklistMode.Graph }]} />
   </div>
 

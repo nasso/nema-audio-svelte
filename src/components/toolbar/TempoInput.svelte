@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick } from "svelte";
-  import uiState from "@app/stores/ui";
+  import { ui } from "@app/stores/settings";
   import Icon from "@components/Icon.svelte";
 
   export let value: number;
@@ -55,7 +55,7 @@
       return;
     }
 
-    const usedPointerLock = $uiState.usePointerLock;
+    const usedPointerLock = $ui.usePointerLock;
     const startValue = value;
     let deltaY = 0;
 

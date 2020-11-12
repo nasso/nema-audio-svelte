@@ -1,5 +1,5 @@
 <script lang="ts">
-  import uiState from "@app/stores/ui";
+  import { ui } from "@app/stores/settings";
   import Pane from "@components/Pane.svelte";
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";
@@ -51,12 +51,9 @@
 
 <main>
   <Toolbar />
-  <SplitPane
-    bind:splitpos={$uiState.bottomPaneHeight}
-    reverse
-    snaps={paneSnaps}>
+  <SplitPane bind:splitpos={$ui.bottomPaneHeight} reverse snaps={paneSnaps}>
     <SplitPane
-      bind:splitpos={$uiState.sidePaneWidth}
+      bind:splitpos={$ui.sidePaneWidth}
       direction="row"
       snaps={paneSnaps}>
       <Pane />

@@ -6,7 +6,7 @@
 
   import drag from "@components/actions/drag";
   import project from "@app/stores/project";
-  import uiState, { TracklistMode } from "@app/stores/ui";
+  import { ui, TracklistMode } from "@app/stores/settings";
   import FlexSpace from "@components/layout/FlexSpace.svelte";
   import SplitBar from "@components/layout/SplitBar.svelte";
   import SplitPane from "@components/layout/SplitPane.svelte";
@@ -28,7 +28,7 @@
     tracklist.scrollTop += $scrollDelta.y;
   }
 
-  $: switch ($uiState.tracklistMode) {
+  $: switch ($ui.tracklistMode) {
     case TracklistMode.Playlist:
       playlist?.scrollBy($scrollDelta.x);
       break;
@@ -75,7 +75,7 @@
     direction="row"
     min={150}
     snaps={[150, 200, 250]}
-    bind:splitpos={$uiState.trackHeadsWidth}>
+    bind:splitpos={$ui.trackHeadsWidth}>
     <VStack spacing={1}>
       <VStack spacing={2}>
         {#each $project.tracks as track}
@@ -90,9 +90,9 @@
       <NewTrackHead on:newtrack={handleNewTrack} />
     </VStack>
     <div class="content">
-      {#if $uiState.tracklistMode === TracklistMode.Playlist}
+      {#if $ui.tracklistMode === TracklistMode.Playlist}
         <Playlist bind:this={playlist} />
-      {:else if $uiState.tracklistMode === TracklistMode.Graph}
+      {:else if $ui.tracklistMode === TracklistMode.Graph}
         <Graph bind:this={graph} />
       {/if}
     </div>

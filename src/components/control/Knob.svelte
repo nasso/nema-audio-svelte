@@ -1,5 +1,5 @@
 <script lang="ts">
-  import uiState from "@app/stores/ui";
+  import { ui } from "@app/stores/settings";
 
   export let id: undefined | string = undefined;
   export let color: string = "var(--color-accent)";
@@ -29,7 +29,7 @@
       return;
     }
 
-    const usedPointerLock = $uiState.usePointerLock;
+    const usedPointerLock = $ui.usePointerLock;
 
     this.onpointermove = (e: PointerEvent) => {
       value -= (e.movementY / 50) * (max - min) * 0.5;

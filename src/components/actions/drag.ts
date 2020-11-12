@@ -7,7 +7,7 @@ interface Settable<T> extends Readable<T> {
 
 type MouseButtons = number | number[];
 
-export interface DragParameters {
+export interface DragOptions {
   invert?: boolean;
   button?: MouseButtons;
   capture?: boolean;
@@ -20,11 +20,14 @@ interface Action<T> {
   update: (parameters: T) => void,
 }
 
-export default function drag(node: Element, parameters: DragParameters): Action<DragParameters> {
+export default function drag(
+  node: Element,
+  options: DragOptions,
+): Action<DragOptions> {
   function handlePointerDown(this: Element, e: PointerEvent) {
     if (
-      (typeof parameters.button === "number" && e.button !== parameters.button) ||
-      (Array.isArray(parameters.button) && !parameters.button.includes(e.button))
+      (typeof options.button === "number" && e.button !== options.button) ||
+      (Array.isArray(options.button) && !options.button.includes(e.button))
     ) {
       return;
     }
@@ -33,9 +36,9 @@ export default function drag(node: Element, parameters: DragParameters): Action<
     e.preventDefault();
 
     const pointerStart: Point = { x: e.clientX, y: e.clientY };
-    const startOffset = { ...get(parameters.offset) as Point };
-    const elem = parameters.element || this;
-    const capture = parameters.capture !== false;
+    const startOffset = { ...get(options.offset) as Point };
+    const elem = options.element || this;
+    const capture = options.capture !== false;
 
     const handlePointerMove = (e: PointerEvent) => {
       const delta = {
@@ -43,22 +46,22 @@ export default function drag(node: Element, parameters: DragParameters): Action<
         y: e.clientY - pointerStart.y,
       };
 
-      if (parameters.relative) {
+      if (options.relative) {
         pointerStart.x = e.clientX;
         pointerStart.y = e.clientY;
       }
 
-      const factor = parameters.invert ? -1 : 1;
+      const factor = options.invert ? -1 : 1;
 
-      parameters.offset.set({
+      options.offset.set({
         x: startOffset.x + delta.x * factor,
         y: startOffset.y + delta.y * factor,
       });
     };
 
     const handlePointerUp = (e: PointerEvent) => {
-      if (parameters.relative) {
-        parameters.offset.set({
+      if (options.relative) {
+        options.offset.set({
           x: startOffset.x,
           y: startOffset.y,
         });
@@ -88,7 +91,7 @@ export default function drag(node: Element, parameters: DragParameters): Action<
 
   return {
     update(newParams) {
-      parameters = newParams;
+      options = newParams;
     },
   };
 }

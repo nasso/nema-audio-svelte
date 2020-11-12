@@ -1,11 +1,10 @@
 <script lang="ts">
   import type { Clip } from "@api/playlist";
-  import { createEventDispatcher } from "svelte";
-  import project from "@app/stores/project";
   import { AudioClip } from "@api/audio";
   import AudioWaveform from "./AudioWaveform.svelte";
 
   export let clip: Clip;
+  export let selected: boolean = false;
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
@@ -15,8 +14,6 @@
     Start = "start",
     End = "end",
   }
-
-  const dispatch = createEventDispatcher();
 
   let visibleRange: [number, number];
   $: visibleRange = [
@@ -178,17 +175,9 @@
 </style>
 
 <div
-  on:pointerdown={(e) => {
-    if (e.button !== 0) {
-      return;
-    }
-
-    $project.selectedClips = $project.selectedClips.add(clip);
-
-    dispatch('cliptake', clip);
-  }}
+  on:pointerdown
   class="clip"
-  class:selected={$project.selectedClips.has(clip)}
+  class:selected
   style={`
     --clip-color: ${color};
     transform: translateX(${Math.round((clip.start + clip.extentPast) * secWidth)}px);

@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
-  import type { Clip, ClipInstance, Track } from "@api/playlist";
+  import type { Clip, Track } from "@api/playlist";
   import type { Point } from "@app/utils/geom";
   import type { Player } from "@api/player";
 
   import { spring } from "svelte/motion";
   import project, { player } from "@app/stores/project";
+  import { shortcuts } from "@components/actions/commands";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
 
@@ -15,6 +16,8 @@
     track: Track<Source<Player>>;
   }
 
+  let selectedClips: Set<Clip> = new Set();
+  let selectedClipsTracks: WeakMap<Clip, Track<any>> = new WeakMap();
   let cursorPos = 0;
   let playlistWidth = 300;
   let viewRegion: [number, number] = [0, 20];
@@ -135,14 +138,30 @@
   use:initPlaylistWidth
   bind:clientWidth={playlistWidth}
   on:wheel={handleWheel}
+  use:shortcuts
+  on:command={(e) => {
+    switch (e.detail) {
+      case 'playlist.clip.delete':
+        for (const clip of selectedClips) {
+          const track = selectedClipsTracks.get(clip);
+          const index = track.clips.indexOf(clip);
+
+          track.clips.splice(index, 1);
+        }
+
+        selectedClips.clear();
+        selectedClips = selectedClips;
+        break;
+    }
+  }}
   on:pointerdown|capture={(e) => {
     if (e.button !== 0) {
       return;
     }
 
     if (!e.shiftKey) {
-      $project.selectedClips.clear();
-      $project = $project;
+      selectedClips.clear();
+      selectedClips = selectedClips;
     }
 
     pointerStart = { x: e.clientX, y: e.clientY };
@@ -169,6 +188,7 @@
         viewRegion={$animatedViewRegion}
         {secWidth}
         {snap}
+        {selectedClips}
         on:pointerenter={() => {
           if (movedClip && track.mod.canPlay(movedClip.clip)) {
             movedClip.track.clips = movedClip.track.clips.filter((clip) => clip !== movedClip.clip);
@@ -176,8 +196,14 @@
             movedClip.track = track;
           }
         }}
-        on:cliptake={(e) => {
-          movedClip = { clip: e.detail, start: e.detail.start, track };
+        on:pointerdownclip={(e) => {
+          if (e.detail.e.button !== 0) {
+            return;
+          }
+
+          movedClip = { clip: e.detail.clip, start: e.detail.clip.start, track };
+          selectedClips = selectedClips.add(e.detail.clip);
+          selectedClipsTracks.set(e.detail.clip, track);
         }} />
     {/each}
   </VStack>

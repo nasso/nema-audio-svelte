@@ -73,15 +73,28 @@ const project = writable(proj);
 const playerValue = new AudioPlayer(new AudioContext(), proj);
 
 (async () => {
-  const sample = await fetch("data/BRLY_ALV_MORE_DRUMS_Drumloop_150_OnHoldC78.wav");
+  const sample =
+    await fetch("data/BRLY_ALV_MORE_DRUMS_Drumloop_150_OnHoldC78.wav");
   const blob = await sample.blob();
 
   const audioBuffer = await playerValue.decodeBlob(blob);
 
   project.update((project) => {
-    project.tracks[0].clips.push(new AudioClip(blob, 0, audioBuffer.duration));
-    project.tracks[1].clips.push(new AudioClip(blob, 0, audioBuffer.duration, audioBuffer.duration * 2));
-    project.tracks[2].clips.push(new AudioClip(blob, 2, audioBuffer.duration, audioBuffer.duration * 1.5, -1));
+    project.tracks[0].clips.push(
+      new AudioClip(blob, 0, audioBuffer.duration),
+    );
+    project.tracks[1].clips.push(
+      new AudioClip(blob, 0, audioBuffer.duration, audioBuffer.duration * 2),
+    );
+    project.tracks[2].clips.push(
+      new AudioClip(
+        blob,
+        2,
+        audioBuffer.duration,
+        audioBuffer.duration * 1.5,
+        -1,
+      ),
+    );
 
     return project;
   });

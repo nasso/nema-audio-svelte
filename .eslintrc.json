@@ -25,6 +25,16 @@
     }
   ],
   "rules": {
+    "prefer-template": "error",
+    "eqeqeq": "error",
+    "no-multi-spaces": "warn",
+    "brace-style": "error",
+    "max-len": "warn",
+    "prefer-destructuring": "warn",
+    "function-paren-newline": [
+      "error",
+      "multiline-arguments"
+    ],
     "indent": [
       "error",
       2
@@ -49,8 +59,9 @@
       "error",
       "consistent"
     ],
-    "prefer-template": [
-      "error"
+    "dot-location": [
+      "error",
+      "property"
     ]
   }
 }

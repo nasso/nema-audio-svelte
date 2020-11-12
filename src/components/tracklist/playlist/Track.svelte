@@ -2,6 +2,7 @@
   import type { Track } from "@api/playlist";
   import { Clip } from "@api/playlist";
 
+  import { createEventDispatcher } from "svelte";
   import { AudioClip } from "@api/audio";
   import project, { player } from "@app/stores/project";
   import ClipComponent from "./Clip.svelte";
@@ -10,6 +11,9 @@
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
+  export let selectedClips: Set<Clip>;
+
+  const dispatch = createEventDispatcher();
 
   let ghostClip: Clip = null;
   const audioTypes = /^audio\/.+/;
@@ -157,7 +161,13 @@
   `}>
   <div class="clips">
     {#each track.clips as clip (clip)}
-      <ClipComponent bind:clip {secWidth} {snap} {viewRegion} on:cliptake />
+      <ClipComponent
+        bind:clip
+        selected={selectedClips.has(clip)}
+        {secWidth}
+        {snap}
+        {viewRegion}
+        on:pointerdown={(e) => dispatch('pointerdownclip', { clip, e })} />
     {/each}
   </div>
 
