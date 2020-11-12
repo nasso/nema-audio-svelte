@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: row;
     background-color: var(--color-background-1);
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
   }
 </style>
 

@@ -55,8 +55,8 @@ import App from "./App.svelte";
   compressor.connect(merger, 1);
   merger.connect(output);
 
-  const sample =
-    await fetch("data/BRLY_ALV_MORE_DRUMS_Drumloop_150_OnHoldC78.wav");
+  const sampleName = "BRLY_ALV_MORE_DRUMS_Drumloop_150_OnHoldC78.wav";
+  const sample = await fetch(`data/${sampleName}`);
   const blob = await sample.blob();
 
   const audioBuffer = await get(player).decodeBlob(blob);
@@ -78,13 +78,20 @@ import App from "./App.svelte";
     project.tracks[1].connect(gain);
 
     project.tracks[0].clips.push(
-      new AudioClip(blob, 0, audioBuffer.duration),
+      new AudioClip(sampleName, blob, 0, audioBuffer.duration),
     );
     project.tracks[1].clips.push(
-      new AudioClip(blob, 0, audioBuffer.duration, audioBuffer.duration * 2),
+      new AudioClip(
+        sampleName,
+        blob,
+        0,
+        audioBuffer.duration,
+        audioBuffer.duration * 2,
+      ),
     );
     project.tracks[2].clips.push(
       new AudioClip(
+        sampleName,
         blob,
         2,
         audioBuffer.duration,

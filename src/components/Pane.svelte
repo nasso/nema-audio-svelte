@@ -4,7 +4,7 @@
 
     background: var(--color-background-1);
 
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
   }
 </style>
 

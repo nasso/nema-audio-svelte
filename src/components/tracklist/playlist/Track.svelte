@@ -19,9 +19,9 @@
   let ghostClip: AbstractClip = null;
   const audioTypes = /^audio\/.+/;
 
-  async function insertAudioClip(time: number, blob: Blob) {
+  async function insertAudioClip(time: number, name: string, blob: Blob) {
     const buffer = await $player.decodeBlob(blob);
-    const clip = new AudioClip(blob, 0, buffer.duration);
+    const clip = new AudioClip(name, blob, 0, buffer.duration);
 
     clip.start = time;
     track.clips = [...track.clips, clip];
@@ -49,7 +49,7 @@
       const time = computeDropTime(e);
 
       if (!ghostClip) {
-        ghostClip = new AbstractClip();
+        ghostClip = new AbstractClip("Audio clip");
         ghostClip.length = ghostClip.extent = $project.barsToTime(1);
       }
 
@@ -73,7 +73,7 @@
 
     for (const file of files) {
       if (file.type.match(audioTypes)) {
-        insertAudioClip(time, file);
+        insertAudioClip(time, file.name, file);
       }
     }
   }
@@ -84,7 +84,7 @@
     --background-xshift: calc(-1px - var(--xscroll));
     --bar-group-width: calc(var(--bar-width) * 8);
 
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
 
     background-size: var(--bar-width) 1px, calc(var(--bar-group-width) * 2) 1px;
     background-position: var(--background-xshift) 0px;

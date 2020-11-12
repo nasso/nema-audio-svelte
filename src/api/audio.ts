@@ -12,13 +12,14 @@ export class AudioClip extends Clip {
   blob: Blob;
 
   constructor(
+    name: string,
     blob: Blob,
     start: number,
     length: number,
     extent = length,
     extentPast = 0,
   ) {
-    super();
+    super(name);
 
     this.blob = blob;
     this.start = start;
@@ -29,6 +30,7 @@ export class AudioClip extends Clip {
 
   duplicate(): Clip {
     return new AudioClip(
+      this.name,
       this.blob,
       this.start,
       this.length,

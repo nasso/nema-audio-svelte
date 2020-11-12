@@ -43,7 +43,7 @@
     position: absolute;
     height: 64px;
     background: var(--color-background-1);
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
 
     h2 {
       font-size: 12px;

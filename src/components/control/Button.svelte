@@ -11,7 +11,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
     background-color: var(--color-background-1);
     padding: 0px 8px;
 

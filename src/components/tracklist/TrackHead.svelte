@@ -27,7 +27,7 @@
     display: grid;
     background: var(--color-background-1);
     height: var(--track-height);
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
 
     flex-shrink: 0;
 

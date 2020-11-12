@@ -46,7 +46,7 @@
     // snap is 1 bar by default
     snap = $project.barsToTime(1);
 
-    for (let i = 0; i < 8 && (snap / 2) * secWidth >= 20; i++) {
+    for (let i = 0; i < 8 && (snap / 2) * secWidth >= 15; i++) {
       snap /= 2;
     }
 

@@ -31,7 +31,7 @@
     color: var(--color-foreground-2);
 
     background-color: var(--color-background-0);
-    border-radius: 8px;
+    border-radius: var(--corner-radius);
 
     transition: background-color var(--anim-short), color var(--anim-short);
 

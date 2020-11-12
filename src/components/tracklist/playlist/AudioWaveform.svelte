@@ -118,8 +118,6 @@
 
 <style lang="scss">
   .audio-waveform {
-    color: var(--color-foreground-0);
-
     width: 100%;
     height: 100%;
 

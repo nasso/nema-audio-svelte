@@ -9,7 +9,7 @@
   export let viewRegion: [number, number];
   export let snap: number;
   export let secWidth: number;
-  export let color = "var(--color-foreground-2)";
+  export let color = "var(--color-red)";
 
   enum ResizeSide {
     Start = "start",
@@ -89,41 +89,31 @@
     left: 0;
     bottom: 0;
 
+    color: var(--color-foreground-0);
+
+    --header-background-opacity: 0.7;
+    --header-background-color: var(--clip-color);
+    --header-foreground-color: var(--color-foreground-0);
+    --background-opacity: 0.05;
+
+    &.selected {
+      --background-opacity: 0.2;
+    }
+
     .content {
       display: flex;
+      flex-direction: column;
 
-      border-radius: 8px;
+      border-radius: var(--corner-radius);
       overflow: hidden;
 
       position: relative;
 
-      &::before,
-      &::after {
-        content: "";
-
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-
-        border-radius: inherit;
-      }
-
-      &::before {
-        background: var(--clip-color);
-        opacity: 0.05;
-      }
-
-      &::after {
-        border: 1px solid var(--clip-color);
-        opacity: 0.5;
-      }
-
-      .data {
+      header {
         flex-shrink: 0;
 
         position: relative;
+        color: var(--header-foreground-color);
 
         &::before {
           content: "";
@@ -134,24 +124,39 @@
           right: 0;
           bottom: 0;
 
-          background: var(--clip-color);
-          opacity: 0.1;
+          background: var(--header-background-color);
+          opacity: var(--header-background-opacity);
+        }
+
+        h3 {
+          position: sticky;
+          font-size: 11px;
+          padding: 2px 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
-    }
 
-    &.selected .content {
       &::before {
-        background: var(--color-accent);
+        content: "";
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        border-radius: inherit;
+        background: var(--color-foreground-0);
+        opacity: var(--background-opacity);
+
+        transition: opacity var(--anim-short);
       }
 
-      &::after {
-        border-color: var(--color-accent);
-      }
-
-      .data::before {
-        background: var(--color-accent);
-        opacity: 0.1;
+      .data {
+        flex-shrink: 0;
+        flex-grow: 1;
       }
     }
 
@@ -190,11 +195,14 @@
   <div
     class="content"
     style={`width: ${Math.round(Math.max(clip.totalExtent * secWidth, 1))}px`}>
+    <header>
+      <h3>{clip.name}</h3>
+    </header>
     <div
       class="data"
       style={`
         transform: translateX(${-clip.extentPast * secWidth}px);
-        width: ${clip.length * secWidth}px
+        width: ${clip.length * secWidth}px;
       `}>
       {#if clip instanceof AudioClip}
         <AudioWaveform blob={clip.blob} {visibleRange} />
