@@ -4,7 +4,8 @@
   import SplitPane from "@components/layout/SplitPane.svelte";
   import Toolbar from "@components/toolbar/Toolbar.svelte";
   import Tracklist from "@components/tracklist/Tracklist.svelte";
-  import { player } from "./stores/project";
+  import player from "./stores/player";
+  import project from "./stores/project";
 
   const paneSnaps = [200];
 
@@ -40,7 +41,8 @@
   on:keydown={(e) => {
     if (e.key === ' ' && releasedSpacebar) {
       releasedSpacebar = false;
-      $player.playing = !$player.playing;
+
+      $player = $player.toggle($project);
     }
   }}
   on:keyup={(e) => {

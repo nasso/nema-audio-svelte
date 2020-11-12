@@ -6,7 +6,8 @@
   import ToggleButton from "@components/control/ToggleButton.svelte";
   import TempoInput from "./TempoInput.svelte";
   import PlayButton from "./PlayButton.svelte";
-  import project, { player } from "@app/stores/project";
+  import project from "@app/stores/project";
+  import player from "@app/stores/player";
 </script>
 
 <style lang="scss">
@@ -66,7 +67,7 @@
       <Button>
         <Icon name="media/skip_previous" />
       </Button>
-      <PlayButton bind:playing={$player.playing} />
+      <PlayButton />
       <ToggleButton icon="media/repeat" selected />
     </div>
 

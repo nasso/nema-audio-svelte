@@ -128,9 +128,8 @@ export class AudioTrack extends Track<AudioClipPlayer> {
 }
 
 export class AudioPlayer implements Player {
-  project: Project;
   loop = true;
-  startCursor = 5;
+  startCursor = 0;
   endCursor = 0;
 
   #ctx: BaseAudioContext;
@@ -141,19 +140,22 @@ export class AudioPlayer implements Player {
 
   constructor(ctx: BaseAudioContext, project: Project) {
     this.#ctx = ctx;
-    this.project = project;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  start(start = this.startCursor, _end = this.endCursor): void {
+  start(
+    project: Project,
+    start = this.startCursor,
+    _end = this.endCursor,
+  ): this {
     if (this.#playing) {
-      return;
+      return this;
     }
 
     this.#playing = true;
     this.#startTime = this.#ctx.currentTime - start;
 
-    for (const track of this.project.tracks) {
+    for (const track of project.tracks) {
       const source = track.mod;
 
       if (!track.enabled) {
@@ -185,9 +187,11 @@ export class AudioPlayer implements Player {
         }
       }
     }
+
+    return this;
   }
 
-  stop(): void {
+  stop(): this {
     if (!this.#playing) {
       return;
     }
@@ -195,13 +199,19 @@ export class AudioPlayer implements Player {
     this.#playing = false;
     this.#runningJobs.forEach(job => job.stop());
     this.#runningJobs.clear();
+
+    return this;
   }
 
-  set playing(value: boolean) {
-    if (value) {
-      this.start();
+  toggle(
+    project: Project,
+    start = this.startCursor,
+    end = this.endCursor,
+  ): this {
+    if (this.#playing) {
+      return this.stop();
     } else {
-      this.stop();
+      return this.start(project, start, end);
     }
   }
 

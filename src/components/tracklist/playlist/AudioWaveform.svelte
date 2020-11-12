@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { player } from "@app/stores/project";
+  import player from "@app/stores/player";
 
   export let blob: Blob;
   export let visibleRange: [number, number];

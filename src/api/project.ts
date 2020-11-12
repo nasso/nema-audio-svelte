@@ -25,4 +25,8 @@ export class Project {
   barsToTime(bars: number): number {
     return this.beatsToTime(bars * this.signature[0]);
   }
+
+  get quantum(): number {
+    return 128 / this.sampleRate;
+  }
 }

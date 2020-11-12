@@ -1,13 +1,17 @@
 <script lang="ts">
+  import player from "@app/stores/player";
+  import project from "@app/stores/project";
+
   import Button from "@components/control/Button.svelte";
   import Icon from "@components/Icon.svelte";
 
-  export let playing: boolean = false;
+  let playing: boolean = $player.playing;
 
   $: icon = playing ? "media/pause_circle_filled" : "media/play_arrow";
 
   function handleClick() {
-    playing = !playing;
+    $player = $player.toggle($project);
+    playing = $player.playing;
   }
 </script>
 

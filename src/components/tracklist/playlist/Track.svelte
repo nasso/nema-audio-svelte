@@ -4,7 +4,8 @@
   import { createEventDispatcher } from "svelte";
   import { AbstractClip, Track } from "@api/playlist";
   import { AudioClip } from "@api/audio";
-  import project, { player } from "@app/stores/project";
+  import project from "@app/stores/project";
+  import player from "@app/stores/player";
   import ClipComponent from "./Clip.svelte";
 
   export let track: Track<any>;

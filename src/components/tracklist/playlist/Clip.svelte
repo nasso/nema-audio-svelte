@@ -2,6 +2,7 @@
   import type { Clip } from "@api/playlist";
   import { AudioClip } from "@api/audio";
   import AudioWaveform from "./AudioWaveform.svelte";
+  import project from "@app/stores/project";
 
   export let clip: Clip;
   export let selected: boolean = false;
@@ -45,9 +46,12 @@
         }
 
         if (side === ResizeSide.Start) {
-          clip.extentPast = Math.max(Math.min(t, 0), -clip.start);
+          clip.extentPast = Math.max(
+            Math.min(t, clip.extent - $project.quantum),
+            -clip.start
+          );
         } else {
-          clip.extent = Math.max(t, 0);
+          clip.extent = Math.max(t, clip.extentPast + $project.quantum);
         }
       };
 
@@ -185,7 +189,7 @@
   <div class="resize-handle" use:resizer={'start'} />
   <div
     class="content"
-    style={`width: ${Math.max(clip.totalExtent * secWidth, 1)}px`}>
+    style={`width: ${Math.round(Math.max(clip.totalExtent * secWidth, 1))}px`}>
     <div
       class="data"
       style={`

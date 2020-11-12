@@ -5,7 +5,8 @@
   import type { Player } from "@api/player";
 
   import { spring } from "svelte/motion";
-  import project, { player } from "@app/stores/project";
+  import project from "@app/stores/project";
+  import player from "@app/stores/player";
   import { shortcuts } from "@components/actions/commands";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
@@ -45,8 +46,12 @@
     // snap is 1 bar by default
     snap = $project.barsToTime(1);
 
-    for (let i = 0; i < 4 && (snap / 2) * secWidth >= 20; i++) {
+    for (let i = 0; i < 8 && (snap / 2) * secWidth >= 20; i++) {
       snap /= 2;
+    }
+
+    if ((snap / 2) * secWidth >= 20) {
+      snap = $project.quantum;
     }
   }
 
