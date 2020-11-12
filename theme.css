@@ -3,6 +3,8 @@
   --anim-short: 100ms;
   --anim-medium: 300ms;
   --anim-long: 500ms;
+
+  --corner-radius: 4px;
 }
 
 /* Colors */
