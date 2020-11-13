@@ -4,7 +4,8 @@
   import type { Point } from "@app/utils/geom";
   import type { Player } from "@api/player";
 
-  import { spring } from "svelte/motion";
+  import { tweened } from "svelte/motion";
+  import { cubicOut } from "svelte/easing";
   import project from "@app/stores/project";
   import player from "@app/stores/player";
   import { shortcuts } from "@components/actions/commands";
@@ -25,9 +26,9 @@
   let snap: number;
   let movedClip: MovedClip<Clip> = null;
   let pointerStart: Point;
-  let animatedViewRegion = spring(viewRegion, {
-    stiffness: 0.25,
-    damping: 1.0,
+  let animatedViewRegion = tweened(viewRegion, {
+    duration: 100,
+    easing: cubicOut,
   });
 
   export function scrollBy(xdelta: number) {
@@ -37,7 +38,7 @@
     viewRegion[1] = viewRegion[0] + span;
   }
 
-  $: $animatedViewRegion = viewRegion;
+  $: animatedViewRegion.set([viewRegion[0], viewRegion[1]]);
 
   $: secWidth =
     playlistWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
