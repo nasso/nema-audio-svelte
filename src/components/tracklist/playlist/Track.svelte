@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Clip } from "@api/playlist";
 
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { AbstractClip, Track } from "@api/playlist";
   import { AudioClip } from "@api/audio";
   import project from "@app/stores/project";
@@ -15,6 +15,12 @@
   export let selectedClips: Set<Clip>;
 
   const dispatch = createEventDispatcher();
+
+  let backgroundCanvas: HTMLCanvasElement;
+  let backgroundWidth: number;
+  let backgroundHeight: number;
+  let backgroundFrame: number;
+  let ctx: CanvasRenderingContext2D;
 
   let ghostClip: AbstractClip = null;
   const audioTypes = /^audio\/.+/;
@@ -77,27 +83,112 @@
       }
     }
   }
+
+  function drawRegions(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    divwidth: number,
+    scroll: number
+  ) {
+    const xoffset = scroll % (divwidth * 2);
+
+    ctx.beginPath();
+    for (let i = 1; i * divwidth - xoffset < width; i += 2) {
+      ctx.rect(i * divwidth - xoffset, 0, divwidth, 1);
+    }
+  }
+
+  function drawDivisions(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    divwidth: number,
+    scroll: number
+  ) {
+    const xoffset = scroll % divwidth;
+
+    ctx.beginPath();
+    for (let i = 0; i * divwidth - xoffset < width; i++) {
+      ctx.moveTo(i * divwidth - xoffset, 0);
+      ctx.lineTo(i * divwidth - xoffset, 1);
+    }
+  }
+
+  function redrawBackground() {
+    if (!backgroundCanvas) {
+      return;
+    }
+
+    ctx = ctx ?? backgroundCanvas.getContext("2d");
+
+    backgroundFrame ?? cancelAnimationFrame(backgroundFrame);
+
+    backgroundFrame = requestAnimationFrame(() => {
+      backgroundCanvas.width = backgroundWidth * window.devicePixelRatio;
+      backgroundCanvas.height = backgroundHeight * window.devicePixelRatio;
+
+      const height = backgroundCanvas.height;
+
+      const style = getComputedStyle(backgroundCanvas);
+      const color = style.getPropertyValue("--color-background-0");
+      const bg = style.getPropertyValue("--color-background-1");
+
+      backgroundFrame = null;
+
+      ctx.save();
+      {
+        ctx.scale(1, height);
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = bg;
+
+        drawRegions(
+          ctx,
+          backgroundWidth,
+          $project.barsToTime(4) * secWidth,
+          viewRegion[0] * secWidth
+        );
+        ctx.fill();
+
+        drawDivisions(
+          ctx,
+          backgroundWidth,
+          snap * secWidth,
+          viewRegion[0] * secWidth
+        );
+        ctx.globalAlpha = 0.5;
+        ctx.stroke();
+
+        drawDivisions(
+          ctx,
+          backgroundWidth,
+          $project.barsToTime(1) * secWidth,
+          viewRegion[0] * secWidth
+        );
+        ctx.globalAlpha = 1;
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+  }
+
+  $: {
+    // redraw when any of these change
+    $project.tempo;
+    $project.signature;
+    backgroundWidth;
+    backgroundHeight;
+    viewRegion;
+    secWidth;
+
+    redrawBackground();
+  }
 </script>
 
 <style lang="scss">
   .track {
-    --background-xshift: calc(-1px - var(--xscroll));
-    --bar-group-width: calc(var(--bar-width) * 8);
-
     border-radius: var(--corner-radius);
 
-    background-size: var(--bar-width) 1px, calc(var(--bar-group-width) * 2) 1px;
-    background-position: var(--background-xshift) 0px;
-    background-image: linear-gradient(
-        to right,
-        var(--color-background-0) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to right,
-        var(--color-background-2) var(--bar-group-width),
-        var(--color-background-1) var(--bar-group-width)
-      );
+    background: var(--color-background-2);
 
     transition: opacity var(--anim-short);
 
@@ -108,25 +199,15 @@
       opacity: 0.5;
     }
 
-    &::before {
-      content: "";
-      display: inline-block;
-
+    .grid {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
 
-      background-size: var(--snap-width) 1px;
-      background-position: var(--background-xshift) 0px;
-      background-image: linear-gradient(
-        to right,
-        var(--color-background-0) 1px,
-        transparent 1px
-      );
+      width: 100%;
+      height: 100%;
 
-      opacity: 0.5;
+      color: var(--color-background-0);
     }
 
     .clips,
@@ -160,6 +241,11 @@
     --bar-width: ${$project.barsToTime(1) * secWidth}px;
     --beat-width: ${$project.beatsToTime(1) * secWidth}px;
   `}>
+  <canvas
+    class="grid"
+    bind:this={backgroundCanvas}
+    bind:clientWidth={backgroundWidth}
+    bind:clientHeight={backgroundHeight} />
   <div class="clips">
     {#each track.clips as clip (clip)}
       <ClipComponent
