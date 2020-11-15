@@ -32,13 +32,16 @@ window.addEventListener("keydown", (e: KeyboardEvent) => {
   }
 });
 
-interface ShortcutsAction {
+interface CommandsAction {
   destroy(): void;
 }
 
-export function shortcuts(node: Element): ShortcutsAction {
+export default function(
+  node: Element,
+  handler: (e: CustomEvent<string>) => void,
+): CommandsAction {
   const callback = (action: string) => {
-    node.dispatchEvent(new CustomEvent("command", { detail: action }));
+    handler.call(node, new CustomEvent("command", { detail: action }));
   };
 
   commandCallbacks.add(callback);

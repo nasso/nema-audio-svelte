@@ -8,7 +8,7 @@
   import { cubicOut } from "svelte/easing";
   import project from "@app/stores/project";
   import player from "@app/stores/player";
-  import { shortcuts } from "@components/actions/commands";
+  import commands from "@components/actions/commands";
   import VStack from "@components/layout/VStack.svelte";
   import PlaylistTrack from "./Track.svelte";
 
@@ -36,6 +36,26 @@
 
     viewRegion[0] = Math.max(0, viewRegion[0] + xdelta / secWidth);
     viewRegion[1] = viewRegion[0] + span;
+  }
+
+  export function selectAllClips(track: Track<any>) {
+    for (const clip of track.clips) {
+      selectedClips.add(clip);
+    }
+
+    selectedClips = selectedClips;
+  }
+
+  export function deselectAllClips(track?: Track<any>) {
+    if (track) {
+      for (const clip of track.clips) {
+        selectedClips.delete(clip);
+      }
+    } else {
+      selectedClips.clear();
+    }
+
+    selectedClips = selectedClips;
   }
 
   $: animatedViewRegion.set([viewRegion[0], viewRegion[1]]);
@@ -130,6 +150,12 @@
 <svelte:window
   on:keydown={handleGlobalKeyDown}
   on:keyup={handleGlobalKeyUp}
+  on:pointerdown|capture={(e) => {
+    if (e.button === 0 && !e.shiftKey && !e.ctrlKey) {
+      selectedClips.clear();
+      selectedClips = selectedClips;
+    }
+  }}
   on:pointerup={(e) => {
     if (e.button !== 0) {
       return;
@@ -143,8 +169,7 @@
   use:initPlaylistWidth
   bind:clientWidth={playlistWidth}
   on:wheel={handleWheel}
-  use:shortcuts
-  on:command={(e) => {
+  use:commands={(e) => {
     switch (e.detail) {
       case 'playlist.clip.delete':
         for (const track of $project.tracks) {
@@ -174,16 +199,9 @@
     }
   }}
   on:pointerdown|capture={(e) => {
-    if (e.button !== 0) {
-      return;
+    if (e.button === 0) {
+      pointerStart = { x: e.clientX, y: e.clientY };
     }
-
-    if (!e.shiftKey) {
-      selectedClips.clear();
-      selectedClips = selectedClips;
-    }
-
-    pointerStart = { x: e.clientX, y: e.clientY };
   }}
   on:pointermove={(e) => {
     if (movedClip) {

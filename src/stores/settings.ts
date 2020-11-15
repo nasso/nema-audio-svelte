@@ -42,6 +42,10 @@ const defaultShortcuts: Shortcut[] = [
     command: "playlist.clip.delete",
   },
   {
+    key: "delete",
+    command: "playlist.track.delete",
+  },
+  {
     key: "ctrl+c",
     command: "playlist.clip.copy",
   },

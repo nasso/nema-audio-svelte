@@ -9,6 +9,7 @@
   import Checkbox from "@components/control/Checkbox.svelte";
   import Knob from "@components/control/Knob.svelte";
 
+  export let selected: boolean = false;
   export let track: Track<Source<any>>;
 
   const dispatch = createEventDispatcher();
@@ -28,8 +29,34 @@
     background: var(--color-background-1);
     height: var(--track-height);
     border-radius: var(--corner-radius);
-
     flex-shrink: 0;
+
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+      content: "";
+
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+
+      width: calc(var(--corner-radius) / 2);
+      background: var(--color-accent);
+
+      opacity: 0.25;
+
+      transition: opacity var(--anim-short);
+    }
+
+    &.selected {
+      background: var(--color-background-2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
 
     h2,
     h3 {
@@ -69,7 +96,9 @@
 
 <article
   class="track-head"
+  class:selected
   class:disabled={!track.enabled}
+  on:pointerdown
   style={`--track-height: ${track.height}px`}>
   <HStack align="center">
     <HStack hpad={16} vpad={8} spacing={8} align="center">

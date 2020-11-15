@@ -74,7 +74,10 @@
     {disabled}
     min={clamp && min}
     max={clamp && max} />
-  <svg width={size} height={size} on:pointerdown={handlePointerDown}>
+  <svg
+    width={size}
+    height={size}
+    on:pointerdown|stopPropagation={handlePointerDown}>
     <!-- Background -->
     <circle opacity="0.1" cx="50%" cy="50%" r={size / 2} fill="currentColor" />
 

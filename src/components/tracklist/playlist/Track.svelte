@@ -114,15 +114,15 @@
   }
 
   function redrawBackground() {
-    if (!backgroundCanvas) {
-      return;
-    }
-
-    ctx = ctx ?? backgroundCanvas.getContext("2d");
-
     backgroundFrame ?? cancelAnimationFrame(backgroundFrame);
 
     backgroundFrame = requestAnimationFrame(() => {
+      if (!backgroundCanvas) {
+        return;
+      }
+
+      ctx = ctx ?? backgroundCanvas.getContext("2d");
+
       backgroundCanvas.width = backgroundWidth * window.devicePixelRatio;
       backgroundCanvas.height = backgroundHeight * window.devicePixelRatio;
 

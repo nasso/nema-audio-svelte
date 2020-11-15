@@ -15,7 +15,9 @@
   import TrackHead from "./TrackHead.svelte";
   import Playlist from "./playlist/Playlist.svelte";
   import Graph from "./graph/Graph.svelte";
+  import commands from "@components/actions/commands";
 
+  let selectedTracks = new Set<Track<any>>();
   let tracklist: HTMLElement;
   let playlist: Playlist;
   let graph: Graph;
@@ -37,6 +39,23 @@
       break;
   }
 
+  function deleteSelectedTracks() {
+    $project.tracks = $project.tracks.filter(
+      (track) => !selectedTracks.delete(track)
+    );
+  }
+
+  function selectTrack(track: Track<any>) {
+    selectedTracks = selectedTracks.add(track);
+    playlist.selectAllClips(track);
+  }
+
+  function deselectAllTracks() {
+    selectedTracks.clear();
+    playlist.deselectAllClips();
+    selectedTracks = selectedTracks;
+  }
+
   function handleSolo(e: CustomEvent<Track<any>>) {
     const track = e.detail;
 
@@ -51,6 +70,37 @@
   async function handleNewTrack() {
     await tick();
     tracklist.scrollTop = tracklist.scrollHeight - tracklist.clientHeight;
+  }
+
+  function handleTrackClick(e: PointerEvent, track: Track<any>, i: number) {
+    if (e.button === 0) {
+      selectTrack(track);
+
+      if (e.shiftKey && selectedTracks.size > 0) {
+        let range: [number, number] = null;
+
+        for (let j = 1; i + j < $project.tracks.length || i - j >= 0; j++) {
+          if (
+            i + j < $project.tracks.length &&
+            selectedTracks.has($project.tracks[i + j])
+          ) {
+            range = [i, i + j];
+            break;
+          }
+
+          if (i - j >= 0 && selectedTracks.has($project.tracks[i - j])) {
+            range = [i - j, i];
+            break;
+          }
+        }
+
+        if (range) {
+          for (let i = range[0]; i < range[1]; i++) {
+            selectTrack($project.tracks[i]);
+          }
+        }
+      }
+    }
   }
 </script>
 
@@ -67,9 +117,23 @@
   }
 </style>
 
+<svelte:window
+  on:pointerdown|capture={(e) => {
+    if (e.button === 0 && !e.shiftKey && !e.ctrlKey) {
+      deselectAllTracks();
+    }
+  }} />
+
 <div
   bind:this={tracklist}
   class="tracklist"
+  use:commands={(e) => {
+    switch (e.detail) {
+      case 'playlist.track.delete':
+        deleteSelectedTracks();
+        break;
+    }
+  }}
   use:drag={{ button: 1, offset: scrollDelta, invert: true, relative: true }}>
   <SplitPane
     direction="row"
@@ -78,8 +142,12 @@
     bind:splitpos={$ui.trackHeadsWidth}>
     <VStack spacing={1}>
       <VStack spacing={2}>
-        {#each $project.tracks as track}
-          <TrackHead bind:track on:solo={handleSolo} />
+        {#each $project.tracks as track, i (track)}
+          <TrackHead
+            bind:track
+            on:solo={handleSolo}
+            on:pointerdown={(e) => handleTrackClick(e, track, i)}
+            selected={selectedTracks.has(track)} />
           <SplitBar
             bind:position={track.height}
             snaps={[1, 2, 3, 4].map((x) => 64 * x)}
