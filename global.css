@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap");
 
 body {
   margin: 0;
-  font-family: 'Fira Sans', Arial, Helvetica, sans-serif;
+  font-family: "Fira Sans", Arial, Helvetica, sans-serif;
   color: var(--color-foreground-0);
   background: var(--color-background-0);
   overflow: hidden;
@@ -10,7 +10,12 @@ body {
   user-select: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 400;
   margin: 0;
 }
