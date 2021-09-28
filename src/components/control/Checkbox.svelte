@@ -4,16 +4,6 @@
   export let color: string = "var(--color-accent)";
 </script>
 
-<style lang="scss">
-  .checkbox {
-    line-height: 0;
-
-    svg {
-      overflow: visible;
-    }
-  }
-</style>
-
 <label class="checkbox" on:contextmenu on:pointerdown|stopPropagation>
   <input type="checkbox" hidden bind:checked />
   <svg width={size} height={size}>
@@ -23,7 +13,8 @@
       r={size / 2 - 0.5}
       stroke={color}
       stroke-width="1px"
-      fill="none" />
+      fill="none"
+    />
 
     <g transform={`translate(${size / 2} ${size / 2})`}>
       <circle
@@ -32,7 +23,18 @@
         fill={color}
         r={checked ? size / 4 : 0}
         opacity={checked ? 1 : 0}
-        style="transition: r var(--anim-short), opacity var(--anim-short);" />
+        style="transition: r var(--anim-short), opacity var(--anim-short);"
+      />
     </g>
   </svg>
 </label>
+
+<style lang="scss">
+  .checkbox {
+    line-height: 0;
+
+    svg {
+      overflow: visible;
+    }
+  }
+</style>

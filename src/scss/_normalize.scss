@@ -17,7 +17,7 @@
   @include common;
 
   // hide number spinners
-  &[type=number] {
+  &[type="number"] {
     appearance: textfield;
   }
 

@@ -21,6 +21,28 @@
   export let reverse: boolean = false;
 </script>
 
+<div
+  class="stack"
+  class:inline
+  class:reverse
+  class:horizontal={dir === "horizontal"}
+  class:vertical={dir === "vertical"}
+  style={`
+    padding: ${vpad}px ${hpad}px;
+    gap: ${spacing}px;
+    align-items: ${
+      {
+        start: "flex-start",
+        center: "center",
+        end: "flex-end",
+        stretch: "stretch",
+      }[align]
+    };
+  `}
+>
+  <slot />
+</div>
+
 <style lang="scss">
   .stack {
     display: flex;
@@ -46,17 +68,3 @@
     }
   }
 </style>
-
-<div
-  class="stack"
-  class:inline
-  class:reverse
-  class:horizontal={dir === 'horizontal'}
-  class:vertical={dir === 'vertical'}
-  style={`
-    padding: ${vpad}px ${hpad}px;
-    gap: ${spacing}px;
-    align-items: ${{ start: 'flex-start', center: 'center', end: 'flex-end', stretch: 'stretch' }[align]};
-  `}>
-  <slot />
-</div>

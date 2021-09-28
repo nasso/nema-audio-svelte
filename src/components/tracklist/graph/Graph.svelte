@@ -95,6 +95,80 @@
   }
 </script>
 
+<div
+  class="graph-viewport"
+  bind:this={context.viewportElem}
+  on:pointermove={(e) => (pointerPos = { x: e.clientX, y: e.clientY })}
+  on:pointerup={() => (wireSource = null)}
+>
+  <div
+    class="graph-content"
+    style={`
+      transform: translateX(${-xscroll}px);
+    `}
+  >
+    <div class="track-outputs">
+      <VStack spacing={4}>
+        {#each $project.tracks as track}
+          <div class="track" style={`--track-height: ${track.height}px`}>
+            <OutputPort
+              bind:context
+              output={{ node: track, output: 0 }}
+              on:wireout={(e) =>
+                handleWireOut(portCenter(e.detail.portElem), track, 0)}
+            />
+          </div>
+        {/each}
+      </VStack>
+    </div>
+    {#each [...$project.graph.nodes] as node}
+      <Node
+        bind:context
+        bind:node
+        on:wiretake={(e) => {
+          const input = e.detail;
+          const output = node.inputs.get(input);
+          const outputPos = context.nodeMap
+            .get(output.node)
+            ?.get(output.output);
+
+          node = node.disconnectInput(input);
+
+          if (output) {
+            console.log(get(outputPos));
+            handleWireOut(
+              toViewportSpace(get(outputPos)),
+              output.node,
+              output.output
+            );
+            wireEndPos.set(toViewportSpace(pointerPos), { hard: true });
+          }
+        }}
+        on:wireout={(e) =>
+          handleWireOut(portCenter(e.detail.portElem), node, e.detail.output)}
+        on:connect={(e) => {
+          if (wireSource) {
+            const input = e.detail;
+
+            wireSource.node.connect(node, input, wireSource.output);
+            wireSource = null;
+            wireVisible = false;
+
+            // refresh the node
+            node = node;
+          }
+        }}
+      />
+    {/each}
+  </div>
+
+  {#if wireVisible}
+    <svg class="dragged-wire" class:visible={!!wireSource}>
+      <Link source={wireStartPos} target={$wireEndPos} />
+    </svg>
+  {/if}
+</div>
+
 <style lang="scss">
   .graph-viewport {
     position: relative;
@@ -128,67 +202,3 @@
     }
   }
 </style>
-
-<div
-  class="graph-viewport"
-  bind:this={context.viewportElem}
-  on:pointermove={(e) => (pointerPos = { x: e.clientX, y: e.clientY })}
-  on:pointerup={() => (wireSource = null)}>
-  <div
-    class="graph-content"
-    style={`
-      transform: translateX(${-xscroll}px);
-    `}>
-    <div class="track-outputs">
-      <VStack spacing={4}>
-        {#each $project.tracks as track}
-          <div class="track" style={`--track-height: ${track.height}px`}>
-            <OutputPort
-              bind:context
-              output={{ node: track, output: 0 }}
-              on:wireout={(e) => handleWireOut(portCenter(e.detail.portElem), track, 0)} />
-          </div>
-        {/each}
-      </VStack>
-    </div>
-    {#each [...$project.graph.nodes] as node}
-      <Node
-        bind:context
-        bind:node
-        on:wiretake={(e) => {
-          const input = e.detail;
-          const output = node.inputs.get(input);
-          const outputPos = context.nodeMap
-            .get(output.node)
-            ?.get(output.output);
-
-          node = node.disconnectInput(input);
-
-          if (output) {
-            console.log(get(outputPos));
-            handleWireOut(toViewportSpace(get(outputPos)), output.node, output.output);
-            wireEndPos.set(toViewportSpace(pointerPos), { hard: true });
-          }
-        }}
-        on:wireout={(e) => handleWireOut(portCenter(e.detail.portElem), node, e.detail.output)}
-        on:connect={(e) => {
-          if (wireSource) {
-            const input = e.detail;
-
-            wireSource.node.connect(node, input, wireSource.output);
-            wireSource = null;
-            wireVisible = false;
-
-            // refresh the node
-            node = node;
-          }
-        }} />
-    {/each}
-  </div>
-
-  {#if wireVisible}
-    <svg class="dragged-wire" class:visible={!!wireSource}>
-      <Link source={wireStartPos} target={$wireEndPos} />
-    </svg>
-  {/if}
-</div>

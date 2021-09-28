@@ -184,6 +184,53 @@
   }
 </script>
 
+<div
+  class="track"
+  class:disabled={!track.enabled}
+  on:pointerenter
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
+  on:drop={handleDrop}
+  style={`
+    height: ${track.height}px;
+    --xscroll: ${viewRegion[0] * secWidth}px;
+    --snap-width: ${snap * secWidth}px;
+    --bar-width: ${$project.barsToTime(1) * secWidth}px;
+    --beat-width: ${$project.beatsToTime(1) * secWidth}px;
+  `}
+>
+  <canvas
+    class="grid"
+    bind:this={backgroundCanvas}
+    bind:clientWidth={backgroundWidth}
+    bind:clientHeight={backgroundHeight}
+  />
+  <div class="clips">
+    {#each track.clips as clip (clip)}
+      <ClipComponent
+        bind:clip
+        selected={selectedClips.has(clip)}
+        {secWidth}
+        {snap}
+        {viewRegion}
+        on:pointerdown={(e) => dispatch("pointerdownclip", { clip, e })}
+      />
+    {/each}
+  </div>
+
+  <div class="ghost-clip">
+    {#if ghostClip}
+      <ClipComponent
+        bind:clip={ghostClip}
+        {secWidth}
+        {snap}
+        {viewRegion}
+        on:cliptake
+      />
+    {/if}
+  </div>
+</div>
+
 <style lang="scss">
   .track {
     border-radius: var(--corner-radius);
@@ -226,46 +273,3 @@
     }
   }
 </style>
-
-<div
-  class="track"
-  class:disabled={!track.enabled}
-  on:pointerenter
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
-  on:drop={handleDrop}
-  style={`
-    height: ${track.height}px;
-    --xscroll: ${viewRegion[0] * secWidth}px;
-    --snap-width: ${snap * secWidth}px;
-    --bar-width: ${$project.barsToTime(1) * secWidth}px;
-    --beat-width: ${$project.beatsToTime(1) * secWidth}px;
-  `}>
-  <canvas
-    class="grid"
-    bind:this={backgroundCanvas}
-    bind:clientWidth={backgroundWidth}
-    bind:clientHeight={backgroundHeight} />
-  <div class="clips">
-    {#each track.clips as clip (clip)}
-      <ClipComponent
-        bind:clip
-        selected={selectedClips.has(clip)}
-        {secWidth}
-        {snap}
-        {viewRegion}
-        on:pointerdown={(e) => dispatch('pointerdownclip', { clip, e })} />
-    {/each}
-  </div>
-
-  <div class="ghost-clip">
-    {#if ghostClip}
-      <ClipComponent
-        bind:clip={ghostClip}
-        {secWidth}
-        {snap}
-        {viewRegion}
-        on:cliptake />
-    {/if}
-  </div>
-</div>

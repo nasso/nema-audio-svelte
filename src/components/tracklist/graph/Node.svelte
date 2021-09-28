@@ -37,6 +37,75 @@
   $: updateNodePos($dragOffset);
 </script>
 
+<section
+  class="module"
+  class:disabled={!node.enabled}
+  style={`
+    transform: translate(${node.x}px, ${node.y}px);
+  `}
+>
+  <div class="inputs">
+    <VStack spacing={8}>
+      {#each { length: node.mod.inputs } as _, input}
+        <InputPort
+          bind:context
+          link={node.inputs.get(input)}
+          on:wiretake={() => dispatch("wiretake", input)}
+          on:connect={() => dispatch("connect", input)}
+        />
+      {/each}
+    </VStack>
+  </div>
+
+  <div class="outputs">
+    <VStack spacing={8}>
+      {#each { length: node.mod.outputs } as _, output}
+        <OutputPort
+          bind:context
+          output={{ node, output }}
+          on:wireout={(e) =>
+            dispatch("wireout", {
+              output,
+              portElem: e.detail.portElem,
+            })}
+        />
+      {/each}
+    </VStack>
+  </div>
+
+  <VStack>
+    <header use:drag={{ button: 0, offset: dragOffset }}>
+      <HStack hpad={4} vpad={2} spacing={8} align="center">
+        <HStack hpad={4} vpad={2} spacing={8} align="center">
+          <Checkbox bind:checked={node.enabled} size={8} />
+          <h2>{node.mod.name}</h2>
+        </HStack>
+        <FlexSpace />
+        <Icon name="arrow/chevron_down" color="var(--color-foreground-2)" />
+      </HStack>
+    </header>
+    <div class="parameters">
+      <HStack hpad={8} spacing={16} align="end">
+        {#each node.mod.parameters as param}
+          <div class="parameter">
+            <VStack align="center" spacing={2} vpad={4}>
+              <Knob
+                id={`${node.id}-${param.name}`}
+                bind:value={param.value}
+                type={param.type}
+                min={param.min}
+                max={param.max}
+                disabled={!node.enabled}
+              />
+              <label for={`${node.id}-${param.name}`}>{param.name}</label>
+            </VStack>
+          </div>
+        {/each}
+      </HStack>
+    </div>
+  </VStack>
+</section>
+
 <style lang="scss">
   .module {
     display: grid;
@@ -86,67 +155,3 @@
     }
   }
 </style>
-
-<section
-  class="module"
-  class:disabled={!node.enabled}
-  style={`
-    transform: translate(${node.x}px, ${node.y}px);
-  `}>
-  <div class="inputs">
-    <VStack spacing={8}>
-      {#each { length: node.mod.inputs } as _, input}
-        <InputPort
-          bind:context
-          link={node.inputs.get(input)}
-          on:wiretake={() => dispatch('wiretake', input)}
-          on:connect={() => dispatch('connect', input)} />
-      {/each}
-    </VStack>
-  </div>
-
-  <div class="outputs">
-    <VStack spacing={8}>
-      {#each { length: node.mod.outputs } as _, output}
-        <OutputPort
-          bind:context
-          output={{ node, output }}
-          on:wireout={(e) => dispatch('wireout', {
-              output,
-              portElem: e.detail.portElem,
-            })} />
-      {/each}
-    </VStack>
-  </div>
-
-  <VStack>
-    <header use:drag={{ button: 0, offset: dragOffset }}>
-      <HStack hpad={4} vpad={2} spacing={8} align="center">
-        <HStack hpad={4} vpad={2} spacing={8} align="center">
-          <Checkbox bind:checked={node.enabled} size={8} />
-          <h2>{node.mod.name}</h2>
-        </HStack>
-        <FlexSpace />
-        <Icon name="arrow/chevron_down" color="var(--color-foreground-2)" />
-      </HStack>
-    </header>
-    <div class="parameters">
-      <HStack hpad={8} spacing={16} align="end">
-        {#each node.mod.parameters as param}
-          <div class="parameter">
-            <VStack align="center" spacing={2} vpad={4}>
-              <Knob
-                id={`${node.id}-${param.name}`}
-                bind:value={param.value}
-                type={param.type}
-                min={param.min}
-                max={param.max}
-                disabled={!node.enabled} />
-              <label for={`${node.id}-${param.name}`}>{param.name}</label>
-            </VStack>
-          </div>
-        {/each}
-      </HStack>
-    </div>
-  </VStack>
-</section>

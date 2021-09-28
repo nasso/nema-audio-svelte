@@ -32,14 +32,14 @@
   $: path = getIconPath(name);
 </script>
 
-<style lang="scss">
-  path {
-    transition: fill var(--anim-short);
-  }
-</style>
-
 <svg width={size} height={size} viewBox="0 0 24 24">
   {#await path then path}
     <path d={path} fill={color} />
   {/await}
 </svg>
+
+<style lang="scss">
+  path {
+    transition: fill var(--anim-short);
+  }
+</style>

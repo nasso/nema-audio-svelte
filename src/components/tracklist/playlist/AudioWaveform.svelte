@@ -116,20 +116,6 @@
   }
 </script>
 
-<style lang="scss">
-  .audio-waveform {
-    width: 100%;
-    height: 100%;
-
-    svg {
-      overflow: visible;
-
-      width: 100%;
-      height: 100%;
-    }
-  }
-</style>
-
 <div class="audio-waveform" bind:clientWidth={width}>
   <svg preserveAspectRatio="none" viewBox={`0 0 ${renderWidth} 2`}>
     <path
@@ -138,7 +124,8 @@
       vector-effect="non-scaling-stroke"
       stroke="currentColor"
       stroke-width={lineWidth}
-      d={path} />
+      d={path}
+    />
 
     {#if decodedBuffer && debugRange}
       <path
@@ -159,7 +146,22 @@
           `}
         fill="none"
         stroke="var(--color-background-0)"
-        stroke-width="2" />
+        stroke-width="2"
+      />
     {/if}
   </svg>
 </div>
+
+<style lang="scss">
+  .audio-waveform {
+    width: 100%;
+    height: 100%;
+
+    svg {
+      overflow: visible;
+
+      width: 100%;
+      height: 100%;
+    }
+  }
+</style>

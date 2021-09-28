@@ -10,6 +10,27 @@
   export let snapdist: undefined | number = undefined;
 </script>
 
+<div
+  class:vertical={direction === "column"}
+  class:horizontal={direction === "row"}
+  class:reverse
+  class="split-pane"
+  style={`--split-pos: ${splitpos}px`}
+>
+  <slot />
+  <div class="splitter">
+    <SplitBar
+      bind:position={splitpos}
+      {direction}
+      {reverse}
+      {min}
+      {max}
+      {snaps}
+      {snapdist}
+    />
+  </div>
+</div>
+
 <style lang="scss">
   .split-pane {
     display: inline-grid;
@@ -60,22 +81,3 @@
     }
   }
 </style>
-
-<div
-  class:vertical={direction === 'column'}
-  class:horizontal={direction === 'row'}
-  class:reverse
-  class="split-pane"
-  style={`--split-pos: ${splitpos}px`}>
-  <slot />
-  <div class="splitter">
-    <SplitBar
-      bind:position={splitpos}
-      {direction}
-      {reverse}
-      {min}
-      {max}
-      {snaps}
-      {snapdist} />
-  </div>
-</div>

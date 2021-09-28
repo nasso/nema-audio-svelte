@@ -58,6 +58,32 @@
   });
 </script>
 
+<div
+  on:pointerup={(e) => e.button === 0 && dispatch("connect")}
+  on:pointerdown={(e) => e.button === 0 && dispatch("wiretake")}
+  bind:this={elem}
+  class="graph-port"
+  style={`
+    color: ${color};
+  `}
+>
+  <svg width={size} height={size}>
+    <circle
+      class="port-dot"
+      style="r: var(--dot-size)"
+      cx={size / 2}
+      cy={size / 2}
+      fill="currentColor"
+    />
+  </svg>
+
+  {#if linkTarget}
+    <svg class="link">
+      <Link source={{ x: 0, y: 0 }} target={linkTarget} />
+    </svg>
+  {/if}
+</div>
+
 <style lang="scss">
   .graph-port {
     padding: 4px;
@@ -83,27 +109,3 @@
     }
   }
 </style>
-
-<div
-  on:pointerup={(e) => e.button === 0 && dispatch('connect')}
-  on:pointerdown={(e) => e.button === 0 && dispatch('wiretake')}
-  bind:this={elem}
-  class="graph-port"
-  style={`
-    color: ${color};
-  `}>
-  <svg width={size} height={size}>
-    <circle
-      class="port-dot"
-      style="r: var(--dot-size)"
-      cx={size / 2}
-      cy={size / 2}
-      fill="currentColor" />
-  </svg>
-
-  {#if linkTarget}
-    <svg class="link">
-      <Link source={{ x: 0, y: 0 }} target={linkTarget} />
-    </svg>
-  {/if}
-</div>

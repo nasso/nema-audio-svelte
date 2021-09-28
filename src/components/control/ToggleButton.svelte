@@ -12,6 +12,6 @@
   }
 </script>
 
-<Button on:click={handleClick} pressed={selected ? 'true' : 'false'}>
+<Button on:click={handleClick} pressed={selected ? "true" : "false"}>
   <Icon name={icon} color={iconColor} />
 </Button>

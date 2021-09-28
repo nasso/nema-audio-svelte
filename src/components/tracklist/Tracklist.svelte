@@ -104,42 +104,32 @@
   }
 </script>
 
-<style lang="scss">
-  .tracklist {
-    display: grid;
-    overflow: hidden;
-    overflow-y: scroll;
-
-    .content {
-      flex-grow: 1;
-      display: grid;
-    }
-  }
-</style>
-
 <svelte:window
   on:pointerdown|capture={(e) => {
     if (e.button === 0 && !e.shiftKey && !e.ctrlKey) {
       deselectAllTracks();
     }
-  }} />
+  }}
+/>
 
 <div
   bind:this={tracklist}
   class="tracklist"
   use:commands={(e) => {
     switch (e.detail) {
-      case 'playlist.track.delete':
+      case "playlist.track.delete":
         deleteSelectedTracks();
         break;
     }
   }}
-  use:drag={{ button: 1, offset: scrollDelta, invert: true, relative: true }}>
+  use:drag={{ button: 1, offset: scrollDelta, invert: true, relative: true }}
+>
   <SplitPane
     direction="row"
     min={150}
     snaps={[150, 200, 250]}
-    bind:splitpos={$ui.trackHeadsWidth}>
+    bind:splitpos={$ui.trackHeadsWidth}
+  >
     <VStack spacing={1}>
       <VStack spacing={2}>
         {#each $project.tracks as track, i (track)}
@@ -147,11 +137,13 @@
             bind:track
             on:solo={handleSolo}
             on:pointerdown={(e) => handleTrackClick(e, track, i)}
-            selected={selectedTracks.has(track)} />
+            selected={selectedTracks.has(track)}
+          />
           <SplitBar
             bind:position={track.height}
             snaps={[1, 2, 3, 4].map((x) => 64 * x)}
-            min={64} />
+            min={64}
+          />
         {/each}
       </VStack>
       <FlexSpace />
@@ -166,3 +158,16 @@
     </div>
   </SplitPane>
 </div>
+
+<style lang="scss">
+  .tracklist {
+    display: grid;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    .content {
+      flex-grow: 1;
+      display: grid;
+    }
+  }
+</style>

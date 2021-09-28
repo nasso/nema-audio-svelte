@@ -23,6 +23,43 @@
   }
 </script>
 
+<article
+  class="track-head"
+  class:selected
+  class:disabled={!track.enabled}
+  on:pointerdown
+  style={`--track-height: ${track.height}px`}
+>
+  <HStack align="center">
+    <HStack hpad={16} vpad={8} spacing={8} align="center">
+      <Checkbox
+        size={10}
+        bind:checked={track.enabled}
+        on:contextmenu={handleMuteContextMenu}
+      />
+      <VStack>
+        <h2>{track.name}</h2>
+        {#if track.description}
+          <h3>{track.description}</h3>
+        {/if}
+      </VStack>
+    </HStack>
+    <div class="knobs">
+      <VStack spacing={8} hpad={8}>
+        {#each track.mod.parameters as param}
+          <Knob
+            type={param.type}
+            min={param.min}
+            max={param.max}
+            bind:value={param.value}
+            disabled={!track.enabled}
+          />
+        {/each}
+      </VStack>
+    </div>
+  </HStack>
+</article>
+
 <style lang="scss">
   .track-head {
     display: grid;
@@ -93,37 +130,3 @@
     }
   }
 </style>
-
-<article
-  class="track-head"
-  class:selected
-  class:disabled={!track.enabled}
-  on:pointerdown
-  style={`--track-height: ${track.height}px`}>
-  <HStack align="center">
-    <HStack hpad={16} vpad={8} spacing={8} align="center">
-      <Checkbox
-        size={10}
-        bind:checked={track.enabled}
-        on:contextmenu={handleMuteContextMenu} />
-      <VStack>
-        <h2>{track.name}</h2>
-        {#if track.description}
-          <h3>{track.description}</h3>
-        {/if}
-      </VStack>
-    </HStack>
-    <div class="knobs">
-      <VStack spacing={8} hpad={8}>
-        {#each track.mod.parameters as param}
-          <Knob
-            type={param.type}
-            min={param.min}
-            max={param.max}
-            bind:value={param.value}
-            disabled={!track.enabled} />
-        {/each}
-      </VStack>
-    </div>
-  </HStack>
-</article>

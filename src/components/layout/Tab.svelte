@@ -5,6 +5,10 @@
   export let selected: boolean = false;
 </script>
 
+<button class:selected role="tab" tabindex={selected ? 0 : -1} on:click>
+  <Icon name={icon} />
+</button>
+
 <style lang="scss">
   @use '@app/scss/normalize';
 
@@ -35,7 +39,3 @@
     }
   }
 </style>
-
-<button class:selected role="tab" tabindex={selected ? 0 : -1} on:click>
-  <Icon name={icon} />
-</button>

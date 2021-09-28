@@ -14,6 +14,10 @@
   }
 </script>
 
+<button class="new-track-head" on:click={handleClick}>
+  <Icon name="edit/plus" />
+</button>
+
 <style lang="scss">
   @use '@app/scss/normalize';
 
@@ -47,7 +51,3 @@
     }
   }
 </style>
-
-<button class="new-track-head" on:click={handleClick}>
-  <Icon name="edit/plus" />
-</button>

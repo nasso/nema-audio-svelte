@@ -12,6 +12,36 @@
   let releasedSpacebar = true;
 </script>
 
+<svelte:window
+  on:keydown={(e) => {
+    if (e.key === " " && releasedSpacebar) {
+      releasedSpacebar = false;
+
+      $player = $player.toggle($project);
+    }
+  }}
+  on:keyup={(e) => {
+    if (e.key === " ") {
+      releasedSpacebar = true;
+    }
+  }}
+/>
+
+<main>
+  <Toolbar />
+  <SplitPane bind:splitpos={$ui.bottomPaneHeight} reverse snaps={paneSnaps}>
+    <SplitPane
+      bind:splitpos={$ui.sidePaneWidth}
+      direction="row"
+      snaps={paneSnaps}
+    >
+      <Pane />
+      <Tracklist />
+    </SplitPane>
+    <Pane />
+  </SplitPane>
+</main>
+
 <style lang="scss">
   main {
     position: relative;
@@ -36,31 +66,3 @@
     }
   }
 </style>
-
-<svelte:window
-  on:keydown={(e) => {
-    if (e.key === ' ' && releasedSpacebar) {
-      releasedSpacebar = false;
-
-      $player = $player.toggle($project);
-    }
-  }}
-  on:keyup={(e) => {
-    if (e.key === ' ') {
-      releasedSpacebar = true;
-    }
-  }} />
-
-<main>
-  <Toolbar />
-  <SplitPane bind:splitpos={$ui.bottomPaneHeight} reverse snaps={paneSnaps}>
-    <SplitPane
-      bind:splitpos={$ui.sidePaneWidth}
-      direction="row"
-      snaps={paneSnaps}>
-      <Pane />
-      <Tracklist />
-    </SplitPane>
-    <Pane />
-  </SplitPane>
-</main>

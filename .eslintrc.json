@@ -3,24 +3,16 @@
     "browser": true,
     "es2021": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "svelte3"
-  ],
+  "plugins": ["@typescript-eslint", "svelte3"],
   "overrides": [
     {
-      "files": [
-        "*.svelte"
-      ],
+      "files": ["*.svelte"],
       "processor": "svelte3/svelte3"
     }
   ],
@@ -31,37 +23,13 @@
     "brace-style": "error",
     "max-len": "warn",
     "prefer-destructuring": "warn",
-    "function-paren-newline": [
-      "error",
-      "multiline-arguments"
-    ],
-    "indent": [
-      "error",
-      2
-    ],
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
-    "quotes": [
-      "error",
-      "double"
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "comma-dangle": [
-      "error",
-      "always-multiline"
-    ],
-    "array-bracket-newline": [
-      "error",
-      "consistent"
-    ],
-    "dot-location": [
-      "error",
-      "property"
-    ]
+    "function-paren-newline": ["error", "multiline-arguments"],
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "array-bracket-newline": ["error", "consistent"],
+    "dot-location": ["error", "property"]
   }
 }

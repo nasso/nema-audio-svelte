@@ -125,28 +125,6 @@
   }
 </script>
 
-<style lang="scss">
-  .playlist {
-    position: relative;
-
-    overflow: hidden;
-
-    .cursor {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 1px;
-
-      background: var(--color-accent);
-
-      opacity: 0.5;
-
-      transform: translateX(var(--x));
-    }
-  }
-</style>
-
 <svelte:window
   on:keydown={handleGlobalKeyDown}
   on:keyup={handleGlobalKeyUp}
@@ -162,7 +140,8 @@
     }
 
     movedClip = null;
-  }} />
+  }}
+/>
 
 <div
   class="playlist"
@@ -171,7 +150,7 @@
   on:wheel={handleWheel}
   use:commands={(e) => {
     switch (e.detail) {
-      case 'playlist.clip.delete':
+      case "playlist.clip.delete":
         for (const track of $project.tracks) {
           track.clips = track.clips.filter((clip) => !selectedClips.has(clip));
         }
@@ -179,7 +158,7 @@
         selectedClips.clear();
         selectedClips = selectedClips;
         break;
-      case 'playlist.clip.duplicate':
+      case "playlist.clip.duplicate":
         for (const track of $project.tracks) {
           const duplicatedClips = track.clips.filter((clip) =>
             selectedClips.has(clip)
@@ -217,7 +196,8 @@
 
       $project.tracks = $project.tracks;
     }
-  }}>
+  }}
+>
   <VStack spacing={4}>
     {#each $project.tracks as track}
       <PlaylistTrack
@@ -228,7 +208,9 @@
         {selectedClips}
         on:pointerenter={() => {
           if (movedClip && track.mod.canPlay(movedClip.clip)) {
-            movedClip.track.clips = movedClip.track.clips.filter((clip) => clip !== movedClip.clip);
+            movedClip.track.clips = movedClip.track.clips.filter(
+              (clip) => clip !== movedClip.clip
+            );
             track.clips = [...track.clips, movedClip.clip];
             movedClip.track = track;
           }
@@ -238,10 +220,37 @@
             return;
           }
 
-          movedClip = { clip: e.detail.clip, start: e.detail.clip.start, track };
+          movedClip = {
+            clip: e.detail.clip,
+            start: e.detail.clip.start,
+            track,
+          };
           selectedClips = selectedClips.add(e.detail.clip);
-        }} />
+        }}
+      />
     {/each}
   </VStack>
   <div class="cursor" style={`--x: ${cursorPos}px`} />
 </div>
+
+<style lang="scss">
+  .playlist {
+    position: relative;
+
+    overflow: hidden;
+
+    .cursor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+
+      background: var(--color-accent);
+
+      opacity: 0.5;
+
+      transform: translateX(var(--x));
+    }
+  }
+</style>

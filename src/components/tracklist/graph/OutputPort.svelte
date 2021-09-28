@@ -59,6 +59,40 @@
   }
 </script>
 
+<div
+  on:pointerdown={(e) => {
+    if (e.button !== 0) {
+      return;
+    }
+
+    dispatch("wireout", { portElem: e.currentTarget });
+  }}
+  bind:this={elem}
+  class="output-port"
+  style={`
+    color: ${color};
+  `}
+>
+  <svg width={size} height={size}>
+    <clipPath id="hole-clip">
+      <circle cx="0%" cy="0%" r="50%" />
+    </clipPath>
+
+    <g class="port-group">
+      <circle
+        clip-path="url('#hole-clip')"
+        cx="0%"
+        cy="0%"
+        r="50%"
+        stroke="currentColor"
+        stroke-width="50%"
+        fill="none"
+        class="circle"
+      />
+    </g>
+  </svg>
+</div>
+
 <style lang="scss">
   .output-port {
     line-height: 0;
@@ -85,35 +119,3 @@
     }
   }
 </style>
-
-<div
-  on:pointerdown={(e) => {
-    if (e.button !== 0) {
-      return;
-    }
-
-    dispatch('wireout', { portElem: e.currentTarget });
-  }}
-  bind:this={elem}
-  class="output-port"
-  style={`
-    color: ${color};
-  `}>
-  <svg width={size} height={size}>
-    <clipPath id="hole-clip">
-      <circle cx="0%" cy="0%" r="50%" />
-    </clipPath>
-
-    <g class="port-group">
-      <circle
-        clip-path="url('#hole-clip')"
-        cx="0%"
-        cy="0%"
-        r="50%"
-        stroke="currentColor"
-        stroke-width="50%"
-        fill="none"
-        class="circle" />
-    </g>
-  </svg>
-</div>

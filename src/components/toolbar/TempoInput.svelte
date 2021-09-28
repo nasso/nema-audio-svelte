@@ -84,6 +84,24 @@
   }
 </script>
 
+<div
+  class="tempo-root"
+  on:wheel={handleWheel}
+  on:pointerdown={handlePointerDown}
+>
+  <input
+    {min}
+    {max}
+    type="number"
+    bind:value={fieldValue}
+    {readonly}
+    on:blur={handleBlur}
+    on:dblclick={handleDblClick}
+    on:keydown={handleKeyDown}
+  />
+  <Icon name="arrow/unfold_more" />
+</div>
+
 <style lang="scss">
   @use '@app/scss/normalize';
 
@@ -115,19 +133,3 @@
     }
   }
 </style>
-
-<div
-  class="tempo-root"
-  on:wheel={handleWheel}
-  on:pointerdown={handlePointerDown}>
-  <input
-    {min}
-    {max}
-    type="number"
-    bind:value={fieldValue}
-    {readonly}
-    on:blur={handleBlur}
-    on:dblclick={handleDblClick}
-    on:keydown={handleKeyDown} />
-  <Icon name="arrow/unfold_more" />
-</div>

@@ -54,17 +54,12 @@
   }
 </script>
 
-<style lang="scss">
-  .knob {
-    line-height: 0;
-  }
-</style>
-
 <label
   class="knob"
   style={`
     color: ${disabled ? disabledColor : color};
-  `}>
+  `}
+>
   <input
     type="number"
     hidden
@@ -73,11 +68,13 @@
     {step}
     {disabled}
     min={clamp && min}
-    max={clamp && max} />
+    max={clamp && max}
+  />
   <svg
     width={size}
     height={size}
-    on:pointerdown|stopPropagation={handlePointerDown}>
+    on:pointerdown|stopPropagation={handlePointerDown}
+  >
     <!-- Background -->
     <circle opacity="0.1" cx="50%" cy="50%" r={size / 2} fill="currentColor" />
 
@@ -86,17 +83,22 @@
       stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
-      fill="none">
+      fill="none"
+    >
       <!-- Little line that shows the value -->
       <g
-        transform={`translate(${size / 2} ${size / 2}) rotate(${normalized * 270 - 135})`}>
+        transform={`translate(${size / 2} ${size / 2}) rotate(${
+          normalized * 270 - 135
+        })`}
+      >
         <line
           opacity={neutral ? 0.25 : 1}
           style="transition: opacity var(--anim-short)"
           x1="0"
           y1={4 - size / 2}
           x2="0"
-          y2={6 - size / 2} />
+          y2={6 - size / 2}
+        />
       </g>
 
       <!-- Track -->
@@ -106,7 +108,8 @@
         d={`
           M 0,${1 - size / 2}
           A ${size / 2 - 1} ${size / 2 - 1} 0 1 1 ${1 - size / 2},0
-        `} />
+        `}
+      />
 
       <!-- Value track -->
       <path
@@ -120,7 +123,14 @@
             ${valueArcLarge ? 1 : 0} ${valueArcSide ? 1 : 0}
             ${Math.cos(valueArcEnd) * (1 - size / 2)}
             ${Math.sin(valueArcEnd) * (1 - size / 2)}
-        `} />
+        `}
+      />
     </g>
   </svg>
 </label>
+
+<style lang="scss">
+  .knob {
+    line-height: 0;
+  }
+</style>

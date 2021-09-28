@@ -10,6 +10,45 @@
   import player from "@app/stores/player";
 </script>
 
+<nav>
+  <div class="group left">
+    <div class="subgroup">
+      <Button>
+        <Icon name="basic/stopwatch" />
+      </Button>
+      <TempoInput bind:value={$project.tempo} />
+    </div>
+
+    <Button>
+      <Icon name="misc/dot_05_xl" />
+    </Button>
+  </div>
+
+  <div class="group center">
+    <div class="subgroup">
+      <Button>
+        <Icon name="media/skip_previous" />
+      </Button>
+      <PlayButton />
+      <ToggleButton icon="media/repeat" selected />
+    </div>
+
+    <TabbedControl
+      bind:selected={$ui.tracklistMode}
+      tabs={[
+        { icon: "edit/list_ul", name: TracklistMode.Playlist },
+        { icon: "basic/path", name: TracklistMode.Graph },
+      ]}
+    />
+  </div>
+
+  <div class="group right">
+    <Button>
+      <Icon name="basic/share" />
+    </Button>
+  </div>
+</nav>
+
 <style lang="scss">
   nav {
     flex-shrink: 0;
@@ -47,38 +86,3 @@
     }
   }
 </style>
-
-<nav>
-  <div class="group left">
-    <div class="subgroup">
-      <Button>
-        <Icon name="basic/stopwatch" />
-      </Button>
-      <TempoInput bind:value={$project.tempo} />
-    </div>
-
-    <Button>
-      <Icon name="misc/dot_05_xl" />
-    </Button>
-  </div>
-
-  <div class="group center">
-    <div class="subgroup">
-      <Button>
-        <Icon name="media/skip_previous" />
-      </Button>
-      <PlayButton />
-      <ToggleButton icon="media/repeat" selected />
-    </div>
-
-    <TabbedControl
-      bind:selected={$ui.tracklistMode}
-      tabs={[{ icon: 'edit/list_ul', name: TracklistMode.Playlist }, { icon: 'basic/path', name: TracklistMode.Graph }]} />
-  </div>
-
-  <div class="group right">
-    <Button>
-      <Icon name="basic/share" />
-    </Button>
-  </div>
-</nav>

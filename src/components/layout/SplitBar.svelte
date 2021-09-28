@@ -66,6 +66,16 @@
   }
 </script>
 
+<div class="split-bar">
+  <div
+    class="hotspot"
+    class:horizontal={direction === "row"}
+    class:vertical={direction === "column"}
+    style={`color: ${color}`}
+    on:pointerdown|stopPropagation={handlePointerDown}
+  />
+</div>
+
 <style lang="scss">
   .split-bar {
     display: inline-block;
@@ -127,12 +137,3 @@
     }
   }
 </style>
-
-<div class="split-bar">
-  <div
-    class="hotspot"
-    class:horizontal={direction === 'row'}
-    class:vertical={direction === 'column'}
-    style={`color: ${color}`}
-    on:pointerdown|stopPropagation={handlePointerDown} />
-</div>

@@ -1,3 +1,5 @@
+<div />
+
 <style lang="scss">
   div {
     flex-grow: 1;
@@ -7,5 +9,3 @@
     border-radius: var(--corner-radius);
   }
 </style>
-
-<div />

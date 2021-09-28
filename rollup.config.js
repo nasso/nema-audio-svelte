@@ -17,8 +17,8 @@ const production = !process.env.ROLLUP_WATCH;
 const projectDir = path.resolve(__dirname);
 const srcDir = path.resolve(projectDir, "src");
 
-const scssAliases = aliases => {
-  return url => {
+const scssAliases = (aliases) => {
+  return (url) => {
     for (const [alias, aliasPath] of Object.entries(aliases)) {
       if (url.indexOf(alias) === 0) {
         return {
@@ -40,10 +40,14 @@ function serve() {
   return {
     writeBundle() {
       if (server) return;
-      server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
-        stdio: ["ignore", "inherit", "inherit"],
-        shell: true,
-      });
+      server = require("child_process").spawn(
+        "npm",
+        ["run", "start", "--", "--dev"],
+        {
+          stdio: ["ignore", "inherit", "inherit"],
+          shell: true,
+        }
+      );
 
       process.on("SIGTERM", toExit);
       process.on("exit", toExit);
@@ -61,16 +65,16 @@ export default {
   },
   onwarn(warning, rollupWarn) {
     // Skip certain warnings
-    switch(warning.code) {
-    case "THIS_IS_UNDEFINED":
-      return;
-    case "CIRCULAR_DEPENDENCY":
-      if (["semver"].some(d => warning.importer.includes(d))) {
+    switch (warning.code) {
+      case "THIS_IS_UNDEFINED":
         return;
-      }
+      case "CIRCULAR_DEPENDENCY":
+        if (["semver"].some((d) => warning.importer.includes(d))) {
+          return;
+        }
       // fall through
-    default:
-      rollupWarn(warning);
+      default:
+        rollupWarn(warning);
     }
   },
   plugins: [
@@ -79,7 +83,7 @@ export default {
       dev: !production,
       // we'll extract any component CSS out into
       // a separate file - better for performance
-      css: css => {
+      css: (css) => {
         css.write("bundle.css");
       },
       preprocess: sveltePreprocess({

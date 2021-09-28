@@ -80,6 +80,40 @@
   }
 </script>
 
+<div
+  on:pointerdown
+  class="clip"
+  class:selected
+  style={`
+    --clip-color: ${color};
+    transform: translateX(${Math.round(
+      (clip.start + clip.extentPast) * secWidth
+    )}px);
+  `}
+>
+  <div class="resize-handle" use:resizer={ResizeSide.Start} />
+  <div
+    class="content"
+    style={`width: ${Math.round(Math.max(clip.totalExtent * secWidth, 1))}px`}
+  >
+    <header>
+      <h3>{clip.name}</h3>
+    </header>
+    <div
+      class="data"
+      style={`
+        transform: translateX(${-clip.extentPast * secWidth}px);
+        width: ${clip.length * secWidth}px;
+      `}
+    >
+      {#if clip instanceof AudioClip}
+        <AudioWaveform blob={clip.blob} {visibleRange} />
+      {/if}
+    </div>
+  </div>
+  <div class="resize-handle" use:resizer={ResizeSide.End} />
+</div>
+
 <style lang="scss">
   .clip {
     display: flex;
@@ -95,7 +129,7 @@
     --header-background-color: var(--clip-color);
     --header-foreground-color: var(--color-foreground-0);
     --background-opacity: 0.05;
-    --background-tint: 0.0;
+    --background-tint: 0;
 
     &.selected {
       --background-tint: 0.15;
@@ -204,32 +238,3 @@
     }
   }
 </style>
-
-<div
-  on:pointerdown
-  class="clip"
-  class:selected
-  style={`
-    --clip-color: ${color};
-    transform: translateX(${Math.round((clip.start + clip.extentPast) * secWidth)}px);
-  `}>
-  <div class="resize-handle" use:resizer={ResizeSide.Start} />
-  <div
-    class="content"
-    style={`width: ${Math.round(Math.max(clip.totalExtent * secWidth, 1))}px`}>
-    <header>
-      <h3>{clip.name}</h3>
-    </header>
-    <div
-      class="data"
-      style={`
-        transform: translateX(${-clip.extentPast * secWidth}px);
-        width: ${clip.length * secWidth}px;
-      `}>
-      {#if clip instanceof AudioClip}
-        <AudioWaveform blob={clip.blob} {visibleRange} />
-      {/if}
-    </div>
-  </div>
-  <div class="resize-handle" use:resizer={ResizeSide.End} />
-</div>
