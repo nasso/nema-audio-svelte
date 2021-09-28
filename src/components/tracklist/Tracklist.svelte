@@ -2,7 +2,7 @@
   import type { Track } from "@api/timeline";
 
   import { writable } from "svelte/store";
-  import { tick } from "svelte/internal";
+  import { tick, xlink_attr } from "svelte/internal";
 
   import drag from "@components/actions/drag";
   import project from "@app/stores/project";
@@ -21,10 +21,7 @@
   let tracklist: HTMLElement | null = null;
   let timeline: Timeline | null = null;
   let graph: Graph | null = null;
-  let scrollDelta = writable({
-    x: 0,
-    y: 0,
-  });
+  let scrollDelta = writable({ x: 0, y: 0 });
 
   $: if (tracklist) {
     tracklist.scrollTop += $scrollDelta.y;
@@ -123,6 +120,18 @@
     }
   }}
   use:drag={{ button: 1, offset: scrollDelta, invert: true, relative: true }}
+  on:wheel={async (e) => {
+    e.preventDefault();
+
+    scrollDelta.set({
+      x: e.deltaX,
+      y: e.deltaY,
+    });
+
+    await tick();
+
+    scrollDelta.set({ x: 0, y: 0 });
+  }}
 >
   <SplitPane
     direction="row"
