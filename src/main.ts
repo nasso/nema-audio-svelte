@@ -67,6 +67,9 @@ import App from "./App.svelte";
     project.tracks.push(new AudioTrack());
     project.tracks.push(new AudioTrack());
 
+    project.tracks[1].name = "Longer name";
+    project.tracks[2].name = "Very very very long name";
+
     project.graph.nodes.add(gain);
     project.graph.nodes.add(compressor);
     project.graph.nodes.add(delay);
