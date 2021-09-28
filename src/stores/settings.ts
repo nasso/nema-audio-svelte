@@ -2,7 +2,7 @@ import { persistent } from "@app/utils/persistentStore";
 import { derived } from "svelte/store";
 
 export enum TracklistMode {
-  Playlist = "playlist",
+  Timeline = "timeline",
   Graph = "graph",
 }
 
@@ -18,7 +18,7 @@ export const ui = persistent<UiConfig>("nema-ui", {
   sidePaneWidth: 200,
   bottomPaneHeight: 200,
   trackHeadsWidth: 150,
-  tracklistMode: TracklistMode.Playlist,
+  tracklistMode: TracklistMode.Timeline,
   usePointerLock: false,
 }, { version: "0.1.0" });
 
@@ -39,23 +39,23 @@ export const settings = persistent<Settings>("nema-settings", {
 const defaultShortcuts: Shortcut[] = [
   {
     key: "delete",
-    command: "playlist.clip.delete",
+    command: "timeline.clip.delete",
   },
   {
     key: "delete",
-    command: "playlist.track.delete",
+    command: "timeline.track.delete",
   },
   {
     key: "ctrl+c",
-    command: "playlist.clip.copy",
+    command: "timeline.clip.copy",
   },
   {
     key: "ctrl+v",
-    command: "playlist.clip.paste",
+    command: "timeline.clip.paste",
   },
   {
     key: "ctrl+d",
-    command: "playlist.clip.duplicate",
+    command: "timeline.clip.duplicate",
   },
 ];
 

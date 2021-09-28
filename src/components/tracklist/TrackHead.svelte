@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
 
   import type { Source } from "@api/graph";
-  import type { Track } from "@api/playlist";
+  import type { Track } from "@api/timeline";
 
   import HStack from "@components/layout/HStack.svelte";
   import VStack from "@components/layout/VStack.svelte";

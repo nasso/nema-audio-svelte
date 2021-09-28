@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Clip } from "@api/playlist";
+  import type { Clip } from "@api/timeline";
 
   import { createEventDispatcher, onMount } from "svelte";
-  import { AbstractClip, Track } from "@api/playlist";
+  import { AbstractClip, Track } from "@api/timeline";
   import { AudioClip } from "@api/audio";
   import project from "@app/stores/project";
   import player from "@app/stores/player";

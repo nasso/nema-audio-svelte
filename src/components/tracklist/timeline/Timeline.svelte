@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Source } from "@api/graph";
-  import type { Clip, Track } from "@api/playlist";
+  import type { Clip, Track } from "@api/timeline";
   import type { Point } from "@app/utils/geom";
   import type { Player } from "@api/player";
 
@@ -10,7 +10,7 @@
   import player from "@app/stores/player";
   import commands from "@components/actions/commands";
   import VStack from "@components/layout/VStack.svelte";
-  import PlaylistTrack from "./Track.svelte";
+  import TimelineTrack from "./Track.svelte";
 
   interface MovedClip<C extends Clip> {
     clip: C;
@@ -20,7 +20,7 @@
 
   let selectedClips: Set<Clip> = new Set();
   let cursorPos = 0;
-  let playlistWidth = 300;
+  let timelineWidth = 300;
   let viewRegion: [number, number] = [0, 20];
   let secWidth: number;
   let snap: number;
@@ -61,7 +61,7 @@
   $: animatedViewRegion.set([viewRegion[0], viewRegion[1]]);
 
   $: secWidth =
-    playlistWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
+    timelineWidth / ($animatedViewRegion[1] - $animatedViewRegion[0]);
 
   $: {
     // snap is 1 bar by default
@@ -89,8 +89,8 @@
     cursorPos = ($player.startCursor - $animatedViewRegion[0]) * secWidth;
   }
 
-  function initPlaylistWidth(node: HTMLElement) {
-    playlistWidth = node.getBoundingClientRect().width;
+  function initTimelineWidth(node: HTMLElement) {
+    timelineWidth = node.getBoundingClientRect().width;
   }
 
   function handleWheel(this: HTMLElement, e: WheelEvent) {
@@ -144,13 +144,13 @@
 />
 
 <div
-  class="playlist"
-  use:initPlaylistWidth
-  bind:clientWidth={playlistWidth}
+  class="timeline"
+  use:initTimelineWidth
+  bind:clientWidth={timelineWidth}
   on:wheel={handleWheel}
   use:commands={(e) => {
     switch (e.detail) {
-      case "playlist.clip.delete":
+      case "timeline.clip.delete":
         for (const track of $project.tracks) {
           track.clips = track.clips.filter((clip) => !selectedClips.has(clip));
         }
@@ -158,7 +158,7 @@
         selectedClips.clear();
         selectedClips = selectedClips;
         break;
-      case "playlist.clip.duplicate":
+      case "timeline.clip.duplicate":
         for (const track of $project.tracks) {
           const duplicatedClips = track.clips.filter((clip) =>
             selectedClips.has(clip)
@@ -200,7 +200,7 @@
 >
   <VStack spacing={4}>
     {#each $project.tracks as track}
-      <PlaylistTrack
+      <TimelineTrack
         bind:track
         viewRegion={$animatedViewRegion}
         {secWidth}
@@ -234,7 +234,7 @@
 </div>
 
 <style lang="scss">
-  .playlist {
+  .timeline {
     position: relative;
 
     overflow: hidden;

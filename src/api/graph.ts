@@ -1,5 +1,5 @@
 import type { Player } from "@api/player";
-import type { Clip } from "@api/playlist";
+import type { Clip } from "@api/timeline";
 
 let lastNodeId = 0;
 

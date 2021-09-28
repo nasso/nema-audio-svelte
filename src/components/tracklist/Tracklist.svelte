@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Track } from "@api/playlist";
+  import type { Track } from "@api/timeline";
 
   import { writable } from "svelte/store";
   import { tick } from "svelte/internal";
@@ -13,14 +13,14 @@
   import VStack from "@components/layout/VStack.svelte";
   import NewTrackHead from "./NewTrackHead.svelte";
   import TrackHead from "./TrackHead.svelte";
-  import Playlist from "./playlist/Playlist.svelte";
+  import Timeline from "./timeline/Timeline.svelte";
   import Graph from "./graph/Graph.svelte";
   import commands from "@components/actions/commands";
 
   let selectedTracks = new Set<Track<any>>();
-  let tracklist: HTMLElement;
-  let playlist: Playlist;
-  let graph: Graph;
+  let tracklist: HTMLElement | null = null;
+  let timeline: Timeline | null = null;
+  let graph: Graph | null = null;
   let scrollDelta = writable({
     x: 0,
     y: 0,
@@ -31,8 +31,8 @@
   }
 
   $: switch ($ui.tracklistMode) {
-    case TracklistMode.Playlist:
-      playlist?.scrollBy($scrollDelta.x);
+    case TracklistMode.Timeline:
+      timeline?.scrollBy($scrollDelta.x);
       break;
     case TracklistMode.Graph:
       graph?.scrollBy($scrollDelta.x);
@@ -47,12 +47,12 @@
 
   function selectTrack(track: Track<any>) {
     selectedTracks = selectedTracks.add(track);
-    playlist.selectAllClips(track);
+    timeline?.selectAllClips(track);
   }
 
   function deselectAllTracks() {
     selectedTracks.clear();
-    playlist.deselectAllClips();
+    timeline?.deselectAllClips();
     selectedTracks = selectedTracks;
   }
 
@@ -117,7 +117,7 @@
   class="tracklist"
   use:commands={(e) => {
     switch (e.detail) {
-      case "playlist.track.delete":
+      case "timeline.track.delete":
         deleteSelectedTracks();
         break;
     }
@@ -150,8 +150,8 @@
       <NewTrackHead on:newtrack={handleNewTrack} />
     </VStack>
     <div class="content">
-      {#if $ui.tracklistMode === TracklistMode.Playlist}
-        <Playlist bind:this={playlist} />
+      {#if $ui.tracklistMode === TracklistMode.Timeline}
+        <Timeline bind:this={timeline} />
       {:else if $ui.tracklistMode === TracklistMode.Graph}
         <Graph bind:this={graph} />
       {/if}

@@ -1,4 +1,4 @@
-import type { Track } from "@api/playlist";
+import type { Track } from "@api/timeline";
 import type { Player } from "@api/player";
 import { ProcessingGraph, Source } from "@api/graph";
 

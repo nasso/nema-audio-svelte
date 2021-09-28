@@ -36,7 +36,7 @@
     <TabbedControl
       bind:selected={$ui.tracklistMode}
       tabs={[
-        { icon: "edit/list_ul", name: TracklistMode.Playlist },
+        { icon: "edit/list_ul", name: TracklistMode.Timeline },
         { icon: "basic/path", name: TracklistMode.Graph },
       ]}
     />

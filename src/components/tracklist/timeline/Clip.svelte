@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Clip } from "@api/playlist";
+  import type { Clip } from "@api/timeline";
   import { AudioClip } from "@api/audio";
   import AudioWaveform from "./AudioWaveform.svelte";
   import project from "@app/stores/project";

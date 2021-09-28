@@ -1,6 +1,6 @@
 import type { Player } from "@api/player";
 import type { Project } from "@api/project";
-import { Clip, Track } from "@api/playlist";
+import { Clip, Track } from "@api/timeline";
 import {
   ParameterAccuracy,
   ParameterType,

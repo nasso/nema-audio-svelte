@@ -101,12 +101,7 @@
   on:pointermove={(e) => (pointerPos = { x: e.clientX, y: e.clientY })}
   on:pointerup={() => (wireSource = null)}
 >
-  <div
-    class="graph-content"
-    style={`
-      transform: translateX(${-xscroll}px);
-    `}
-  >
+  <div class="graph-content" style={`transform: translateX(${-xscroll}px);`}>
     <div class="track-outputs">
       <VStack spacing={4}>
         {#each $project.tracks as track}
@@ -135,7 +130,6 @@
           node = node.disconnectInput(input);
 
           if (output) {
-            console.log(get(outputPos));
             handleWireOut(
               toViewportSpace(get(outputPos)),
               output.node,
