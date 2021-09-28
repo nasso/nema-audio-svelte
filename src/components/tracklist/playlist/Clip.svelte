@@ -91,13 +91,33 @@
 
     color: var(--color-foreground-0);
 
-    --header-background-opacity: 0.7;
+    --header-background-opacity: 0.6;
     --header-background-color: var(--clip-color);
     --header-foreground-color: var(--color-foreground-0);
     --background-opacity: 0.05;
+    --background-tint: 0.0;
 
     &.selected {
-      --background-opacity: 0.2;
+      --background-tint: 0.15;
+      --header-background-opacity: 0.8;
+    }
+
+    &::before {
+      content: "";
+
+      display: inline-block;
+      border-radius: var(--corner-radius);
+
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      background-color: var(--color-accent);
+      opacity: var(--background-tint);
+
+      transition: opacity var(--anim-short);
     }
 
     .content {
@@ -126,6 +146,8 @@
 
           background: var(--header-background-color);
           opacity: var(--header-background-opacity);
+
+          transition: opacity var(--anim-short);
         }
 
         h3 {
@@ -191,7 +213,7 @@
     --clip-color: ${color};
     transform: translateX(${Math.round((clip.start + clip.extentPast) * secWidth)}px);
   `}>
-  <div class="resize-handle" use:resizer={'start'} />
+  <div class="resize-handle" use:resizer={ResizeSide.Start} />
   <div
     class="content"
     style={`width: ${Math.round(Math.max(clip.totalExtent * secWidth, 1))}px`}>
@@ -209,5 +231,5 @@
       {/if}
     </div>
   </div>
-  <div class="resize-handle" use:resizer={'end'} />
+  <div class="resize-handle" use:resizer={ResizeSide.End} />
 </div>
