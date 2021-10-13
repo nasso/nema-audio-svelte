@@ -1,4 +1,6 @@
-<div />
+<div>
+  <slot />
+</div>
 
 <style lang="scss">
   div {

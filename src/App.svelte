@@ -6,6 +6,7 @@
   import Tracklist from "@components/tracklist/Tracklist.svelte";
   import player from "./stores/player";
   import project from "./stores/project";
+  import Browser from "@components/browser/Browser.svelte";
 
   const paneSnaps = [200];
 
@@ -35,7 +36,7 @@
       direction="row"
       snaps={paneSnaps}
     >
-      <Pane />
+      <Browser />
       <Tracklist />
     </SplitPane>
     <Pane />
