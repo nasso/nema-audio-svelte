@@ -23,6 +23,7 @@
   import Node from "./Node.svelte";
   import OutputPort from "./OutputPort.svelte";
   import { rectCenter } from "@app/utils/geom";
+  import commands from "@components/actions/commands";
 
   export function scrollBy(xdelta: number) {
     xscroll = Math.max(0, xscroll + xdelta);
@@ -93,10 +94,52 @@
     // forcefully set the end position to the source pos
     wireEndPos.set(wireSource.pos, { hard: true });
   }
+
+  let selectedNodes = new Set<GraphNode<any>>();
+
+  function deselectAllNodes() {
+    selectedNodes.clear();
+    selectedNodes = selectedNodes;
+  }
+
+  function deleteSelectedNodes() {
+    selectedNodes.forEach((node) => {
+      project.update((p) => {
+        p.graph.deleteNode(node);
+        return p;
+      });
+    });
+    selectedNodes.clear();
+  }
+
+  function handleNodeClick(e: PointerEvent, node: GraphNode<any>) {
+    if (e.button === 0) {
+      if (!e.shiftKey) {
+        deselectAllNodes();
+      }
+
+      selectedNodes = selectedNodes.add(node);
+    }
+  }
 </script>
+
+<svelte:window
+  on:pointerdown|capture={(e) => {
+    if (e.button === 0 && !e.shiftKey && !e.ctrlKey) {
+      deselectAllNodes();
+    }
+  }}
+/>
 
 <div
   class="graph-viewport"
+  use:commands={(e) => {
+    switch (e.detail) {
+      case "graph.node.delete":
+        deleteSelectedNodes();
+        break;
+    }
+  }}
   bind:this={context.viewportElem}
   on:pointermove={(e) => (pointerPos = { x: e.clientX, y: e.clientY })}
   on:pointerup={() => (wireSource = null)}
@@ -120,6 +163,8 @@
       <Node
         bind:context
         bind:node
+        selected={selectedNodes.has(node)}
+        on:pointerdown={(e) => handleNodeClick(e, node)}
         on:wiretake={(e) => {
           const input = e.detail;
           const output = node.inputs.get(input);

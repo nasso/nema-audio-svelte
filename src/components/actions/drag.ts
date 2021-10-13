@@ -13,6 +13,7 @@ export interface DragOptions {
   capture?: boolean;
   element?: Element;
   relative?: boolean;
+  stopPropagation?: boolean;
   offset: Settable<Point>;
 }
 
@@ -32,7 +33,9 @@ export default function drag(
       return;
     }
 
-    e.stopImmediatePropagation();
+    if (options.stopPropagation !== false) {
+      e.stopImmediatePropagation();
+    }
     e.preventDefault();
 
     const pointerStart: Point = { x: e.clientX, y: e.clientY };

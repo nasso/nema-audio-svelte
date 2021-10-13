@@ -17,6 +17,7 @@
 
   export let context: ViewportContext;
   export let node: GraphNode<Effect>;
+  export let selected = false;
 
   const dispatch = createEventDispatcher();
 
@@ -40,9 +41,9 @@
 <section
   class="module"
   class:disabled={!node.enabled}
-  style={`
-    transform: translate(${node.x}px, ${node.y}px);
-  `}
+  class:selected
+  on:pointerdown
+  style={`transform: translate(${node.x}px, ${node.y}px);`}
 >
   <div class="inputs">
     <VStack spacing={8}>
@@ -74,7 +75,9 @@
   </div>
 
   <VStack>
-    <header use:drag={{ button: 0, offset: dragOffset }}>
+    <header
+      use:drag={{ button: 0, offset: dragOffset, stopPropagation: false }}
+    >
       <HStack hpad={4} vpad={2} spacing={8} align="center">
         <HStack hpad={4} vpad={2} spacing={8} align="center">
           <Checkbox bind:checked={node.enabled} size={8} />
@@ -114,6 +117,8 @@
     background: var(--color-background-1);
     border-radius: var(--corner-radius);
 
+    transition: background-color var(--anim-short);
+
     h2 {
       font-size: 12px;
       transition: opacity var(--anim-short);
@@ -150,6 +155,34 @@
 
     &.disabled {
       h2 {
+        opacity: 0.5;
+      }
+    }
+
+    &::before {
+      pointer-events: none;
+
+      content: "";
+
+      display: inline-block;
+      border-radius: var(--corner-radius);
+
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      opacity: 0.2;
+
+      transition: opacity var(--anim-short), border var(--anim-short);
+    }
+
+    &.selected {
+      background: var(--color-background-2);
+
+      &::before {
+        border: 1px solid var(--color-foreground-2);
         opacity: 0.5;
       }
     }

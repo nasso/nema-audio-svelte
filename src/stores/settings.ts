@@ -46,6 +46,10 @@ const defaultShortcuts: Shortcut[] = [
     command: "timeline.track.delete",
   },
   {
+    key: "delete",
+    command: "graph.node.delete",
+  },
+  {
     key: "ctrl+c",
     command: "timeline.clip.copy",
   },

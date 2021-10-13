@@ -125,4 +125,19 @@ export class GraphNode<T extends Effect> {
 
 export class ProcessingGraph {
   nodes: Set<GraphNode<Effect>> = new Set([]);
+
+  deleteNode(node: GraphNode<Effect>): this {
+    this.nodes.delete(node);
+
+    // Disconnect all nodes that were connected to this node
+    this.nodes.forEach((other) => {
+      other.inputs.forEach((output, input) => {
+        if (output.node === node) {
+          other.disconnectInput(input);
+        }
+      });
+    });
+
+    return this;
+  }
 }
